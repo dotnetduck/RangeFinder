@@ -1,0 +1,27 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+        
+        <!-- Package Information -->
+        <PackageId>RangeFinder</PackageId>
+        <Version>0.1.1</Version>
+        <Authors>dotnetduck</Authors>
+        <Copyright>Copyright (c) 2025- dotnetduck@gmail.com</Copyright>
+        <Description>A high-performance .NET range query library for general numeric ranges.</Description>
+        <PackageProjectUrl>https://github.com/dotnetduck/RangeFinder</PackageProjectUrl>
+        <RepositoryUrl>https://github.com/dotnetduck/RangeFinder</RepositoryUrl>
+        <RepositoryType>git</RepositoryType>
+        <PackageLicenseExpression>MIT</PackageLicenseExpression>
+        <PackageReadmeFile>NUGET_README.md</PackageReadmeFile>
+        <PackageTags>range-query;interval-tree;performance;numeric;binary-search</PackageTags>
+        <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+    </PropertyGroup>
+    
+    <ItemGroup>
+        <None Include="NUGET_README.md" Pack="true" PackagePath="\" />
+    </ItemGroup>
+
+</Project>

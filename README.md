@@ -1,0 +1,122 @@
+# RangeFinder
+
+A high-performance .NET range query library for general numeric ranges.
+
+[![.NET](https://img.shields.io/badge/.NET-8.0%20or%20later-blue)](https://dotnet.microsoft.com/download)
+[![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
+[![nuget](https://img.shields.io/badge/nuget-v0.1.1-blue)](https://www.nuget.org/packages/RangeFinder/)
+
+## Features
+
+- **High Performance**: Fast construction, fast query.
+- **Generic Support**: Works with any numeric type using [`INumber<TSelf>`](https://learn.microsoft.com/en-us/dotnet/api/system.numerics.inumber-1) interface
+- **Memory Efficient**: Predictable allocation patterns with low GC pressure (not yet measured)
+- **Compatibility**: RangeTree-compatible [Query APIs](#migration-from-rangetree) for easy migration
+
+## Quick Start
+
+```csharp
+using RangeFinder.Core;
+
+// Create ranges with associated values
+var ranges = new List<NumericRange<double, int>>
+{
+    { new(1.0, 2.2, 100) },
+    { new(2.0, 3.2, 200) },
+    { new(3.0, 4.0, 300) }
+};
+
+// Create a RangeFinder instance
+var rangeFinder = new RangeFinder<double, int>(ranges);
+
+// RangeTree-compatible range query (returns values only)
+var values = rangeFinder.Query(2.0, 2.9);
+foreach (var value in values)
+    Console.WriteLine(value); // Output: 100, 200
+
+// RangeFinder native range query (returns full range objects)
+var overlaps = rangeFinder.QueryRanges(2.0, 3.0);
+foreach (var range in overlaps)
+    Console.WriteLine($"[{range.Start}, {range.End}] = {range.Value}");
+// Output: [1.0, 2.2] = 100, [2.0, 3.2] = 200
+
+// RangeTree-compatible point queries
+var pointQueryValues = rangeFinder.Query(1.9);
+foreach (var value in pointQueryValues)
+    Console.WriteLine($"{value}"); // Output: 100
+
+// RangeFinder native point query (returns full range objects)
+var pointQueryRanges = rangeFinder.QueryRanges(1.9);
+foreach (var range in pointQueryRanges)
+    Console.WriteLine($"[{range.Start}, {range.End}] = {range.Value}");
+// Output: [1.0, 2.2] = 100
+```
+
+## Performance
+
+RangeFinder is designed for high-performance range queries with optimized construction and query algorithms. 
+
+Please refer a detailed performance analysis at
+📊 **[Benchmark](RangeFinder.Benchmark)**
+
+## API Reference
+
+### Core Types
+
+```csharp
+// Basic range with associated value
+var range = new NumericRange<double, int>(1.0, 5.0, 42);
+
+// Range finder for efficient queries
+var finder = new RangeFinder<double, int>(ranges);
+```
+
+### Query Methods
+
+```csharp
+// RangeTree-compatible API (returns values only)
+IEnumerable<TValue> Query(TNumber point)
+IEnumerable<TValue> Query(TNumber from, TNumber to)
+
+// Native API (returns full range objects)
+IEnumerable<NumericRange<TNumber, TValue>> QueryRanges(TNumber point)
+IEnumerable<NumericRange<TNumber, TValue>> QueryRanges(TNumber from, TNumber to)
+```
+
+## Migration from RangeTree
+
+RangeFinder provides query API compatibility for easy migration:
+
+```csharp
+// Before - Dynamic construction
+var tree = new IntervalTree<double, int>();
+tree.Add(1.0, 5.0, 42);
+tree.Add(2.0, 6.0, 100);
+var results = tree.Query(2.0, 4.0);
+
+// After - Upfront construction for performance
+var ranges = new[] { 
+    new NumericRange<double, int>(1.0, 5.0, 42),
+    new NumericRange<double, int>(2.0, 6.0, 100)
+};
+var finder = new RangeFinder<double, int>(ranges);
+var results = finder.Query(2.0, 4.0); // Compatible query API!
+```
+
+**Key Differences:**
+- **Dynamic insertion**: Not supported - requires all ranges during construction
+- **Query API**: Compatible method signatures and behavior
+- **Performance focus**: Optimized for fast construction and queries
+
+## Requirements
+
+- .NET 8.0 or later
+- Supports any `INumber<T>` numeric type (int, double, decimal, etc.)
+
+## License
+
+MIT License - see [LICENSE](LICENSE) for details.
+
+## Contributing
+
+Contributions welcome! Please read our [contributing guidelines](CONTRIBUTING.md) and ensure all tests pass before submitting PRs.
