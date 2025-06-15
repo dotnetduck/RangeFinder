@@ -18,38 +18,22 @@ A high-performance .NET range query library for general numeric ranges.
 ```csharp
 using RangeFinder.Core;
 
-// Create ranges with associated values
 var ranges = new List<NumericRange<double, int>>
 {
-    { new(1.0, 2.2, 100) },
-    { new(2.0, 3.2, 200) },
-    { new(3.0, 4.0, 300) }
+    new(1.0, 2.2, 100),
+    new(2.0, 3.2, 200),
+    new(3.0, 4.0, 300)
 };
 
-// Create a RangeFinder instance
-var rangeFinder = new RangeFinder<double, int>(ranges);
+var finder = new RangeFinder<double, int>(ranges);
 
-// RangeTree-compatible range query (returns values only)
-var values = rangeFinder.Query(2.0, 2.9);
-foreach (var value in values)
-    Console.WriteLine(value); // Output: 100, 200
+// Query overlapping ranges
+var values = finder.Query(2.0, 2.9);         // Returns: 100, 200
+var overlaps = finder.QueryRanges(2.0, 3.0); // Returns: [1.0,2.2]=100, [2.0,3.2]=200
 
-// RangeFinder native range query (returns full range objects)
-var overlaps = rangeFinder.QueryRanges(2.0, 3.0);
-foreach (var range in overlaps)
-    Console.WriteLine($"[{range.Start}, {range.End}] = {range.Value}");
-// Output: [1.0, 2.2] = 100, [2.0, 3.2] = 200
-
-// RangeTree-compatible point queries
-var pointQueryValues = rangeFinder.Query(1.9);
-foreach (var value in pointQueryValues)
-    Console.WriteLine($"{value}"); // Output: 100
-
-// RangeFinder native point query (returns full range objects)
-var pointQueryRanges = rangeFinder.QueryRanges(1.9);
-foreach (var range in pointQueryRanges)
-    Console.WriteLine($"[{range.Start}, {range.End}] = {range.Value}");
-// Output: [1.0, 2.2] = 100
+// Point queries
+var pointValues = finder.Query(1.9);        // Returns: 100
+var pointRanges = finder.QueryRanges(1.9);  // Returns: [1.0,2.2]=100
 ```
 
 ## Performance
@@ -88,19 +72,15 @@ IEnumerable<NumericRange<TNumber, TValue>> QueryRanges(TNumber from, TNumber to)
 RangeFinder provides query API compatibility for easy migration:
 
 ```csharp
-// Before - Dynamic construction
+// Before
 var tree = new IntervalTree<double, int>();
 tree.Add(1.0, 5.0, 42);
-tree.Add(2.0, 6.0, 100);
 var results = tree.Query(2.0, 4.0);
 
-// After - Upfront construction for performance
-var ranges = new[] { 
-    new NumericRange<double, int>(1.0, 5.0, 42),
-    new NumericRange<double, int>(2.0, 6.0, 100)
-};
+// After  
+var ranges = new[] { new NumericRange<double, int>(1.0, 5.0, 42) };
 var finder = new RangeFinder<double, int>(ranges);
-var results = finder.Query(2.0, 4.0); // Compatible query API!
+var results = finder.Query(2.0, 4.0); // Same API!
 ```
 
 **Key Differences:**
