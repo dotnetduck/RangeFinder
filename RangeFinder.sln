@@ -13,6 +13,8 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RangeFinder.Tests", "RangeF
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RangeFinder.Core", "RangeFinder.Core\RangeFinder.Core.csproj", "{D876E2E5-6F44-4F57-8AA9-B6AC3724AD6F}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RangeFinder.RangeTreeCompat", "RangeFinder.RangeTreeCompat\RangeFinder.RangeTreeCompat.csproj", "{3CA60A64-10D0-45D8-BA49-4AB5AB22134E}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -43,6 +45,10 @@ Global
 		{D876E2E5-6F44-4F57-8AA9-B6AC3724AD6F}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D876E2E5-6F44-4F57-8AA9-B6AC3724AD6F}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D876E2E5-6F44-4F57-8AA9-B6AC3724AD6F}.Release|Any CPU.Build.0 = Release|Any CPU
+		{3CA60A64-10D0-45D8-BA49-4AB5AB22134E}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{3CA60A64-10D0-45D8-BA49-4AB5AB22134E}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{3CA60A64-10D0-45D8-BA49-4AB5AB22134E}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{3CA60A64-10D0-45D8-BA49-4AB5AB22134E}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
