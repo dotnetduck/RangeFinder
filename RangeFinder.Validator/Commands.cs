@@ -189,19 +189,43 @@ public class Commands
         
         var testCount = 0;
         
+        var performanceStats = new List<(double ratio, int size)>();
+        
         _intervalTreeTester.RunContinuousTest(result =>
         {
             testCount++;
+            
+            // Collect performance statistics
+            if (result.PerformanceRatio > 0)
+            {
+                performanceStats.Add((result.PerformanceRatio, result.Size));
+            }
             
             if (result.IsCompatible)
             {
                 if (testCount % reportInterval == 0)
                 {
-                    Console.WriteLine($"✅ Test #{testCount}: {result.Characteristic} ({result.Size:N0} ranges) - Compatible");
+                    var perfSummary = "";
+                    if (performanceStats.Any())
+                    {
+                        var avgRatio = performanceStats.Average(x => x.ratio);
+                        perfSummary = $" (avg perf: {avgRatio:F2}x)";
+                    }
+                    Console.WriteLine($"✅ Test #{testCount}: {result.Characteristic} ({result.Size:N0} ranges) - Compatible{perfSummary}");
                 }
                 
                 if (maxTests > 0 && testCount >= maxTests)
                 {
+                    // Print final performance statistics
+                    if (performanceStats.Any())
+                    {
+                        var avgRatio = performanceStats.Average(x => x.ratio);
+                        var minRatio = performanceStats.Min(x => x.ratio);
+                        var maxRatio = performanceStats.Max(x => x.ratio);
+                        Console.WriteLine($"\n📊 Performance Summary over {testCount} tests:");
+                        Console.WriteLine($"   Average ratio: {avgRatio:F2}x (IntervalTree/RangeFinder)");
+                        Console.WriteLine($"   Range: {minRatio:F2}x - {maxRatio:F2}x");
+                    }
                     Console.WriteLine($"\n✅ Completed {testCount} wrapper tests successfully - 100% compatibility maintained");
                     Environment.Exit(0);
                 }

@@ -15,12 +15,24 @@ public class TestResult
     // Correctness validation
     public List<CompatibilityError> CompatibilityErrors { get; set; } = new();
     
+    // Performance comparison
+    public double IntervalTreeQueryTime { get; set; }
+    public double RangeFinderQueryTime { get; set; }
+    
+    public double PerformanceRatio => RangeFinderQueryTime > 0 ? IntervalTreeQueryTime / RangeFinderQueryTime : 0;
+    
     public bool IsCompatible => !CompatibilityErrors.Any();
     
     public void PrintSummary()
     {
         Console.WriteLine($"🔍 Validation Results: {Characteristic} ({Size:N0} ranges, {QueryCount:N0} queries)");
         Console.WriteLine($"   ✅ Compatibility: {(IsCompatible ? "PASS" : $"FAIL ({CompatibilityErrors.Count} errors)")}");
+        
+        // Print performance comparison if timing data is available
+        if (IntervalTreeQueryTime > 0 && RangeFinderQueryTime > 0)
+        {
+            Console.WriteLine($"   ⚡ Performance: IntervalTree {IntervalTreeQueryTime:F3}ms vs RangeFinder {RangeFinderQueryTime:F3}ms (ratio: {PerformanceRatio:F2}x)");
+        }
         
         if (!IsCompatible)
         {

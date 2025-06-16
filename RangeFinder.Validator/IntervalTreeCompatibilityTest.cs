@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using RangeFinder.Core;
 using RangeFinder.Generator;
 using IntervalTree;
@@ -51,7 +52,7 @@ public class IntervalTreeCompatibilityTest
 
         // Test 1: Initial state compatibility
         TotalTests += 2;
-        ValidateQueriesHelper(intervalTree, rangeFinder, queries.Take(5), points.Take(5), errors, "Initial");
+        var (intervalTreeTime1, rangeFinderTime1) = ValidateQueriesHelperWithTiming(intervalTree, rangeFinder, queries.Take(5), points.Take(5), errors, "Initial");
 
         // Test 2: Add operations with dynamic rebuilding
         var newParameters = GetParameters(characteristic, size / 10);
@@ -63,7 +64,7 @@ public class IntervalTreeCompatibilityTest
         rangeFinder = new RangeFinder<double, int>(allRanges);
 
         TotalTests += 2;
-        ValidateQueriesHelper(intervalTree, rangeFinder, queries.Take(5), points.Take(5), errors, "AfterAdd");
+        var (intervalTreeTime2, rangeFinderTime2) = ValidateQueriesHelperWithTiming(intervalTree, rangeFinder, queries.Take(5), points.Take(5), errors, "AfterAdd");
 
         // Test 3: Remove operations
         var rangeListCopy = allRanges.ToList();
@@ -75,9 +76,10 @@ public class IntervalTreeCompatibilityTest
         rangeFinder = new RangeFinder<double, int>(rangeListCopy);
 
         TotalTests += 2;
-        ValidateQueriesHelper(intervalTree, rangeFinder, queries.Take(5), points.Take(5), errors, "AfterRemove");
+        var (intervalTreeTime3, rangeFinderTime3) = ValidateQueriesHelperWithTiming(intervalTree, rangeFinder, queries.Take(5), points.Take(5), errors, "AfterRemove");
 
         // Test 4: Bulk remove operations
+        double intervalTreeTime4 = 0, rangeFinderTime4 = 0;
         if (rangeListCopy.Count > 5)
         {
             var bulkRemove = rangeListCopy.Take(3).Select(r => r.Value).ToList();
@@ -87,7 +89,7 @@ public class IntervalTreeCompatibilityTest
             rangeFinder = new RangeFinder<double, int>(rangeListCopy);
             
             TotalTests += 2;
-            ValidateQueriesHelper(intervalTree, rangeFinder, queries.Take(5), points.Take(5), errors, "AfterBulkRemove");
+            (intervalTreeTime4, rangeFinderTime4) = ValidateQueriesHelperWithTiming(intervalTree, rangeFinder, queries.Take(5), points.Take(5), errors, "AfterBulkRemove");
         }
 
         // Test 5: Clear and rebuild
@@ -99,7 +101,15 @@ public class IntervalTreeCompatibilityTest
         rangeFinder = new RangeFinder<double, int>(clearTestRanges);
         
         TotalTests += 2;
-        ValidateQueriesHelper(intervalTree, rangeFinder, queries.Take(5), points.Take(5), errors, "AfterClear");
+        var (intervalTreeTime5, rangeFinderTime5) = ValidateQueriesHelperWithTiming(intervalTree, rangeFinder, queries.Take(5), points.Take(5), errors, "AfterClear");
+
+        // Calculate total times and performance ratio
+        var totalIntervalTreeTime = intervalTreeTime1 + intervalTreeTime2 + intervalTreeTime3 + intervalTreeTime4 + intervalTreeTime5;
+        var totalRangeFinderTime = rangeFinderTime1 + rangeFinderTime2 + rangeFinderTime3 + rangeFinderTime4 + rangeFinderTime5;
+        
+        // Store performance data in result
+        result.IntervalTreeQueryTime = totalIntervalTreeTime;
+        result.RangeFinderQueryTime = totalRangeFinderTime;
 
         // Test 6: Verify Count and Values properties
         if (intervalTree.Count != clearTestRanges.Count)
@@ -291,5 +301,105 @@ public class IntervalTreeCompatibilityTest
                 });
             }
         }
+    }
+
+    private static (double intervalTreeTime, double rangeFinderTime) ValidateQueriesHelperWithTiming(
+        RangeTreeAdapter<double, int> intervalTree,
+        RangeFinder<double, int> rangeFinder,
+        IEnumerable<NumericRange<double, object>> queries,
+        IEnumerable<double> points,
+        List<CompatibilityError> errors,
+        string testPhase)
+    {
+        var sw = Stopwatch.StartNew();
+        
+        // Time IntervalTree queries
+        sw.Restart();
+        var intervalTreeResults = new List<int[]>();
+        
+        // Range queries for IntervalTree
+        var queryList = queries.ToList();
+        for (int i = 0; i < queryList.Count; i++)
+        {
+            var q = queryList[i];
+            var itResult = intervalTree.Query(q.Start, q.End).OrderBy(v => v).ToArray();
+            intervalTreeResults.Add(itResult);
+        }
+        
+        // Point queries for IntervalTree
+        var pointList = points.ToList();
+        for (int i = 0; i < pointList.Count; i++)
+        {
+            var p = pointList[i];
+            var itResult = intervalTree.Query(p).OrderBy(v => v).ToArray();
+            intervalTreeResults.Add(itResult);
+        }
+        
+        var intervalTreeTime = sw.Elapsed.TotalMilliseconds;
+        
+        // Time RangeFinder queries
+        sw.Restart();
+        var rangeFinderResults = new List<int[]>();
+        
+        // Range queries for RangeFinder
+        for (int i = 0; i < queryList.Count; i++)
+        {
+            var q = queryList[i];
+            var rfResult = rangeFinder.QueryRanges(q.Start, q.End).Select(r => r.Value).OrderBy(v => v).ToArray();
+            rangeFinderResults.Add(rfResult);
+        }
+        
+        // Point queries for RangeFinder
+        for (int i = 0; i < pointList.Count; i++)
+        {
+            var p = pointList[i];
+            var rfResult = rangeFinder.QueryRanges(p).Select(r => r.Value).OrderBy(v => v).ToArray();
+            rangeFinderResults.Add(rfResult);
+        }
+        
+        var rangeFinderTime = sw.Elapsed.TotalMilliseconds;
+        
+        // Now validate results for correctness (same as original ValidateQueriesHelper)
+        for (int i = 0; i < queryList.Count; i++)
+        {
+            var q = queryList[i];
+            var rfResult = rangeFinderResults[i];
+            var itResult = intervalTreeResults[i];
+
+            if (!rfResult.SequenceEqual(itResult))
+            {
+                errors.Add(new CompatibilityError
+                {
+                    QueryType = $"RangeQuery-{testPhase}",
+                    Query = $"[{q.Start:F3}, {q.End:F3}]",
+                    RangeFinderResult = rfResult,
+                    IntervalTreeResult = itResult,
+                    OnlyInRangeFinder = rfResult.Except(itResult).ToArray(),
+                    OnlyInIntervalTree = itResult.Except(rfResult).ToArray()
+                });
+            }
+        }
+
+        for (int i = 0; i < pointList.Count; i++)
+        {
+            var p = pointList[i];
+            var rfResult = rangeFinderResults[queryList.Count + i];
+            var itResult = intervalTreeResults[queryList.Count + i];
+
+            if (!rfResult.SequenceEqual(itResult))
+            {
+                errors.Add(new CompatibilityError
+                {
+                    QueryType = $"PointQuery-{testPhase}",
+                    Query = $"{p:F3}",
+                    RangeFinderResult = rfResult,
+                    IntervalTreeResult = itResult,
+                    OnlyInRangeFinder = rfResult.Except(itResult).ToArray(),
+                    OnlyInIntervalTree = itResult.Except(rfResult).ToArray()
+                });
+            }
+        }
+        
+        return (intervalTreeTime, rangeFinderTime);
     }
 }
