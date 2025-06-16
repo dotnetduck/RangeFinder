@@ -61,7 +61,7 @@ public class RangeTreeAdapter<TKey, TValue> : IIntervalTree<TKey, TValue>
             {
                 _ranges.RemoveAt(i);
                 _isDirty = true;
-                break;
+                // Continue to remove ALL occurrences, don't break
             }
         }
     }
@@ -103,7 +103,7 @@ public class RangeTreeAdapter<TKey, TValue> : IIntervalTree<TKey, TValue>
             if (_ranges.Count > 0)
             {
                 var numericRanges = _ranges.Select(r => 
-                    new NumericRange<TKey, TValue>(r.From, r.To, r.Value));
+                    new NumericRange<TKey, TValue>(r.From, r.To, r.Value)).ToList();
                 _rangeFinder = new RangeFinder<TKey, TValue>(numericRanges);
             }
             else

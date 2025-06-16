@@ -11,7 +11,7 @@ namespace RangeFinder.RangeTreeCompat.Tests;
 public class IntervalTreeEdgeCaseTests
 {
     [Test]
-    public void DuplicateValues_Remove_ShouldRemoveOnlyOneInstance()
+    public void DuplicateValues_Remove_ShouldRemoveAllInstances()
     {
         var tree = new RangeTreeAdapter<int, int>();
         tree.Add(1, 5, 32);   // Same value 32
@@ -22,12 +22,12 @@ public class IntervalTreeEdgeCaseTests
         
         tree.Remove(32);
         
-        Assert.That(tree.Count, Is.EqualTo(2), "Should remove only one instance of duplicate value");
+        Assert.That(tree.Count, Is.EqualTo(1), "Should remove all instances of duplicate value");
         
         var values = tree.Values.ToList();
-        Assert.That(values, Contains.Item(32), "Should still contain one instance of 32");
+        Assert.That(values, Does.Not.Contain(32), "Should not contain any instance of 32");
         Assert.That(values, Contains.Item(790));
-        Assert.That(values.Count(v => v == 32), Is.EqualTo(1), "Should have exactly one instance of 32");
+        Assert.That(values.Count(v => v == 32), Is.EqualTo(0), "Should have no instances of 32");
     }
 
     [Test]
