@@ -57,51 +57,91 @@ public class IntervalTreeCompatibilityTest
         // Test 2: Add operations with dynamic rebuilding
         var newParameters = GetParameters(characteristic, size / 10);
         var newRanges = Gen.GenerateRanges<double>(newParameters);
+        
+        // Measure IntervalTree add + query time
+        var sw = Stopwatch.StartNew();
         AddRangesToIntervalTree(intervalTree, newRanges);
+        var intervalTreeAddTime = sw.Elapsed.TotalMilliseconds;
 
-        // Update reference with new ranges
+        // Measure RangeFinder reconstruction time (equivalent to IntervalTree's add operation)
+        sw.Restart();
         var allRanges = initialRanges.Concat(newRanges);
         rangeFinder = new RangeFinder<double, int>(allRanges);
+        var rangeFinderRebuildTime = sw.Elapsed.TotalMilliseconds;
 
         TotalTests += 2;
-        var (intervalTreeTime2, rangeFinderTime2) = ValidateQueriesHelperWithTiming(intervalTree, rangeFinder, queries.Take(5), points.Take(5), errors, "AfterAdd");
+        var (intervalTreeQueryTime2, rangeFinderQueryTime2) = ValidateQueriesHelperWithTiming(intervalTree, rangeFinder, queries.Take(5), points.Take(5), errors, "AfterAdd");
+        
+        // Include operation costs in total time
+        var intervalTreeTime2 = intervalTreeAddTime + intervalTreeQueryTime2;
+        var rangeFinderTime2 = rangeFinderRebuildTime + rangeFinderQueryTime2;
 
         // Test 3: Remove operations
         var rangeListCopy = allRanges.ToList();
         var toRemove = rangeListCopy.Take(size / 20).Select(r => r.Value).ToList();
         
+        // Measure IntervalTree remove + query time
+        sw.Restart();
         RemoveValuesFromIntervalTree(intervalTree, toRemove);
+        var intervalTreeRemoveTime = sw.Elapsed.TotalMilliseconds;
+        
+        // Measure RangeFinder reconstruction time (equivalent to IntervalTree's remove operation)
+        sw.Restart();
         rangeListCopy.RemoveAll(r => toRemove.Contains(r.Value));
-
         rangeFinder = new RangeFinder<double, int>(rangeListCopy);
+        var rangeFinderRebuildTime3 = sw.Elapsed.TotalMilliseconds;
 
         TotalTests += 2;
-        var (intervalTreeTime3, rangeFinderTime3) = ValidateQueriesHelperWithTiming(intervalTree, rangeFinder, queries.Take(5), points.Take(5), errors, "AfterRemove");
+        var (intervalTreeQueryTime3, rangeFinderQueryTime3) = ValidateQueriesHelperWithTiming(intervalTree, rangeFinder, queries.Take(5), points.Take(5), errors, "AfterRemove");
+        
+        // Include operation costs in total time
+        var intervalTreeTime3 = intervalTreeRemoveTime + intervalTreeQueryTime3;
+        var rangeFinderTime3 = rangeFinderRebuildTime3 + rangeFinderQueryTime3;
 
         // Test 4: Bulk remove operations
         double intervalTreeTime4 = 0, rangeFinderTime4 = 0;
         if (rangeListCopy.Count > 5)
         {
             var bulkRemove = rangeListCopy.Take(3).Select(r => r.Value).ToList();
-            intervalTree.Remove(bulkRemove);
-            rangeListCopy.RemoveAll(r => bulkRemove.Contains(r.Value));
             
+            // Measure IntervalTree bulk remove + query time
+            sw.Restart();
+            intervalTree.Remove(bulkRemove);
+            var intervalTreeBulkRemoveTime = sw.Elapsed.TotalMilliseconds;
+            
+            // Measure RangeFinder reconstruction time (equivalent to IntervalTree's bulk remove operation)
+            sw.Restart();
+            rangeListCopy.RemoveAll(r => bulkRemove.Contains(r.Value));
             rangeFinder = new RangeFinder<double, int>(rangeListCopy);
+            var rangeFinderRebuildTime4 = sw.Elapsed.TotalMilliseconds;
             
             TotalTests += 2;
-            (intervalTreeTime4, rangeFinderTime4) = ValidateQueriesHelperWithTiming(intervalTree, rangeFinder, queries.Take(5), points.Take(5), errors, "AfterBulkRemove");
+            var (intervalTreeQueryTime4, rangeFinderQueryTime4) = ValidateQueriesHelperWithTiming(intervalTree, rangeFinder, queries.Take(5), points.Take(5), errors, "AfterBulkRemove");
+            
+            // Include operation costs in total time
+            intervalTreeTime4 = intervalTreeBulkRemoveTime + intervalTreeQueryTime4;
+            rangeFinderTime4 = rangeFinderRebuildTime4 + rangeFinderQueryTime4;
         }
 
         // Test 5: Clear and rebuild
+        sw.Restart();
         intervalTree.Clear();
         var clearTestParameters = GetParameters(characteristic, size / 5);
         var clearTestRanges = Gen.GenerateRanges<double>(clearTestParameters);
         PopulateIntervalTree(intervalTree, clearTestRanges);
+        var intervalTreeClearRebuildTime = sw.Elapsed.TotalMilliseconds;
         
+        // Measure RangeFinder reconstruction time (equivalent to IntervalTree's clear + rebuild operation)
+        sw.Restart();
         rangeFinder = new RangeFinder<double, int>(clearTestRanges);
+        var rangeFinderRebuildTime5 = sw.Elapsed.TotalMilliseconds;
         
         TotalTests += 2;
-        var (intervalTreeTime5, rangeFinderTime5) = ValidateQueriesHelperWithTiming(intervalTree, rangeFinder, queries.Take(5), points.Take(5), errors, "AfterClear");
+        var (intervalTreeQueryTime5, rangeFinderQueryTime5) = ValidateQueriesHelperWithTiming(intervalTree, rangeFinder, queries.Take(5), points.Take(5), errors, "AfterClear");
+        
+        // Include operation costs in total time
+        var intervalTreeTime5 = intervalTreeClearRebuildTime + intervalTreeQueryTime5;
+        var rangeFinderTime5 = rangeFinderRebuildTime5 + rangeFinderQueryTime5;
 
         // Calculate total times and performance ratio
         var totalIntervalTreeTime = intervalTreeTime1 + intervalTreeTime2 + intervalTreeTime3 + intervalTreeTime4 + intervalTreeTime5;
@@ -313,7 +353,7 @@ public class IntervalTreeCompatibilityTest
     {
         var sw = Stopwatch.StartNew();
         
-        // Time IntervalTree queries
+        // Time IntervalTree queries (includes lazy reconstruction cost)
         sw.Restart();
         var intervalTreeResults = new List<int[]>();
         
@@ -337,7 +377,7 @@ public class IntervalTreeCompatibilityTest
         
         var intervalTreeTime = sw.Elapsed.TotalMilliseconds;
         
-        // Time RangeFinder queries
+        // Time RangeFinder queries (using pre-built instance, no reconstruction cost)
         sw.Restart();
         var rangeFinderResults = new List<int[]>();
         
