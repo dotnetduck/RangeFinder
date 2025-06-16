@@ -5,13 +5,13 @@ using RangeFinder.Core;
 namespace RangeFinder.RangeTreeCompat;
 
 /// <summary>
-/// RangeTree-compatible adapter around RangeFinder for drop-in replacement.
-/// Provides the same API as RangeTree but with RangeFinder's optimized performance.
+/// RangeTree-compatible adapter that provides IntervalTree API using RangeFinder's optimized implementation.
+/// This allows drop-in replacement of RangeTree/IntervalTree with RangeFinder's superior performance.
 /// Original RangeTree: https://github.com/mbuchetics/RangeTree
 /// </summary>
 /// <typeparam name="TKey">The type of the interval key (must be numeric)</typeparam>
 /// <typeparam name="TValue">The type of the associated value</typeparam>
-public class RangeTreeAdapter<TKey, TValue> : IIntervalTree<TKey, TValue>
+public class RangeTreeAdapter<TKey, TValue> : IEnumerable<RangeValuePair<TKey, TValue>>
     where TKey : INumber<TKey>
 {
     private readonly List<RangeValuePair<TKey, TValue>> _ranges;
