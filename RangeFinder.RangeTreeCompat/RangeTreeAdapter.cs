@@ -2,7 +2,7 @@ using System.Collections;
 using System.Numerics;
 using RangeFinder.Core;
 
-namespace IntervalTree;
+namespace RangeFinder.RangeTreeCompat;
 
 /// <summary>
 /// RangeTree-compatible adapter around RangeFinder for drop-in replacement.

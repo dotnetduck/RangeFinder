@@ -1,6 +1,6 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
-using IntervalTree;
+using RangeFinder.RangeTreeCompat;
 using RangeFinder.Core;
 
 namespace RangeFinder.Benchmarks;

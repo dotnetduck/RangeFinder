@@ -1,7 +1,7 @@
 using System.Collections;
 using System.Numerics;
 using RangeFinder.Core;
-using IntervalTree;
+using RangeFinder.RangeTreeCompat;
 
 namespace RangeFinder.RangeTreeCompat.Tests;
 

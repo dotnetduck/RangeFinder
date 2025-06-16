@@ -1,4 +1,4 @@
-using IntervalTree;
+using RangeFinder.RangeTreeCompat;
 using RangeFinder.Core;
 using RangeFinder.Generator;
 using Gen = RangeFinder.Generator.Generator;

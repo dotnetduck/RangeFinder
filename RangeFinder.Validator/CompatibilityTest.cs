@@ -1,6 +1,6 @@
 using RangeFinder.Core;
 using RangeFinder.Generator;
-using IntervalTree;
+using RangeFinder.RangeTreeCompat;
 using Gen = RangeFinder.Generator.Generator;
 
 namespace RangeFinder.Validator;

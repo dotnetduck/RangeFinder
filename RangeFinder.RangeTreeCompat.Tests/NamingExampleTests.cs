@@ -1,4 +1,4 @@
-using IntervalTree;
+using RangeFinder.RangeTreeCompat;
 
 namespace RangeFinder.RangeTreeCompat.Tests;
 

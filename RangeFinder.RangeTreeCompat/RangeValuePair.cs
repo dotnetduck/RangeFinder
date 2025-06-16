@@ -1,4 +1,4 @@
-namespace IntervalTree;
+namespace RangeFinder.RangeTreeCompat;
 
 /// <summary>
 /// Represents a range-value pair for RangeTree compatibility.

@@ -1,6 +1,6 @@
 using System.Collections;
 
-namespace IntervalTree;
+namespace RangeFinder.RangeTreeCompat;
 
 /// <summary>
 /// Interface for interval tree implementations.
