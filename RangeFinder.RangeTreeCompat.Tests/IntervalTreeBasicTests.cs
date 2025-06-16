@@ -12,7 +12,7 @@ public class IntervalTreeBasicTests
     [Test]
     public void Constructor_EmptyTree_ShouldHaveZeroCount()
     {
-        var tree = new IntervalTree<int, string>();
+        var tree = new RangeTreeAdapter<int, string>();
         
         Assert.That(tree.Count, Is.EqualTo(0));
         Assert.That(tree.Values, Is.Empty);
@@ -21,7 +21,7 @@ public class IntervalTreeBasicTests
     [Test]
     public void Add_SingleRange_ShouldIncreaseCount()
     {
-        var tree = new IntervalTree<int, string>();
+        var tree = new RangeTreeAdapter<int, string>();
         
         tree.Add(1, 5, "A");
         
@@ -32,7 +32,7 @@ public class IntervalTreeBasicTests
     [Test]
     public void Add_MultipleRanges_ShouldIncreaseCount()
     {
-        var tree = new IntervalTree<int, string>();
+        var tree = new RangeTreeAdapter<int, string>();
         
         tree.Add(1, 5, "A");
         tree.Add(3, 7, "B");
@@ -45,7 +45,7 @@ public class IntervalTreeBasicTests
     [Test]
     public void Query_Point_ShouldReturnOverlappingRanges()
     {
-        var tree = new IntervalTree<int, string>();
+        var tree = new RangeTreeAdapter<int, string>();
         tree.Add(1, 5, "A");
         tree.Add(3, 7, "B");
         tree.Add(10, 15, "C");
@@ -58,7 +58,7 @@ public class IntervalTreeBasicTests
     [Test]
     public void Query_Range_ShouldReturnOverlappingRanges()
     {
-        var tree = new IntervalTree<int, string>();
+        var tree = new RangeTreeAdapter<int, string>();
         tree.Add(1, 5, "A");
         tree.Add(3, 7, "B");
         tree.Add(10, 15, "C");
@@ -72,7 +72,7 @@ public class IntervalTreeBasicTests
     [Test]
     public void Query_EmptyTree_ShouldReturnEmpty()
     {
-        var tree = new IntervalTree<int, string>();
+        var tree = new RangeTreeAdapter<int, string>();
         
         var pointResult = tree.Query(5).ToList();
         var rangeResult = tree.Query(1, 10).ToList();
@@ -84,7 +84,7 @@ public class IntervalTreeBasicTests
     [Test]
     public void Query_NoOverlap_ShouldReturnEmpty()
     {
-        var tree = new IntervalTree<int, string>();
+        var tree = new RangeTreeAdapter<int, string>();
         tree.Add(1, 5, "A");
         tree.Add(10, 15, "B");
         
@@ -96,7 +96,7 @@ public class IntervalTreeBasicTests
     [Test]
     public void Remove_ExistingValue_ShouldDecreaseCount()
     {
-        var tree = new IntervalTree<int, string>();
+        var tree = new RangeTreeAdapter<int, string>();
         tree.Add(1, 5, "A");
         tree.Add(3, 7, "B");
         tree.Add(10, 15, "C");
@@ -113,7 +113,7 @@ public class IntervalTreeBasicTests
     [Test]
     public void Remove_NonExistingValue_ShouldNotChangeCount()
     {
-        var tree = new IntervalTree<int, string>();
+        var tree = new RangeTreeAdapter<int, string>();
         tree.Add(1, 5, "A");
         tree.Add(3, 7, "B");
         
@@ -126,7 +126,7 @@ public class IntervalTreeBasicTests
     [Test]
     public void Remove_Multiple_ShouldDecreaseCount()
     {
-        var tree = new IntervalTree<int, string>();
+        var tree = new RangeTreeAdapter<int, string>();
         tree.Add(1, 5, "A");
         tree.Add(3, 7, "B");
         tree.Add(10, 15, "C");
@@ -141,7 +141,7 @@ public class IntervalTreeBasicTests
     [Test]
     public void Clear_ShouldEmptyTree()
     {
-        var tree = new IntervalTree<int, string>();
+        var tree = new RangeTreeAdapter<int, string>();
         tree.Add(1, 5, "A");
         tree.Add(3, 7, "B");
         tree.Add(10, 15, "C");
@@ -156,7 +156,7 @@ public class IntervalTreeBasicTests
     [Test]
     public void Enumeration_ShouldReturnAllRangeValuePairs()
     {
-        var tree = new IntervalTree<int, string>();
+        var tree = new RangeTreeAdapter<int, string>();
         tree.Add(1, 5, "A");
         tree.Add(3, 7, "B");
         tree.Add(10, 15, "C");

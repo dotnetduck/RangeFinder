@@ -41,7 +41,7 @@ public class IntervalTreeCompatibilityTest
         var points = Gen.GenerateQueryPoints<double>(parameters, operationCount / 2);
 
         // Create IntervalTree and populate with initial data
-        var intervalTree = new IntervalTree<double, int>();
+        var intervalTree = new RangeTreeAdapter<double, int>();
         PopulateIntervalTree(intervalTree, initialRanges);
 
         // Create reference RangeFinder for comparison
@@ -156,7 +156,7 @@ public class IntervalTreeCompatibilityTest
 
         // Create both implementations
         var rangeFinder = new RangeFinder<double, int>(ranges);
-        var intervalTree = new IntervalTree<double, int>();
+        var intervalTree = new RangeTreeAdapter<double, int>();
         
         PopulateIntervalTree(intervalTree, ranges);
 
@@ -211,7 +211,7 @@ public class IntervalTreeCompatibilityTest
         }
     }
 
-    private static void PopulateIntervalTree(IntervalTree<double, int> intervalTree, IEnumerable<NumericRange<double, int>> ranges)
+    private static void PopulateIntervalTree(RangeTreeAdapter<double, int> intervalTree, IEnumerable<NumericRange<double, int>> ranges)
     {
         var rangeList = ranges.ToList();
         for (int i = 0; i < rangeList.Count; i++)
@@ -221,7 +221,7 @@ public class IntervalTreeCompatibilityTest
         }
     }
 
-    private static void AddRangesToIntervalTree(IntervalTree<double, int> intervalTree, IEnumerable<NumericRange<double, int>> ranges)
+    private static void AddRangesToIntervalTree(RangeTreeAdapter<double, int> intervalTree, IEnumerable<NumericRange<double, int>> ranges)
     {
         var rangeList = ranges.ToList();
         for (int i = 0; i < rangeList.Count; i++)
@@ -231,7 +231,7 @@ public class IntervalTreeCompatibilityTest
         }
     }
 
-    private static void RemoveValuesFromIntervalTree(IntervalTree<double, int> intervalTree, IEnumerable<int> values)
+    private static void RemoveValuesFromIntervalTree(RangeTreeAdapter<double, int> intervalTree, IEnumerable<int> values)
     {
         var valueList = values.ToList();
         for (int i = 0; i < valueList.Count; i++)
@@ -241,7 +241,7 @@ public class IntervalTreeCompatibilityTest
     }
 
     private static void ValidateQueriesHelper(
-        IntervalTree<double, int> intervalTree,
+        RangeTreeAdapter<double, int> intervalTree,
         RangeFinder<double, int> rangeFinder,
         IEnumerable<NumericRange<double, object>> queries,
         IEnumerable<double> points,

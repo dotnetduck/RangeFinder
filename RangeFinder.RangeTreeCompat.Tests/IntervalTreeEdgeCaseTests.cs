@@ -13,7 +13,7 @@ public class IntervalTreeEdgeCaseTests
     [Test]
     public void DuplicateValues_Remove_ShouldRemoveOnlyOneInstance()
     {
-        var tree = new IntervalTree<int, int>();
+        var tree = new RangeTreeAdapter<int, int>();
         tree.Add(1, 5, 32);   // Same value 32
         tree.Add(10, 15, 32); // Same value 32
         tree.Add(20, 25, 790);
@@ -33,7 +33,7 @@ public class IntervalTreeEdgeCaseTests
     [Test]
     public void DuplicateValues_RemoveAll_ShouldRemoveAllInstances()
     {
-        var tree = new IntervalTree<int, int>();
+        var tree = new RangeTreeAdapter<int, int>();
         tree.Add(1, 5, 32);   // Same value 32
         tree.Add(10, 15, 32); // Same value 32
         tree.Add(8, 12, 32);  // Same value 32
@@ -50,7 +50,7 @@ public class IntervalTreeEdgeCaseTests
     [Test]
     public void ConsecutiveRemoveOperations_ShouldMaintainCorrectState()
     {
-        var tree = new IntervalTree<double, int>();
+        var tree = new RangeTreeAdapter<double, int>();
         
         // Add ranges similar to the failing validator test
         tree.Add(1578.0, 1590.0, 32);   // Overlaps with query [1578.605, 1588.949]
@@ -158,7 +158,7 @@ public class IntervalTreeEdgeCaseTests
     [Test]
     public void LargeDataset_RemovalPattern_ShouldMaintainConsistency()
     {
-        var tree = new IntervalTree<double, int>();
+        var tree = new RangeTreeAdapter<double, int>();
         var rangeFinder = new RangeFinder<double, int>(Enumerable.Empty<NumericRange<double, int>>());
         
         // Create a scenario similar to the validator failure

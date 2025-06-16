@@ -5,25 +5,25 @@ using RangeFinder.Core;
 namespace IntervalTree;
 
 /// <summary>
-/// RangeTree-compatible wrapper around RangeFinder for drop-in replacement.
+/// RangeTree-compatible adapter around RangeFinder for drop-in replacement.
 /// Provides the same API as RangeTree but with RangeFinder's optimized performance.
 /// Original RangeTree: https://github.com/mbuchetics/RangeTree
 /// </summary>
 /// <typeparam name="TKey">The type of the interval key (must be numeric)</typeparam>
 /// <typeparam name="TValue">The type of the associated value</typeparam>
-public class IntervalTree<TKey, TValue> : IIntervalTree<TKey, TValue>
+public class RangeTreeAdapter<TKey, TValue> : IIntervalTree<TKey, TValue>
     where TKey : INumber<TKey>
 {
     private readonly List<RangeValuePair<TKey, TValue>> _ranges;
     private RangeFinder<TKey, TValue>? _rangeFinder;
     private bool _isDirty = true;
 
-    public IntervalTree()
+    public RangeTreeAdapter()
     {
         _ranges = new List<RangeValuePair<TKey, TValue>>();
     }
 
-    public IntervalTree(IEnumerable<RangeValuePair<TKey, TValue>> ranges) : this()
+    public RangeTreeAdapter(IEnumerable<RangeValuePair<TKey, TValue>> ranges) : this()
     {
         foreach (var range in ranges)
         {
@@ -113,4 +113,17 @@ public class IntervalTree<TKey, TValue> : IIntervalTree<TKey, TValue>
             _isDirty = false;
         }
     }
+}
+
+/// <summary>
+/// Type alias for backward compatibility with original RangeTree naming.
+/// Use RangeTreeAdapter for new code.
+/// </summary>
+/// <typeparam name="TKey">The type of the interval key (must be numeric)</typeparam>
+/// <typeparam name="TValue">The type of the associated value</typeparam>
+public class IntervalTree<TKey, TValue> : RangeTreeAdapter<TKey, TValue>
+    where TKey : INumber<TKey>
+{
+    public IntervalTree() : base() { }
+    public IntervalTree(IEnumerable<RangeValuePair<TKey, TValue>> ranges) : base(ranges) { }
 }

@@ -13,7 +13,7 @@ public class IntervalTreeBugTests
     public void ValidatorScenario_ExactReproduction()
     {
         // Reproduce the exact scenario that fails in the validator
-        var tree = new IntervalTree<double, int>();
+        var tree = new RangeTreeAdapter<double, int>();
         
         // This reproduces the exact scenario from the failing validator test
         tree.Add(1578.605, 1588.949, 32);  // This should be removed
@@ -44,7 +44,7 @@ public class IntervalTreeBugTests
     public void ComparableWithRangeFinder_ShouldMatchExactly()
     {
         // Create both implementations with identical data
-        var tree = new IntervalTree<double, int>();
+        var tree = new RangeTreeAdapter<double, int>();
         var ranges = new[]
         {
             new NumericRange<double, int>(1578.605, 1588.949, 32),
@@ -81,7 +81,7 @@ public class IntervalTreeBugTests
     [Test]
     public void DebugInternalState_AfterRemoval()
     {
-        var tree = new IntervalTree<double, int>();
+        var tree = new RangeTreeAdapter<double, int>();
         tree.Add(1578.605, 1588.949, 32);
         tree.Add(1580.0, 1595.0, 790);
         

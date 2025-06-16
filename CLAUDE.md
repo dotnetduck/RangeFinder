@@ -9,7 +9,9 @@ RangeFinder is a high-performance .NET 8.0 range query library optimized for fas
 ## Solution Structure
 
 - **RangeFinder.Core/** - Main library with Core interfaces, Finders implementations, and Utilities
+- **RangeFinder.RangeTreeCompat/** - RangeTree compatibility layer for drop-in replacement
 - **RangeFinderTests/** - NUnit test suite
+- **RangeFinder.RangeTreeCompat.Tests/** - NUnit tests for compatibility wrapper
 - **RangeFinder.Benchmark/** - BenchmarkDotNet performance tests
 - **RangeFinder.Validator/** - Performance regression validation and compatibility testing
 
