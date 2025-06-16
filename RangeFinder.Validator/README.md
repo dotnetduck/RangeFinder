@@ -2,6 +2,11 @@
 
 A comprehensive validation tool for testing RangeFinder correctness and RangeTree compatibility wrapper performance.
 
+## Projects Under Test
+
+- **RangeFinder.Core**: Main range query library implementation
+- **RangeFinder.RangeTreeCompat**: IntervalTree compatibility wrapper for legacy code migration
+
 ## Overview
 
 The validator provides two main testing modes:
@@ -12,25 +17,25 @@ Results vary as datasets and queries are randomly generated for thorough testing
 
 ## Commands
 
-### Core RangeFinder Validation
+### Core RangeFinder Validation (Tests: RangeFinder.Core)
 ```bash
 # Run single correctness test
-dotnet run -- single [--characteristic Uniform] [--size 25000] [--queries 500]
+dotnet run --project RangeFinder.Validator -- single [--characteristic Uniform] [--size 25000] [--queries 500]
 
 # Run continuous testing until failure
-dotnet run -- continuous [--maxTests 0] [--reportInterval 10]
+dotnet run --project RangeFinder.Validator -- continuous [--maxTests 0] [--reportInterval 10]
 
 # Run validation suite across characteristics
-dotnet run -- validate [--sizes "10000,25000,50000"] [--queries 500]
+dotnet run --project RangeFinder.Validator -- validate [--sizes "10000,25000,50000"] [--queries 500]
 ```
 
-### RangeTree Compatibility Testing
+### RangeTree Compatibility Testing (Tests: RangeFinder.RangeTreeCompat)
 ```bash
 # Test wrapper with dynamic operations
-dotnet run -- wrapper [--characteristic Uniform] [--size 25000] [--operations 200]
+dotnet run --project RangeFinder.Validator -- wrapper [--characteristic Uniform] [--size 25000] [--operations 200]
 
 # Run continuous wrapper testing with performance metrics
-dotnet run -- wrapper-continuous [--maxTests 0] [--reportInterval 10]
+dotnet run --project RangeFinder.Validator -- wrapper-continuous [--maxTests 0] [--reportInterval 10]
 ```
 
 ## Dataset Characteristics
