@@ -203,14 +203,14 @@ public class IntervalTreeCompatibilityTest
         while (shouldContinue)
         {
             var characteristic = _characteristics[_random.Next(_characteristics.Length)];
-            var size = _random.Next(10, 10_000); // Smaller sizes for dynamic operations
+            var size = _random.Next(100_000, 500_000); // Larger sizes for reliable performance testing
             
             // Alternate between basic and dynamic tests
             var useDynamicTest = _random.Next(2) == 0;
             
             var result = useDynamicTest 
-                ? RunDynamicOperationsTest(characteristic, size)
-                : RunBasicCompatibilityTest(characteristic, size);
+                ? RunDynamicOperationsTest(characteristic, size, 1000) // 1000 operations for reliable testing
+                : RunBasicCompatibilityTest(characteristic, size, 1000); // 1000 queries for reliable testing
             
             progressCallback?.Invoke(result);
 

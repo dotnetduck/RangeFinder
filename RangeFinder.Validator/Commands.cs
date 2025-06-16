@@ -21,7 +21,7 @@ public class Commands
     [Command("single")]
     public void RunSingleTest(
         string characteristic = "Uniform",
-        int size = 10000,
+        int size = 100000,
         int queries = 1000)
     {
         if (!Enum.TryParse<Characteristic>(characteristic, true, out var charEnum))
@@ -94,8 +94,8 @@ public class Commands
     /// <param name="queries">Number of queries per test</param>
     [Command("validate")]
     public void RunValidationSuite(
-        string sizes = "1000,10000,100000",
-        int queries = 100)
+        string sizes = "100000,250000,500000",
+        int queries = 1000)
     {
         Console.WriteLine("🔍 Running correctness validation across characteristics...\n");
         
@@ -148,8 +148,8 @@ public class Commands
     [Command("wrapper")]
     public void TestRangeTreeWrapper(
         string characteristic = "Uniform",
-        int size = 1000,
-        int operations = 100)
+        int size = 100000,
+        int operations = 1000)
     {
         if (!Enum.TryParse<Characteristic>(characteristic, true, out var charEnum))
         {
