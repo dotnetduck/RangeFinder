@@ -58,15 +58,18 @@ public class IntervalTreeCompatibilityTest
         var newParameters = GetParameters(characteristic, size / 10);
         var newRanges = Gen.GenerateRanges<double>(newParameters);
         
-        // Measure IntervalTree add + query time
+        // Track current ranges for RangeFinder to perform identical operations
+        var currentRanges = initialRanges.ToList();
+        
+        // Measure IntervalTree add operations
         var sw = Stopwatch.StartNew();
         AddRangesToIntervalTree(intervalTree, newRanges);
         var intervalTreeAddTime = sw.Elapsed.TotalMilliseconds;
 
-        // Measure RangeFinder reconstruction time (equivalent to IntervalTree's add operation)
+        // Measure RangeFinder performing identical add operations (rebuild with same final state)
         sw.Restart();
-        var allRanges = initialRanges.Concat(newRanges);
-        rangeFinder = new RangeFinder<double, int>(allRanges);
+        currentRanges.AddRange(newRanges);
+        rangeFinder = new RangeFinder<double, int>(currentRanges);
         var rangeFinderRebuildTime = sw.Elapsed.TotalMilliseconds;
 
         TotalTests += 2;
@@ -77,18 +80,17 @@ public class IntervalTreeCompatibilityTest
         var rangeFinderTime2 = rangeFinderRebuildTime + rangeFinderQueryTime2;
 
         // Test 3: Remove operations
-        var rangeListCopy = allRanges.ToList();
-        var toRemove = rangeListCopy.Take(size / 20).Select(r => r.Value).ToList();
+        var toRemove = currentRanges.Take(size / 20).Select(r => r.Value).ToList();
         
-        // Measure IntervalTree remove + query time
+        // Measure IntervalTree remove operations
         sw.Restart();
         RemoveValuesFromIntervalTree(intervalTree, toRemove);
         var intervalTreeRemoveTime = sw.Elapsed.TotalMilliseconds;
         
-        // Measure RangeFinder reconstruction time (equivalent to IntervalTree's remove operation)
+        // Measure RangeFinder performing identical remove operations (rebuild with same final state)
         sw.Restart();
-        rangeListCopy.RemoveAll(r => toRemove.Contains(r.Value));
-        rangeFinder = new RangeFinder<double, int>(rangeListCopy);
+        currentRanges.RemoveAll(r => toRemove.Contains(r.Value));
+        rangeFinder = new RangeFinder<double, int>(currentRanges);
         var rangeFinderRebuildTime3 = sw.Elapsed.TotalMilliseconds;
 
         TotalTests += 2;
@@ -100,19 +102,19 @@ public class IntervalTreeCompatibilityTest
 
         // Test 4: Bulk remove operations
         double intervalTreeTime4 = 0, rangeFinderTime4 = 0;
-        if (rangeListCopy.Count > 5)
+        if (currentRanges.Count > 5)
         {
-            var bulkRemove = rangeListCopy.Take(3).Select(r => r.Value).ToList();
+            var bulkRemove = currentRanges.Take(3).Select(r => r.Value).ToList();
             
-            // Measure IntervalTree bulk remove + query time
+            // Measure IntervalTree bulk remove operations
             sw.Restart();
             intervalTree.Remove(bulkRemove);
             var intervalTreeBulkRemoveTime = sw.Elapsed.TotalMilliseconds;
             
-            // Measure RangeFinder reconstruction time (equivalent to IntervalTree's bulk remove operation)
+            // Measure RangeFinder performing identical bulk remove operations (rebuild with same final state)
             sw.Restart();
-            rangeListCopy.RemoveAll(r => bulkRemove.Contains(r.Value));
-            rangeFinder = new RangeFinder<double, int>(rangeListCopy);
+            currentRanges.RemoveAll(r => bulkRemove.Contains(r.Value));
+            rangeFinder = new RangeFinder<double, int>(currentRanges);
             var rangeFinderRebuildTime4 = sw.Elapsed.TotalMilliseconds;
             
             TotalTests += 2;
@@ -124,16 +126,20 @@ public class IntervalTreeCompatibilityTest
         }
 
         // Test 5: Clear and rebuild
-        sw.Restart();
-        intervalTree.Clear();
         var clearTestParameters = GetParameters(characteristic, size / 5);
         var clearTestRanges = Gen.GenerateRanges<double>(clearTestParameters);
+        
+        // Measure IntervalTree clear and rebuild operations
+        sw.Restart();
+        intervalTree.Clear();
         PopulateIntervalTree(intervalTree, clearTestRanges);
         var intervalTreeClearRebuildTime = sw.Elapsed.TotalMilliseconds;
         
-        // Measure RangeFinder reconstruction time (equivalent to IntervalTree's clear + rebuild operation)
+        // Measure RangeFinder performing identical clear + rebuild operations (rebuild with same final state)
         sw.Restart();
-        rangeFinder = new RangeFinder<double, int>(clearTestRanges);
+        currentRanges.Clear();
+        currentRanges.AddRange(clearTestRanges);
+        rangeFinder = new RangeFinder<double, int>(currentRanges);
         var rangeFinderRebuildTime5 = sw.Elapsed.TotalMilliseconds;
         
         TotalTests += 2;
@@ -152,18 +158,18 @@ public class IntervalTreeCompatibilityTest
         result.RangeFinderQueryTime = totalRangeFinderTime;
 
         // Test 6: Verify Count and Values properties
-        if (intervalTree.Count != clearTestRanges.Count)
+        if (intervalTree.Count != currentRanges.Count)
         {
             errors.Add(new CompatibilityError
             {
                 QueryType = "Count",
                 Query = "Count validation",
-                RangeFinderResult = new[] { clearTestRanges.Count },
+                RangeFinderResult = new[] { currentRanges.Count },
                 IntervalTreeResult = new[] { intervalTree.Count }
             });
         }
 
-        var expectedValues = clearTestRanges.Select(r => r.Value).OrderBy(v => v).ToArray();
+        var expectedValues = currentRanges.Select(r => r.Value).OrderBy(v => v).ToArray();
         var actualValues = intervalTree.Values.OrderBy(v => v).ToArray();
         if (!expectedValues.SequenceEqual(actualValues))
         {
