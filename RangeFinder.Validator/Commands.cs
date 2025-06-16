@@ -10,6 +10,7 @@ namespace RangeFinder.Validator;
 public class Commands
 {
     private readonly CompatibilityTest _tester = new();
+    private readonly IntervalTreeCompatibilityTest _intervalTreeTester = new();
 
     /// <summary>
     /// Run a single correctness validation test.
@@ -136,5 +137,82 @@ public class Commands
         {
             Environment.Exit(1);
         }
+    }
+
+    /// <summary>
+    /// Test the RangeTree compatibility wrapper with dynamic operations.
+    /// </summary>
+    /// <param name="characteristic">Dataset characteristic to test</param>
+    /// <param name="size">Number of ranges to generate</param>
+    /// <param name="operations">Number of dynamic operations to perform</param>
+    [Command("wrapper")]
+    public void TestRangeTreeWrapper(
+        string characteristic = "Uniform",
+        int size = 1000,
+        int operations = 100)
+    {
+        if (!Enum.TryParse<Characteristic>(characteristic, true, out var charEnum))
+        {
+            Console.WriteLine($"❌ Invalid characteristic: {characteristic}");
+            Console.WriteLine("Valid options: Uniform, DenseOverlapping, SparseNonOverlapping, Clustered");
+            return;
+        }
+
+        Console.WriteLine($"🧪 Testing RangeTree wrapper: {charEnum} with {size:N0} ranges and {operations:N0} operations");
+        
+        var result = _intervalTreeTester.RunDynamicOperationsTest(charEnum, size, operations);
+        result.PrintSummary();
+        
+        if (!result.IsCompatible)
+        {
+            result.PrintDetailedErrors();
+            Environment.Exit(1);
+        }
+        
+        Console.WriteLine("✅ RangeTree wrapper passed all dynamic operation tests");
+    }
+
+    /// <summary>
+    /// Run continuous testing of the RangeTree compatibility wrapper.
+    /// </summary>
+    /// <param name="maxTests">Maximum number of tests to run (0 = unlimited)</param>
+    /// <param name="reportInterval">Progress report interval</param>
+    [Command("wrapper-continuous")]
+    public void RunContinuousWrapperTest(int maxTests = 0, int reportInterval = 10)
+    {
+        Console.WriteLine("🔄 Running continuous RangeTree wrapper validation...");
+        if (maxTests > 0)
+            Console.WriteLine($"   Maximum tests: {maxTests:N0}");
+        else
+            Console.WriteLine("   Press Ctrl+C to stop...");
+        Console.WriteLine();
+        
+        var testCount = 0;
+        
+        _intervalTreeTester.RunContinuousTest(result =>
+        {
+            testCount++;
+            
+            if (result.IsCompatible)
+            {
+                if (testCount % reportInterval == 0)
+                {
+                    Console.WriteLine($"✅ Test #{testCount}: {result.Characteristic} ({result.Size:N0} ranges) - Compatible");
+                }
+                
+                if (maxTests > 0 && testCount >= maxTests)
+                {
+                    Console.WriteLine($"\n✅ Completed {testCount} wrapper tests successfully - 100% compatibility maintained");
+                    Environment.Exit(0);
+                }
+            }
+            else
+            {
+                Console.WriteLine($"\n❌ WRAPPER COMPATIBILITY FAILURE at test #{testCount}!");
+                result.PrintSummary();
+                result.PrintDetailedErrors();
+                Environment.Exit(1);
+            }
+        });
     }
 }

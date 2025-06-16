@@ -10,8 +10,11 @@
   <ItemGroup>
     <ProjectReference Include="../RangeFinder.Core/RangeFinder.Core.csproj" />
     <ProjectReference Include="../RangeFinder.Generator/RangeFinder.Generator.csproj" />
-    <PackageReference Include="RangeTree" Version="3.0.1" />
     <PackageReference Include="ConsoleAppFramework" Version="5.3.0" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\RangeFinder.RangeTreeCompat\RangeFinder.RangeTreeCompat.csproj" />
   </ItemGroup>
 
 </Project>
