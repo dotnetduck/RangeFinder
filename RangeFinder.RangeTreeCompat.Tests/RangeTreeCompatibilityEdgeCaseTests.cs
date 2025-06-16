@@ -4,11 +4,11 @@ using RangeFinder.Core;
 namespace RangeFinder.RangeTreeCompat.Tests;
 
 /// <summary>
-/// Edge case and regression tests for the RangeTree compatibility wrapper.
-/// These tests target specific issues found during validation.
+/// Edge case and regression tests for RangeFinder's RangeTree compatibility layer.
+/// These tests ensure proper handling of complex scenarios and maintain compatibility.
 /// </summary>
 [TestFixture]
-public class IntervalTreeEdgeCaseTests
+public class RangeTreeCompatibilityEdgeCaseTests
 {
     [Test]
     public void DuplicateValues_Remove_ShouldRemoveAllInstances()

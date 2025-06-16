@@ -25,6 +25,7 @@
     <ItemGroup>
       <ProjectReference Include="../RangeFinder.Generator/RangeFinder.Generator.csproj" />
       <ProjectReference Include="..\RangeFinder.Core\RangeFinder.Core.csproj" />
+      <ProjectReference Include="..\RangeFinder.RangeTreeCompat\RangeFinder.RangeTreeCompat.csproj" />
     </ItemGroup>
 
 </Project>

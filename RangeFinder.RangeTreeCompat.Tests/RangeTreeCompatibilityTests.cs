@@ -4,10 +4,10 @@ using RangeFinder.Core;
 namespace RangeFinder.RangeTreeCompat.Tests;
 
 /// <summary>
-/// Basic functionality tests for the RangeTree compatibility wrapper.
+/// Basic functionality tests for RangeFinder's RangeTree compatibility layer.
 /// </summary>
 [TestFixture]
-public class IntervalTreeBasicTests
+public class RangeTreeCompatibilityTests
 {
     [Test]
     public void Constructor_EmptyTree_ShouldHaveZeroCount()

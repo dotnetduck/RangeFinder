@@ -46,7 +46,7 @@ public class ConstructionBenchmarks : AbstractRangeFinderBenchmark
 
         // Step 2: Force tree construction (equivalent to calling private Rebuild())
         // This triggers the actual tree building that IntervalTree defers
-        _ = intervalTree.Min; // Forces Rebuild() to be called
+        // The first query will force construction
         
         var result = intervalTree.Query(_sourceData[0].Start, _sourceData[0].End);
         return result.Count();
