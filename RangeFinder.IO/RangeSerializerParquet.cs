@@ -5,7 +5,7 @@ using System.Numerics;
 
 namespace RangeFinder.IO;
 
-public static class RangeSerializerForParquet
+public static partial class RangeSerializer
 {
     static public IEnumerable<NumericRange<TNumber, TAssociated>>
     ReadParquet<TNumber, TAssociated>(string filePath)

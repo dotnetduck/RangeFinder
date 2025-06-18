@@ -22,7 +22,7 @@ public class RangeSerializerParquetTests
             };
 
             originalRanges.WriteParquet(tempFilePath);
-            var loadedRanges = RangeSerializerForParquet.ReadParquet<int, string>(tempFilePath).ToList();
+            var loadedRanges = RangeSerializer.ReadParquet<int, string>(tempFilePath).ToList();
 
             Assert.That(loadedRanges, Is.EqualTo(originalRanges));
         }
@@ -47,7 +47,7 @@ public class RangeSerializerParquetTests
             };
 
             originalRanges.WriteParquet(tempFilePath);
-            var loadedRanges = RangeSerializerForParquet.ReadParquet<double, int>(tempFilePath).ToList();
+            var loadedRanges = RangeSerializer.ReadParquet<double, int>(tempFilePath).ToList();
 
             Assert.That(loadedRanges, Is.EqualTo(originalRanges));
         }
@@ -72,7 +72,7 @@ public class RangeSerializerParquetTests
             };
 
             originalRanges.WriteParquet(tempFilePath);
-            var loadedRanges = RangeSerializerForParquet.ReadParquet<int, string>(tempFilePath).ToList();
+            var loadedRanges = RangeSerializer.ReadParquet<int, string>(tempFilePath).ToList();
 
             Assert.That(loadedRanges, Is.EqualTo(originalRanges));
         }
@@ -97,7 +97,7 @@ public class RangeSerializerParquetTests
             };
 
             await originalRanges.WriteParquetAsync(tempFilePath);
-            var loadedRanges = (await RangeSerializerForParquet.ReadParquetAsync<int, string>(tempFilePath)).ToList();
+            var loadedRanges = (await RangeSerializer.ReadParquetAsync<int, string>(tempFilePath)).ToList();
 
             Assert.That(loadedRanges, Is.EqualTo(originalRanges));
         }
@@ -117,7 +117,7 @@ public class RangeSerializerParquetTests
             var originalRanges = Array.Empty<NumericRange<int, string>>();
 
             originalRanges.WriteParquet(tempFilePath);
-            var loadedRanges = RangeSerializerForParquet.ReadParquet<int, string>(tempFilePath).ToList();
+            var loadedRanges = RangeSerializer.ReadParquet<int, string>(tempFilePath).ToList();
 
             Assert.That(loadedRanges, Is.Empty);
         }
@@ -142,7 +142,7 @@ public class RangeSerializerParquetTests
             };
 
             originalRanges.WriteParquet(tempFilePath);
-            var loadedRanges = RangeSerializerForParquet.ReadParquet<int, string?>(tempFilePath).ToList();
+            var loadedRanges = RangeSerializer.ReadParquet<int, string?>(tempFilePath).ToList();
 
             Assert.That(loadedRanges, Is.EqualTo(originalRanges));
         }
