@@ -13,6 +13,16 @@ public class RangeFinder<TNumber, TAssociated>
 {
     public int Count => _sortedRanges.Length;
     public IEnumerable<NumericRange<TNumber, TAssociated>> Values => _sortedRanges;
+    
+    /// <summary>
+    /// The minimum start value across all ranges
+    /// </summary>
+    public TNumber LowerBound { get; init; }
+    
+    /// <summary>
+    /// The maximum end value across all ranges
+    /// </summary>
+    public TNumber UpperBound { get; init; }
 
     private readonly NumericRange<TNumber, TAssociated>[] _sortedRanges;
     private readonly bool[] _canTerminateHere; // Marks positions where no later range can overlap
@@ -33,18 +43,25 @@ public class RangeFinder<TNumber, TAssociated>
             _maxSpanOfTheRangesForPruning = TNumber.Zero;
         }
         
-        // Pre-compute early termination markers
-        ComputeEarlyTerminationMarkers();
+        // Pre-compute early termination markers and get bounds
+        (LowerBound, UpperBound) = ComputeEarlyTerminationMarkers();
     }
 
     /// <summary>
     /// Pre-computes markers to identify positions where search can terminate early.
     /// For each position i, _canTerminateHere[i] is true if no range at position j > i
     /// can have an end time later than the start time of range at position i.
+    /// Also computes and returns LowerBound and UpperBound during the same pass.
     /// </summary>
-    private void ComputeEarlyTerminationMarkers()
+    private (TNumber LowerBound, TNumber UpperBound) ComputeEarlyTerminationMarkers()
     {
-        if (_sortedRanges.Length == 0) return;
+        if (_sortedRanges.Length == 0)
+        {
+            return (TNumber.Zero, TNumber.Zero);
+        }
+        
+        // LowerBound is always the first element's start (array is sorted)
+        var lowerBound = _sortedRanges[0].Start;
         
         // Work backwards to compute the maximum end time seen so far
         var maxEndSoFar = _sortedRanges[^1].End;
@@ -67,6 +84,9 @@ public class RangeFinder<TNumber, TAssociated>
                 maxEndSoFar = currentRange.End;
             }
         }
+        
+        // maxEndSoFar now contains the global maximum end value
+        return (lowerBound, maxEndSoFar);
     }
 
     /// <summary>
@@ -100,7 +120,7 @@ public class RangeFinder<TNumber, TAssociated>
                 break;
             
             // Check for overlap (always include touching ranges)
-            if (queryRange.OverlapsIncludeTouching(range))
+            if (queryRange.Overlaps(range))
             {
                 results.Add(range);
             }
