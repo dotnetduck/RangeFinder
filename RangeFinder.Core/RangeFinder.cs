@@ -13,6 +13,16 @@ public class RangeFinder<TNumber, TAssociated>
 {
     public int Count => _sortedRanges.Length;
     public IEnumerable<NumericRange<TNumber, TAssociated>> Values => _sortedRanges;
+    
+    /// <summary>
+    /// The minimum start value across all ranges
+    /// </summary>
+    public TNumber DataMin => _sortedRanges.Length > 0 ? _sortedRanges[0].Start : TNumber.Zero;
+    
+    /// <summary>
+    /// The maximum end value across all ranges
+    /// </summary>
+    public TNumber DataMax => _sortedRanges.Length > 0 ? _sortedRanges.Max(r => r.End) : TNumber.Zero;
 
     private readonly NumericRange<TNumber, TAssociated>[] _sortedRanges;
     private readonly bool[] _canTerminateHere; // Marks positions where no later range can overlap
@@ -100,7 +110,7 @@ public class RangeFinder<TNumber, TAssociated>
                 break;
             
             // Check for overlap (always include touching ranges)
-            if (queryRange.OverlapsIncludeTouching(range))
+            if (queryRange.Overlaps(range))
             {
                 results.Add(range);
             }
