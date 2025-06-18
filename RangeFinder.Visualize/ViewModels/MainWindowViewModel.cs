@@ -1,0 +1,185 @@
+using System;
+using System.Collections.Generic;
+using System.Collections.ObjectModel;
+using System.ComponentModel;
+using System.Linq;
+using System.Threading.Tasks;
+using RangeFinder.Core;
+
+namespace RangeFinder.Visualize.ViewModels;
+
+public class MainWindowViewModel : ViewModelBase
+{
+    private string _selectedDataset = "timeseries";
+    private ObservableCollection<NumericRange<double, string>> _ranges = new();
+    private double _viewportStart = 0.0;
+    private double _viewportEnd = 100.0;
+    private double _dataMin = double.NaN;
+    private double _dataMax = double.NaN;
+
+    public string[] AvailableDatasets { get; } = 
+    {
+        "timeseries",
+        "overlapping", 
+        "random",
+        "performance"
+    };
+
+    public string SelectedDataset
+    {
+        get => _selectedDataset;
+        set
+        {
+            if (SetField(ref _selectedDataset, value))
+            {
+                _ = LoadDatasetAsync(value);
+            }
+        }
+    }
+
+    public ObservableCollection<NumericRange<double, string>> Ranges
+    {
+        get => _ranges;
+        set => SetField(ref _ranges, value);
+    }
+
+    public double ViewportStart
+    {
+        get => _viewportStart;
+        set => SetField(ref _viewportStart, value);
+    }
+
+    public double ViewportEnd
+    {
+        get => _viewportEnd;
+        set => SetField(ref _viewportEnd, value);
+    }
+
+    public double DataMin
+    {
+        get => _dataMin;
+        set => SetField(ref _dataMin, value);
+    }
+
+    public double DataMax
+    {
+        get => _dataMax;
+        set => SetField(ref _dataMax, value);
+    }
+
+    public MainWindowViewModel()
+    {
+        _ = LoadDatasetAsync(_selectedDataset);
+    }
+
+    private async Task LoadDatasetAsync(string datasetName)
+    {
+        try
+        {
+            // For now, just create some sample data since we need to fix the build first
+            var sampleRanges = GenerateSampleData(datasetName);
+            Ranges = new ObservableCollection<NumericRange<double, string>>(sampleRanges);
+            
+            if (Ranges.Any())
+            {
+                DataMin = Ranges.Min(r => r.Start);
+                DataMax = Ranges.Max(r => r.End);
+                ViewportStart = DataMin;
+                ViewportEnd = DataMax;
+            }
+        }
+        catch (Exception)
+        {
+            // For now, just create empty collection
+            Ranges = new ObservableCollection<NumericRange<double, string>>();
+        }
+    }
+
+    private List<NumericRange<double, string>> GenerateSampleData(string datasetName)
+    {
+        var random = new Random(42);
+        var ranges = new List<NumericRange<double, string>>();
+
+        switch (datasetName)
+        {
+            case "timeseries":
+                var currentTime = 0.0;
+                for (int i = 0; i < 20; i++)
+                {
+                    var duration = random.NextDouble() * 10 + 2;
+                    var gap = random.NextDouble() * 2;
+                    ranges.Add(new NumericRange<double, string>(
+                        currentTime, currentTime + duration, $"Task {i + 1}"));
+                    currentTime += duration + gap;
+                }
+                break;
+
+            case "overlapping":
+                for (int i = 0; i < 30; i++)
+                {
+                    var start = random.NextDouble() * 50;
+                    var duration = random.NextDouble() * 20 + 5;
+                    ranges.Add(new NumericRange<double, string>(
+                        start, start + duration, $"Process {i + 1}"));
+                }
+                break;
+
+            default:
+                for (int i = 0; i < 10; i++)
+                {
+                    var start = random.NextDouble() * 100;
+                    var duration = random.NextDouble() * 10 + 1;
+                    ranges.Add(new NumericRange<double, string>(
+                        start, start + duration, $"Range {i + 1}"));
+                }
+                break;
+        }
+
+        return ranges;
+    }
+
+    public void OnPanRequested(double delta)
+    {
+        var newStart = ViewportStart + delta;
+        var newEnd = ViewportEnd + delta;
+        var span = ViewportEnd - ViewportStart;
+
+        if (!double.IsNaN(DataMin) && !double.IsNaN(DataMax))
+        {
+            if (newStart < DataMin)
+            {
+                newStart = DataMin;
+                newEnd = newStart + span;
+            }
+            else if (newEnd > DataMax)
+            {
+                newEnd = DataMax;
+                newStart = newEnd - span;
+            }
+        }
+
+        ViewportStart = newStart;
+        ViewportEnd = newEnd;
+    }
+
+    public void OnScrollRequested(double delta, bool isZoomModifier, double mouseX)
+    {
+        if (isZoomModifier)
+        {
+            var span = ViewportEnd - ViewportStart;
+            var zoomFactor = 1.0 + (delta * 0.001);
+            var newSpan = span / zoomFactor;
+            
+            var mouseValue = ViewportStart + mouseX * span;
+            var newStart = mouseValue - (newSpan * mouseX);
+            var newEnd = newStart + newSpan;
+
+            ViewportStart = newStart;
+            ViewportEnd = newEnd;
+        }
+        else
+        {
+            OnPanRequested(delta * (ViewportEnd - ViewportStart) * 0.05);
+        }
+    }
+}

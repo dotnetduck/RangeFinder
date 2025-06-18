@@ -1,0 +1,44 @@
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:vm="using:RangeFinder.Visualize.ViewModels"
+        xmlns:controls="using:RangeFinder.Visualize.Controls"
+        mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="700"
+        x:Class="RangeFinder.Visualize.Views.MainWindow"
+        x:CompileBindings="False"
+        Title="RangeFinder Visualizer"
+        WindowStartupLocation="CenterScreen">
+
+    <Design.DataContext>
+        <vm:MainWindowViewModel/>
+    </Design.DataContext>
+
+    <DockPanel>
+        <!-- Top Controls -->
+        <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="10" Spacing="10">
+            <TextBlock Text="Dataset:" VerticalAlignment="Center"/>
+            <ComboBox ItemsSource="{Binding AvailableDatasets}" 
+                      SelectedItem="{Binding SelectedDataset}"
+                      Width="150"/>
+            
+            <TextBlock Text="Viewport:" VerticalAlignment="Center" Margin="20,0,0,0"/>
+            <TextBlock Text="{Binding ViewportStart, StringFormat=F1}" VerticalAlignment="Center"/>
+            <TextBlock Text=" - " VerticalAlignment="Center"/>
+            <TextBlock Text="{Binding ViewportEnd, StringFormat=F1}" VerticalAlignment="Center"/>
+            
+            <TextBlock Text="Ranges:" VerticalAlignment="Center" Margin="20,0,0,0"/>
+            <TextBlock Text="{Binding Ranges.Count}" VerticalAlignment="Center"/>
+        </StackPanel>
+
+        <!-- Main Visualization -->
+        <Border BorderBrush="Gray" BorderThickness="1" Margin="10">
+            <controls:SimpleRange1DCanvas x:Name="RangeCanvas"
+                                          StringRanges="{Binding Ranges}"
+                                          ViewportStart="{Binding ViewportStart}"
+                                          ViewportEnd="{Binding ViewportEnd}"
+                                          DataMin="{Binding DataMin}"
+                                          DataMax="{Binding DataMax}"/>
+        </Border>
+    </DockPanel>
+</Window>
