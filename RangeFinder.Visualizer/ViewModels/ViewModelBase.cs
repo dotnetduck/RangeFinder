@@ -1,7 +1,7 @@
 using System.ComponentModel;
 using System.Runtime.CompilerServices;
 
-namespace RangeFinder.Visualize.ViewModels;
+namespace RangeFinder.Visualizer.ViewModels;
 
 public class ViewModelBase : INotifyPropertyChanged
 {

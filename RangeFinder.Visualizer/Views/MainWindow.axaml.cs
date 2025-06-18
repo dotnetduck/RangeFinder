@@ -1,8 +1,8 @@
 using Avalonia.Controls;
-using RangeFinder.Visualize.ViewModels;
-using RangeFinder.Visualize.Controls;
+using RangeFinder.Visualizer.ViewModels;
+using RangeFinder.Visualizer.Controls;
 
-namespace RangeFinder.Visualize.Views;
+namespace RangeFinder.Visualizer.Views;
 
 public partial class MainWindow : Window
 {

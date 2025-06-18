@@ -1,10 +1,10 @@
 using Avalonia;
 using Avalonia.Controls.ApplicationLifetimes;
 using Avalonia.Markup.Xaml;
-using RangeFinder.Visualize.ViewModels;
-using RangeFinder.Visualize.Views;
+using RangeFinder.Visualizer.ViewModels;
+using RangeFinder.Visualizer.Views;
 
-namespace RangeFinder.Visualize;
+namespace RangeFinder.Visualizer;
 
 public partial class App : Application
 {

@@ -1,9 +1,9 @@
 using Avalonia.Controls;
 using Avalonia.Controls.Templates;
-using RangeFinder.Visualize.ViewModels;
+using RangeFinder.Visualizer.ViewModels;
 using System;
 
-namespace RangeFinder.Visualize;
+namespace RangeFinder.Visualizer;
 
 public class ViewLocator : IDataTemplate
 {

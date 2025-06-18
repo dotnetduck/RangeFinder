@@ -6,7 +6,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using RangeFinder.Core;
 
-namespace RangeFinder.Visualize.ViewModels;
+namespace RangeFinder.Visualizer.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase
 {

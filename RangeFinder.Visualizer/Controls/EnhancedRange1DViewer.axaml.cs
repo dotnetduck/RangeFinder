@@ -7,7 +7,7 @@ using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.Linq;
 
-namespace RangeFinder.Visualize.Controls;
+namespace RangeFinder.Visualizer.Controls;
 
 public partial class EnhancedRange1DViewer : UserControl
 {

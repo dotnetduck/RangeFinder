@@ -2,10 +2,10 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:vm="using:RangeFinder.Visualize.ViewModels"
-        xmlns:controls="using:RangeFinder.Visualize.Controls"
+        xmlns:vm="using:RangeFinder.Visualizer.ViewModels"
+        xmlns:controls="using:RangeFinder.Visualizer.Controls"
         mc:Ignorable="d" d:DesignWidth="1200" d:DesignHeight="700"
-        x:Class="RangeFinder.Visualize.Views.MainWindow"
+        x:Class="RangeFinder.Visualizer.Views.MainWindow"
         x:CompileBindings="False"
         Title="RangeFinder Visualizer"
         WindowStartupLocation="CenterScreen">

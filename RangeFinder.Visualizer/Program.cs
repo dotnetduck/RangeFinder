@@ -1,7 +1,7 @@
 using Avalonia;
 using System;
 
-namespace RangeFinder.Visualize;
+namespace RangeFinder.Visualizer;
 
 internal sealed class Program
 {
@@ -10,7 +10,7 @@ internal sealed class Program
         .StartWithClassicDesktopLifetime(args);
 
     public static AppBuilder BuildAvaloniaApp()
-        => AppBuilder.Configure<RangeFinder.Visualize.App>()
+        => AppBuilder.Configure<RangeFinder.Visualizer.App>()
             .UsePlatformDetect()
             .WithInterFont()
             .LogToTrace();

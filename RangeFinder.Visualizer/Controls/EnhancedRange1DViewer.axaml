@@ -2,9 +2,9 @@
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-             xmlns:controls="using:RangeFinder.Visualize.Controls"
+             xmlns:controls="using:RangeFinder.Visualizer.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="RangeFinder.Visualize.Controls.EnhancedRange1DViewer">
+             x:Class="RangeFinder.Visualizer.Controls.EnhancedRange1DViewer">
     
     <Grid>
         <Grid.RowDefinitions>
