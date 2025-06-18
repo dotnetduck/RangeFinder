@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace RangeFinder.Core;
 
@@ -164,6 +165,87 @@ public class RangeFinder<TNumber, TAssociated>
         }
         
         return results;
+    }
+
+    /// <summary>
+    /// Asynchronously finds all ranges that overlap with the specified range.
+    /// Returns the complete NumericRange objects for detailed analysis.
+    /// </summary>
+    /// <param name="from">The start of the query range</param>
+    /// <param name="to">The end of the query range</param>
+    /// <param name="cancellationToken">Token to cancel the operation</param>
+    /// <returns>All ranges that overlap with the specified range</returns>
+    public async IAsyncEnumerable<NumericRange<TNumber, TAssociated>> QueryRangesAsync(TNumber from, TNumber to, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        var queryRange = new NumericRange<TNumber, TAssociated>(from, to);
+        
+        // Start searching from the pruned range start
+        var prunedRangeStart = queryRange.Start - _maxSpanOfTheRangesForPruning;
+        if (prunedRangeStart < TNumber.Zero) prunedRangeStart = TNumber.Zero;
+        
+        // Binary search for starting position
+        var startIndex = BinarySearchForStart(prunedRangeStart);
+        
+        // Linear scan with early termination
+        for (var i = startIndex; i < _sortedRanges.Length; i++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            
+            var range = _sortedRanges[i];
+            
+            // Early termination: if current range starts after query ends, we're done
+            if (range.Start.CompareTo(queryRange.End) > 0)
+                yield break;
+            
+            // Check for overlap (always include touching ranges)
+            if (queryRange.Overlaps(range))
+            {
+                yield return range;
+            }
+            
+            // Yield control periodically for better responsiveness
+            if (i % 1000 == 0)
+                await Task.Yield();
+        }
+    }
+
+    /// <summary>
+    /// Asynchronously finds all ranges that contain the specified point value.
+    /// Returns the complete NumericRange objects for detailed analysis.
+    /// </summary>
+    /// <param name="value">The point value to search for</param>
+    /// <param name="cancellationToken">Token to cancel the operation</param>
+    /// <returns>All ranges that contain the specified value</returns>
+    public async IAsyncEnumerable<NumericRange<TNumber, TAssociated>> QueryRangesAsync(TNumber value, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    {
+        // Start searching from the pruned range start
+        var prunedRangeStart = value - _maxSpanOfTheRangesForPruning;
+        if (prunedRangeStart < TNumber.Zero) prunedRangeStart = TNumber.Zero;
+        
+        // Binary search for starting position
+        var startIndex = BinarySearchForStart(prunedRangeStart);
+        
+        // Linear scan with early termination
+        for (var i = startIndex; i < _sortedRanges.Length; i++)
+        {
+            cancellationToken.ThrowIfCancellationRequested();
+            
+            var range = _sortedRanges[i];
+            
+            // Early termination: if current range starts after the point, we're done
+            if (range.Start.CompareTo(value) > 0)
+                yield break;
+            
+            // Check if the point is within the range (inclusive of boundaries)
+            if (range.Start.CompareTo(value) <= 0 && value.CompareTo(range.End) <= 0)
+            {
+                yield return range;
+            }
+            
+            // Yield control periodically for better responsiveness
+            if (i % 1000 == 0)
+                await Task.Yield();
+        }
     }
 
 
