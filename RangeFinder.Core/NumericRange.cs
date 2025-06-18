@@ -1,3 +1,4 @@
+using System.ComponentModel;
 using System.Numerics;
 
 namespace RangeFinder.Core;
@@ -9,6 +10,12 @@ public record NumericRange<TRangeNumber, TAssociated>(
     : IComparable<NumericRange<TRangeNumber, TAssociated>>
     where TRangeNumber : INumber<TRangeNumber>
 {
+    /// <summary>
+    /// Parameterless constructor for serialization frameworks that require it
+    /// </summary>
+    [EditorBrowsable(EditorBrowsableState.Never)]
+    public NumericRange() : this(default!, default!, default!) { }
+    
     public TRangeNumber Span => End - Start;
 
     /// <summary>
