@@ -32,13 +32,13 @@
         </StackPanel>
 
         <!-- Main Visualization -->
-        <Border BorderBrush="Gray" BorderThickness="1" Margin="10">
-            <controls:SimpleRange1DCanvas x:Name="RangeCanvas"
-                                          StringRanges="{Binding Ranges}"
-                                          ViewportStart="{Binding ViewportStart}"
-                                          ViewportEnd="{Binding ViewportEnd}"
-                                          DataMin="{Binding DataMin}"
-                                          DataMax="{Binding DataMax}"/>
-        </Border>
+        <controls:EnhancedRange1DViewer x:Name="RangeCanvas"
+                                        Margin="10"
+                                        StringRanges="{Binding Ranges}"
+                                        ViewportStart="{Binding ViewportStart}"
+                                        ViewportEnd="{Binding ViewportEnd}"
+                                        DataMin="{Binding DataMin}"
+                                        DataMax="{Binding DataMax}"
+                                        ShowControls="True"/>
     </DockPanel>
 </Window>

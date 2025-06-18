@@ -67,6 +67,8 @@ public class SimpleRange1DCanvas : Control
 
     private bool _isDragging = false;
     private Point _lastPointerPosition;
+    private ToolTip? _currentToolTip;
+    private List<List<NumericRange<double, string>>> _cachedLayers = new();
 
     static SimpleRange1DCanvas()
     {
@@ -128,13 +130,13 @@ public class SimpleRange1DCanvas : Control
         if (StringRanges != null && StringRanges.Count > 0)
         {
             var visibleStringRanges = GetVisibleStringRanges();
-            var stringLayers = ArrangeStringRangesInLayers(visibleStringRanges);
+            _cachedLayers = ArrangeStringRangesInLayers(visibleStringRanges);
 
-            for (int layer = 0; layer < stringLayers.Count; layer++)
+            for (int layer = 0; layer < _cachedLayers.Count; layer++)
             {
                 var y = 50 + layer * 30; // Start ranges below axis
                 
-                foreach (var range in stringLayers[layer])
+                foreach (var range in _cachedLayers[layer])
                 {
                     RenderStringRange(context, range, y);
                 }
@@ -196,8 +198,8 @@ public class SimpleRange1DCanvas : Control
         // Draw main axis line
         context.DrawLine(axisPen, new Point(0, axisY), new Point(Bounds.Width, axisY));
         
-        // Draw tick marks and simple labels
-        var tickCount = 5;
+        // Draw tick marks and labels above the axis
+        var tickCount = 8;
         var step = (ViewportEnd - ViewportStart) / tickCount;
         
         for (int i = 0; i <= tickCount; i++)
@@ -210,8 +212,8 @@ public class SimpleRange1DCanvas : Control
                 // Tick mark
                 context.DrawLine(axisPen, new Point(x, axisY - 5), new Point(x, axisY + 5));
                 
-                // Label
-                var labelText = value.ToString("F0");
+                // Label - positioned above the axis
+                var labelText = value.ToString("F1");
                 var textGeometry = new FormattedText(
                     labelText,
                     System.Globalization.CultureInfo.CurrentCulture,
@@ -220,7 +222,7 @@ public class SimpleRange1DCanvas : Control
                     10,
                     Brushes.Black);
                 
-                var labelPos = new Point(x - textGeometry.WidthIncludingTrailingWhitespace / 2, axisY + 8);
+                var labelPos = new Point(x - textGeometry.WidthIncludingTrailingWhitespace / 2, axisY - textGeometry.Height - 8);
                 context.DrawText(textGeometry, labelPos);
             }
         }
@@ -303,6 +305,11 @@ public class SimpleRange1DCanvas : Control
             
             _lastPointerPosition = currentPosition;
         }
+        else
+        {
+            // Handle tooltip on hover
+            HandleTooltipOnHover(e.GetPosition(this));
+        }
     }
 
     protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
@@ -334,5 +341,73 @@ public class SimpleRange1DCanvas : Control
         b = (byte)Math.Max(80, Math.Min(220, (int)b));
         
         return new SolidColorBrush(Color.FromRgb(r, g, b));
+    }
+
+    private void HandleTooltipOnHover(Point mousePosition)
+    {
+        var hoveredRange = GetRangeAtPosition(mousePosition);
+        
+        if (hoveredRange != null)
+        {
+            ShowTooltip(hoveredRange, mousePosition);
+        }
+        else
+        {
+            HideTooltip();
+        }
+    }
+
+    private NumericRange<double, string>? GetRangeAtPosition(Point position)
+    {
+        if (_cachedLayers.Count == 0) return null;
+
+        for (int layer = 0; layer < _cachedLayers.Count; layer++)
+        {
+            var layerY = 50 + layer * 30;
+            var layerRect = new Rect(0, layerY, Bounds.Width, 20);
+            
+            if (layerRect.Contains(position))
+            {
+                foreach (var range in _cachedLayers[layer])
+                {
+                    var startX = ValueToScreenX(range.Start);
+                    var endX = ValueToScreenX(range.End);
+                    
+                    // Clamp to visible area
+                    startX = Math.Max(0, startX);
+                    endX = Math.Min(Bounds.Width, endX);
+                    
+                    if (endX <= startX) continue;
+                    
+                    var rangeRect = new Rect(startX, layerY, endX - startX, 20);
+                    if (rangeRect.Contains(position))
+                    {
+                        return range;
+                    }
+                }
+            }
+        }
+        
+        return null;
+    }
+
+    private void ShowTooltip(NumericRange<double, string> range, Point position)
+    {
+        if (_currentToolTip == null)
+        {
+            _currentToolTip = new ToolTip();
+        }
+
+        var tooltipText = $"{range.Value}\nStart: {range.Start:F2}\nEnd: {range.End:F2}\nSpan: {range.Span:F2}";
+        _currentToolTip.Content = tooltipText;
+        
+        ToolTip.SetTip(this, _currentToolTip);
+        ToolTip.SetIsOpen(this, true);
+    }
+
+    private void HideTooltip()
+    {
+        ToolTip.SetIsOpen(this, false);
+        ToolTip.SetTip(this, null);
     }
 }

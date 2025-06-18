@@ -1,0 +1,50 @@
+<UserControl xmlns="https://github.com/avaloniaui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:controls="using:RangeFinder.Visualize.Controls"
+             mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
+             x:Class="RangeFinder.Visualize.Controls.EnhancedRange1DViewer">
+    
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        
+        <!-- Control Toolbar -->
+        <StackPanel Grid.Row="0" 
+                    Orientation="Horizontal" 
+                    HorizontalAlignment="Right"
+                    Margin="5"
+                    Spacing="5"
+                    IsVisible="{Binding ShowControls, RelativeSource={RelativeSource AncestorType=controls:EnhancedRange1DViewer}}">
+            
+            <Button Name="ZoomInButton"
+                    Content="🔍+"
+                    ToolTip.Tip="Zoom In (Ctrl/Cmd + Mouse Wheel)"
+                    Width="30" Height="30"
+                    Padding="2"/>
+            
+            <Button Name="ZoomOutButton"
+                    Content="🔍−"
+                    ToolTip.Tip="Zoom Out (Ctrl/Cmd + Mouse Wheel)"
+                    Width="30" Height="30"
+                    Padding="2"/>
+            
+            <Button Name="ResetButton"
+                    Content="⌂"
+                    ToolTip.Tip="Reset Viewport"
+                    Width="30" Height="30"
+                    Padding="2"/>
+        </StackPanel>
+        
+        <!-- Main Canvas -->
+        <Border Grid.Row="1" 
+                BorderBrush="Gray" 
+                BorderThickness="1"
+                Background="White">
+            <controls:SimpleRange1DCanvas Name="VisualizationCanvas"/>
+        </Border>
+    </Grid>
+</UserControl>

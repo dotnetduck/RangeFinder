@@ -182,4 +182,36 @@ public class MainWindowViewModel : ViewModelBase
             OnPanRequested(delta * (ViewportEnd - ViewportStart) * 0.05);
         }
     }
+
+    public void ResetViewport()
+    {
+        if (Ranges?.Count > 0 && !double.IsNaN(DataMin) && !double.IsNaN(DataMax))
+        {
+            var dataSpan = DataMax - DataMin;
+            var rangeCount = Ranges.Count;
+            
+            // Calculate optimal initial viewport - show roughly 20-30 ranges
+            var optimalRangeCount = Math.Min(rangeCount, Math.Max(20, rangeCount / 4));
+            var unitsPerRange = dataSpan / rangeCount;
+            var idealViewportSpan = unitsPerRange * optimalRangeCount;
+            
+            // Ensure minimum viewport size
+            var minViewportSpan = dataSpan * 0.1;
+            var viewportSpan = Math.Max(idealViewportSpan, minViewportSpan);
+            
+            // Center on data or show all if viewport covers most data
+            if (viewportSpan >= dataSpan * 0.8)
+            {
+                var padding = dataSpan * 0.05;
+                ViewportStart = DataMin - padding;
+                ViewportEnd = DataMax + padding;
+            }
+            else
+            {
+                var center = DataMin + dataSpan / 2;
+                ViewportStart = center - viewportSpan / 2;
+                ViewportEnd = center + viewportSpan / 2;
+            }
+        }
+    }
 }
