@@ -1,4 +1,4 @@
-namespace RangeFinder.Generator;
+namespace RangeFinder.IO;
 
 public record Stats(
     int Count,

@@ -1,4 +1,4 @@
-namespace RangeFinder.Generator;
+namespace RangeFinder.IO;
 
 /// <summary>
 /// Range generation parameters that clearly express intent

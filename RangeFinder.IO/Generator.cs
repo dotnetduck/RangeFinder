@@ -1,7 +1,7 @@
 using RangeFinder.Core;
 using System.Numerics;
 
-namespace RangeFinder.Generator;
+namespace RangeFinder.IO;
 
 /// <summary>
 /// Parameterized range generator for systematic performance testing.
