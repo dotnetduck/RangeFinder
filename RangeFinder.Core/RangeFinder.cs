@@ -168,19 +168,16 @@ public class RangeFinder<TNumber, TAssociated>
     }
 
     /// <summary>
-    /// Asynchronously finds all ranges that overlap with the specified range.
-    /// Returns the complete NumericRange objects for detailed analysis.
+    /// Core async enumeration logic shared by both query methods.
     /// </summary>
-    /// <param name="from">The start of the query range</param>
-    /// <param name="to">The end of the query range</param>
-    /// <param name="cancellationToken">Token to cancel the operation</param>
-    /// <returns>All ranges that overlap with the specified range</returns>
-    public async IAsyncEnumerable<NumericRange<TNumber, TAssociated>> QueryRangesAsync(TNumber from, TNumber to, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    private async IAsyncEnumerable<NumericRange<TNumber, TAssociated>> QueryRangesAsyncCore(
+        TNumber searchStart,
+        Func<NumericRange<TNumber, TAssociated>, bool> shouldYield,
+        Func<NumericRange<TNumber, TAssociated>, bool> shouldTerminate,
+        [EnumeratorCancellation] CancellationToken cancellationToken = default)
     {
-        var queryRange = new NumericRange<TNumber, TAssociated>(from, to);
-        
         // Start searching from the pruned range start
-        var prunedRangeStart = queryRange.Start - _maxSpanOfTheRangesForPruning;
+        var prunedRangeStart = searchStart - _maxSpanOfTheRangesForPruning;
         if (prunedRangeStart < TNumber.Zero) prunedRangeStart = TNumber.Zero;
         
         // Binary search for starting position
@@ -193,12 +190,12 @@ public class RangeFinder<TNumber, TAssociated>
             
             var range = _sortedRanges[i];
             
-            // Early termination: if current range starts after query ends, we're done
-            if (range.Start.CompareTo(queryRange.End) > 0)
+            // Early termination check
+            if (shouldTerminate(range))
                 yield break;
             
-            // Check for overlap (always include touching ranges)
-            if (queryRange.Overlaps(range))
+            // Check if range should be yielded
+            if (shouldYield(range))
             {
                 yield return range;
             }
@@ -210,42 +207,38 @@ public class RangeFinder<TNumber, TAssociated>
     }
 
     /// <summary>
+    /// Asynchronously finds all ranges that overlap with the specified range.
+    /// Returns the complete NumericRange objects for detailed analysis.
+    /// </summary>
+    /// <param name="from">The start of the query range</param>
+    /// <param name="to">The end of the query range</param>
+    /// <param name="cancellationToken">Token to cancel the operation</param>
+    /// <returns>All ranges that overlap with the specified range</returns>
+    public IAsyncEnumerable<NumericRange<TNumber, TAssociated>> QueryRangesAsync(TNumber from, TNumber to, CancellationToken cancellationToken = default)
+    {
+        var queryRange = new NumericRange<TNumber, TAssociated>(from, to);
+        
+        return QueryRangesAsyncCore(
+            queryRange.Start,
+            range => queryRange.Overlaps(range),
+            range => range.Start.CompareTo(queryRange.End) > 0,
+            cancellationToken);
+    }
+
+    /// <summary>
     /// Asynchronously finds all ranges that contain the specified point value.
     /// Returns the complete NumericRange objects for detailed analysis.
     /// </summary>
     /// <param name="value">The point value to search for</param>
     /// <param name="cancellationToken">Token to cancel the operation</param>
     /// <returns>All ranges that contain the specified value</returns>
-    public async IAsyncEnumerable<NumericRange<TNumber, TAssociated>> QueryRangesAsync(TNumber value, [EnumeratorCancellation] CancellationToken cancellationToken = default)
+    public IAsyncEnumerable<NumericRange<TNumber, TAssociated>> QueryRangesAsync(TNumber value, CancellationToken cancellationToken = default)
     {
-        // Start searching from the pruned range start
-        var prunedRangeStart = value - _maxSpanOfTheRangesForPruning;
-        if (prunedRangeStart < TNumber.Zero) prunedRangeStart = TNumber.Zero;
-        
-        // Binary search for starting position
-        var startIndex = BinarySearchForStart(prunedRangeStart);
-        
-        // Linear scan with early termination
-        for (var i = startIndex; i < _sortedRanges.Length; i++)
-        {
-            cancellationToken.ThrowIfCancellationRequested();
-            
-            var range = _sortedRanges[i];
-            
-            // Early termination: if current range starts after the point, we're done
-            if (range.Start.CompareTo(value) > 0)
-                yield break;
-            
-            // Check if the point is within the range (inclusive of boundaries)
-            if (range.Start.CompareTo(value) <= 0 && value.CompareTo(range.End) <= 0)
-            {
-                yield return range;
-            }
-            
-            // Yield control periodically for better responsiveness
-            if (i % 1000 == 0)
-                await Task.Yield();
-        }
+        return QueryRangesAsyncCore(
+            value,
+            range => range.Start.CompareTo(value) <= 0 && value.CompareTo(range.End) <= 0,
+            range => range.Start.CompareTo(value) > 0,
+            cancellationToken);
     }
 
 
