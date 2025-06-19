@@ -5,7 +5,7 @@
 A high-performance range visualization tool built with Avalonia UI for exploring and analyzing numeric range data using the RangeFinder library.
 
 ![RangeFinder Visualizer Screenshot](SampleData/rangefinder_viz.png)
-*Screenshot showing the visualizer displaying 2000 overlapping ranges with interactive navigation controls*
+*Screenshot showing the visualizer displaying 2000 ranges from the "medium" dataset with interactive navigation controls*
 
 ## Features
 
@@ -62,6 +62,56 @@ The visualizer includes three sample CSV files that are automatically copied to 
 - **`overlapping_sample.csv`**: Overlapping process data (20 ranges)
 - **`large_dataset_sample.csv`**: Large dataset sample (30 ranges)
 
+## Embedding in Your Avalonia Application
+
+You can easily embed the range visualization controls in your own Avalonia applications:
+
+### 1. Add Project References
+
+```xml
+<ItemGroup>
+  <ProjectReference Include="path/to/RangeFinder.Core/RangeFinder.Core.csproj" />
+  <ProjectReference Include="path/to/RangeFinder.IO/RangeFinder.IO.csproj" />
+  <ProjectReference Include="path/to/RangeFinder.Visualizer/RangeFinder.Visualizer.csproj" />
+</ItemGroup>
+```
+
+### 2. Use the RangeViewer Control
+
+```xml
+<Window xmlns="https://github.com/avaloniaui"
+        xmlns:controls="using:RangeFinder.Visualizer.Controls">
+  
+  <controls:RangeViewer StringRanges="{Binding MyRanges}"
+                        ViewportStart="{Binding ViewportStart, Mode=TwoWay}"
+                        ViewportEnd="{Binding ViewportEnd, Mode=TwoWay}"
+                        DataMin="{Binding DataMin, Mode=TwoWay}"
+                        DataMax="{Binding DataMax, Mode=TwoWay}"
+                        ShowControls="True" />
+</Window>
+```
+
+### 3. Bind Your Data
+
+```csharp
+public class MyViewModel : ViewModelBase
+{
+    public ObservableCollection<NumericRange<double, string>> MyRanges { get; set; }
+    public double ViewportStart { get; set; }
+    public double ViewportEnd { get; set; }
+    public double DataMin { get; set; }
+    public double DataMax { get; set; }
+}
+```
+
+### 4. Handle Events (Optional)
+
+```csharp
+// In your code-behind or view model
+rangeViewer.PanRequested += (sender, delta) => { /* Handle panning */ };
+rangeViewer.ScrollRequested += (sender, args) => { /* Handle zooming */ };
+```
+
 ## Supported File Formats
 
 ### CSV Format
@@ -87,8 +137,8 @@ The visualizer currently supports:
 ```
 RangeFinder.Visualizer/
 ├── Controls/                    # Custom Avalonia controls
-│   ├── SimpleRange1DCanvas.cs   # High-performance range renderer
-│   └── EnhancedRange1DViewer.*  # User control with interaction
+│   ├── RangeCanvas.cs           # High-performance range renderer
+│   └── RangeViewer.*            # User control with interaction
 ├── ViewModels/                  # MVVM view models
 │   └── MainWindowViewModel.cs   # Main application logic
 ├── Views/                       # Avalonia UI views

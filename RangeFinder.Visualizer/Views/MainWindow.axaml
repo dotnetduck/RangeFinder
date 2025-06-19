@@ -48,7 +48,7 @@
         </StackPanel>
 
         <!-- Main Visualization -->
-        <controls:EnhancedRange1DViewer x:Name="RangeCanvas"
+        <controls:RangeViewer x:Name="RangeCanvas"
                                         Margin="10"
                                         StringRanges="{Binding Ranges}"
                                         ViewportStart="{Binding ViewportStart, Mode=TwoWay}"

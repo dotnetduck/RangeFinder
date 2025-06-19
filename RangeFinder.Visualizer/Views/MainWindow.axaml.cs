@@ -13,7 +13,7 @@ public partial class MainWindow : Window
         InitializeComponent();
         
         // Connect events
-        if (this.FindControl<EnhancedRange1DViewer>("RangeCanvas") is EnhancedRange1DViewer canvas &&
+        if (this.FindControl<RangeViewer>("RangeCanvas") is RangeViewer canvas &&
             DataContext is MainWindowViewModel viewModel)
         {
             canvas.PanRequested += (_, delta) => viewModel.OnPanRequested(delta);
