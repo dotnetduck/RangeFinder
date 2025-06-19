@@ -345,27 +345,31 @@ public class SimpleRange1DCanvas : Control
         {
             // Arrow keys for slow scroll
             case Key.Left:
+                // Left = backward/earlier = negative pan
                 var slowLeftDelta = span * 0.05; // 5% of viewport
-                PanRequested?.Invoke(this, slowLeftDelta);
+                PanRequested?.Invoke(this, -slowLeftDelta);
                 e.Handled = true;
                 break;
                 
             case Key.Right:
+                // Right = forward/later = positive pan
                 var slowRightDelta = span * 0.05;
-                PanRequested?.Invoke(this, -slowRightDelta);
+                PanRequested?.Invoke(this, slowRightDelta);
                 e.Handled = true;
                 break;
                 
             // Page Up/Down for fast scroll
             case Key.PageUp:
+                // Page Up = backward/earlier = negative pan
                 var fastLeftDelta = span * 0.5; // 50% of viewport
-                PanRequested?.Invoke(this, fastLeftDelta);
+                PanRequested?.Invoke(this, -fastLeftDelta);
                 e.Handled = true;
                 break;
                 
             case Key.PageDown:
+                // Page Down = forward/later = positive pan
                 var fastRightDelta = span * 0.5;
-                PanRequested?.Invoke(this, -fastRightDelta);
+                PanRequested?.Invoke(this, fastRightDelta);
                 e.Handled = true;
                 break;
                 

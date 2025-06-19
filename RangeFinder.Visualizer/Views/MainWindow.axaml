@@ -23,12 +23,18 @@
                       Width="150"/>
             
             <TextBlock Text="Viewport:" VerticalAlignment="Center" Margin="20,0,0,0"/>
-            <TextBlock Text="{Binding ViewportStart, StringFormat=F1}" VerticalAlignment="Center"/>
+            <TextBlock Text="{Binding ViewportStart, StringFormat=F1}" 
+                       VerticalAlignment="Center" 
+                       FontFamily="Consolas,Monaco,Courier New,monospace"/>
             <TextBlock Text=" - " VerticalAlignment="Center"/>
-            <TextBlock Text="{Binding ViewportEnd, StringFormat=F1}" VerticalAlignment="Center"/>
+            <TextBlock Text="{Binding ViewportEnd, StringFormat=F1}" 
+                       VerticalAlignment="Center"
+                       FontFamily="Consolas,Monaco,Courier New,monospace"/>
             
             <TextBlock Text="Ranges:" VerticalAlignment="Center" Margin="20,0,0,0"/>
-            <TextBlock Text="{Binding Ranges.Count}" VerticalAlignment="Center"/>
+            <TextBlock Text="{Binding Ranges.Count}" 
+                       VerticalAlignment="Center"
+                       FontFamily="Consolas,Monaco,Courier New,monospace"/>
             
             <TextBlock Text="Controls:" VerticalAlignment="Center" Margin="20,0,0,0"/>
             <TextBlock Text="Ctrl+Wheel: Zoom | ←→: Scroll | PgUp/Dn: Fast scroll | Home/End: Boundaries | +/-: Zoom" 
@@ -41,8 +47,8 @@
         <controls:EnhancedRange1DViewer x:Name="RangeCanvas"
                                         Margin="10"
                                         StringRanges="{Binding Ranges}"
-                                        ViewportStart="{Binding ViewportStart}"
-                                        ViewportEnd="{Binding ViewportEnd}"
+                                        ViewportStart="{Binding ViewportStart, Mode=TwoWay}"
+                                        ViewportEnd="{Binding ViewportEnd, Mode=TwoWay}"
                                         DataMin="{Binding DataMin}"
                                         DataMax="{Binding DataMax}"
                                         ShowControls="True"/>
