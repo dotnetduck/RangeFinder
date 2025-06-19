@@ -1,5 +1,5 @@
 using ConsoleAppFramework;
-using RangeFinder.Generator;
+using RangeFinder.IO;
 
 namespace RangeFinder.Validator;
 
