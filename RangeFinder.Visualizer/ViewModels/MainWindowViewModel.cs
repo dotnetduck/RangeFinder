@@ -179,7 +179,8 @@ public class MainWindowViewModel : ViewModelBase
         {
             var span = ViewportEnd - ViewportStart;
             // Scale zoom amount based on viewport span - larger spans need bigger zoom steps
-            var zoomSensitivity = Math.Max(0.001, span * 0.00001);
+            // Increased base sensitivity for faster zooming
+            var zoomSensitivity = Math.Max(0.01, span * 0.0001);
             var zoomFactor = 1.0 + (delta * zoomSensitivity);
             var newSpan = span / zoomFactor;
             

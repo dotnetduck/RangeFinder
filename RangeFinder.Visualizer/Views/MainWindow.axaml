@@ -29,6 +29,12 @@
             
             <TextBlock Text="Ranges:" VerticalAlignment="Center" Margin="20,0,0,0"/>
             <TextBlock Text="{Binding Ranges.Count}" VerticalAlignment="Center"/>
+            
+            <TextBlock Text="Controls:" VerticalAlignment="Center" Margin="20,0,0,0"/>
+            <TextBlock Text="Ctrl+Wheel: Zoom | ←→: Scroll | PgUp/Dn: Fast scroll | Home/End: Boundaries | +/-: Zoom" 
+                       VerticalAlignment="Center" 
+                       FontSize="10" 
+                       Foreground="Gray"/>
         </StackPanel>
 
         <!-- Main Visualization -->

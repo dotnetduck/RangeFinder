@@ -69,10 +69,16 @@ public class SimpleRange1DCanvas : Control
     private Point _lastPointerPosition;
     private ToolTip? _currentToolTip;
     private List<List<NumericRange<double, string>>> _cachedLayers = new();
-
+    
     static SimpleRange1DCanvas()
     {
         AffectsRender<SimpleRange1DCanvas>(StringRangesProperty, ViewportStartProperty, ViewportEndProperty);
+    }
+
+    public SimpleRange1DCanvas()
+    {
+        // Enable keyboard input for navigation shortcuts
+        Focusable = true;
     }
 
     public override void Render(DrawingContext context)
@@ -278,6 +284,9 @@ public class SimpleRange1DCanvas : Control
     {
         base.OnPointerPressed(e);
         
+        // Give focus to enable keyboard shortcuts
+        Focus();
+        
         _isDragging = true;
         _lastPointerPosition = e.GetPosition(this);
         e.Pointer.Capture(this);
@@ -324,7 +333,84 @@ public class SimpleRange1DCanvas : Control
         
         e.Handled = true;
     }
-    
+
+    protected override void OnKeyDown(KeyEventArgs e)
+    {
+        base.OnKeyDown(e);
+        
+        var span = ViewportEnd - ViewportStart;
+        var centerX = 0.5; // Center for zoom operations
+        
+        switch (e.Key)
+        {
+            // Arrow keys for slow scroll
+            case Key.Left:
+                var slowLeftDelta = span * 0.05; // 5% of viewport
+                PanRequested?.Invoke(this, slowLeftDelta);
+                e.Handled = true;
+                break;
+                
+            case Key.Right:
+                var slowRightDelta = span * 0.05;
+                PanRequested?.Invoke(this, -slowRightDelta);
+                e.Handled = true;
+                break;
+                
+            // Page Up/Down for fast scroll
+            case Key.PageUp:
+                var fastLeftDelta = span * 0.5; // 50% of viewport
+                PanRequested?.Invoke(this, fastLeftDelta);
+                e.Handled = true;
+                break;
+                
+            case Key.PageDown:
+                var fastRightDelta = span * 0.5;
+                PanRequested?.Invoke(this, -fastRightDelta);
+                e.Handled = true;
+                break;
+                
+            // Home/End to jump to boundaries
+            case Key.Home:
+                if (!double.IsNaN(DataMin))
+                {
+                    var newStart = DataMin;
+                    var newEnd = newStart + span;
+                    // Use pan to move to start
+                    var homeDelta = ViewportStart - newStart;
+                    PanRequested?.Invoke(this, homeDelta);
+                }
+                e.Handled = true;
+                break;
+                
+            case Key.End:
+                if (!double.IsNaN(DataMax))
+                {
+                    var newEnd = DataMax;
+                    var newStart = newEnd - span;
+                    // Use pan to move to end
+                    var endDelta = ViewportStart - newStart;
+                    PanRequested?.Invoke(this, endDelta);
+                }
+                e.Handled = true;
+                break;
+                
+            // +/- for zoom
+            case Key.Add:
+            case Key.OemPlus:
+                // Zoom in
+                ScrollRequested?.Invoke(this, (100, true, centerX));
+                e.Handled = true;
+                break;
+                
+            case Key.Subtract:
+            case Key.OemMinus:
+                // Zoom out
+                ScrollRequested?.Invoke(this, (-100, true, centerX));
+                e.Handled = true;
+                break;
+        }
+    }
+
     private IBrush GetBrushFromHashCode(int hashCode)
     {
         // Generate colors based on hashcode for better distribution
@@ -410,4 +496,5 @@ public class SimpleRange1DCanvas : Control
         ToolTip.SetIsOpen(this, false);
         ToolTip.SetTip(this, null);
     }
+    
 }
