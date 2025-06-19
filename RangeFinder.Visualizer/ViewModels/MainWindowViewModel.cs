@@ -10,7 +10,7 @@ namespace RangeFinder.Visualizer.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase
 {
-    private string _selectedDataset = "timeseries";
+    private string _selectedDataset = "sparse";
     private ObservableCollection<NumericRange<double, string>> _ranges = new();
     private double _viewportStart = 0.0;
     private double _viewportEnd = 100.0;
@@ -19,10 +19,9 @@ public class MainWindowViewModel : ViewModelBase
 
     public string[] AvailableDatasets { get; } = 
     {
-        "timeseries",
-        "overlapping", 
-        "random",
-        "performance"
+        "sparse",
+        "medium", 
+        "dense"
     };
 
     public string SelectedDataset
@@ -102,35 +101,47 @@ public class MainWindowViewModel : ViewModelBase
 
         switch (datasetName)
         {
-            case "timeseries":
-                var currentTime = 0.0;
-                for (int i = 0; i < 20; i++)
+            case "sparse":
+                // Sparse: 1000 ranges with minimal overlap, spread over wide area
+                for (int i = 0; i < 1000; i++)
                 {
-                    var duration = random.NextDouble() * 10 + 2;
-                    var gap = random.NextDouble() * 2;
+                    var start = random.NextDouble() * 10000; // Wide spread
+                    var duration = random.NextDouble() * 5 + 1; // Short ranges
                     ranges.Add(new NumericRange<double, string>(
-                        currentTime, currentTime + duration, $"Task {i + 1}"));
-                    currentTime += duration + gap;
+                        start, start + duration, $"Sparse_{i:D4}"));
                 }
                 break;
 
-            case "overlapping":
-                for (int i = 0; i < 30; i++)
+            case "medium":
+                // Medium: 2000 ranges with moderate overlap
+                for (int i = 0; i < 2000; i++)
                 {
-                    var start = random.NextDouble() * 50;
-                    var duration = random.NextDouble() * 20 + 5;
+                    var start = random.NextDouble() * 5000; // Medium spread
+                    var duration = random.NextDouble() * 15 + 5; // Medium ranges
                     ranges.Add(new NumericRange<double, string>(
-                        start, start + duration, $"Process {i + 1}"));
+                        start, start + duration, $"Medium_{i:D4}"));
+                }
+                break;
+
+            case "dense":
+                // Dense: 5000 ranges with heavy overlap
+                for (int i = 0; i < 5000; i++)
+                {
+                    var start = random.NextDouble() * 2000; // Narrow spread
+                    var duration = random.NextDouble() * 25 + 10; // Longer ranges
+                    ranges.Add(new NumericRange<double, string>(
+                        start, start + duration, $"Dense_{i:D4}"));
                 }
                 break;
 
             default:
-                for (int i = 0; i < 10; i++)
+                // Fallback to sparse
+                for (int i = 0; i < 1000; i++)
                 {
-                    var start = random.NextDouble() * 100;
-                    var duration = random.NextDouble() * 10 + 1;
+                    var start = random.NextDouble() * 10000;
+                    var duration = random.NextDouble() * 5 + 1;
                     ranges.Add(new NumericRange<double, string>(
-                        start, start + duration, $"Range {i + 1}"));
+                        start, start + duration, $"Default_{i:D4}"));
                 }
                 break;
         }
@@ -167,7 +178,9 @@ public class MainWindowViewModel : ViewModelBase
         if (isZoomModifier)
         {
             var span = ViewportEnd - ViewportStart;
-            var zoomFactor = 1.0 + (delta * 0.001);
+            // Scale zoom amount based on viewport span - larger spans need bigger zoom steps
+            var zoomSensitivity = Math.Max(0.001, span * 0.00001);
+            var zoomFactor = 1.0 + (delta * zoomSensitivity);
             var newSpan = span / zoomFactor;
             
             var mouseValue = ViewportStart + mouseX * span;
