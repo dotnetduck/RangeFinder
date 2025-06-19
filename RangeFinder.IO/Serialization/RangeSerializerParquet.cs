@@ -3,7 +3,7 @@ using Parquet.Serialization;
 using RangeFinder.Core;
 using System.Numerics;
 
-namespace RangeFinder.IO;
+namespace RangeFinder.IO.Serialization;
 
 public static partial class RangeSerializer
 {

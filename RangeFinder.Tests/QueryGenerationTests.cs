@@ -1,5 +1,5 @@
 using RangeFinder.Core;
-using RangeFinder.IO;
+using RangeFinder.IO.Generation;
 using System.Reflection;
 
 namespace RangeFinder.Tests;

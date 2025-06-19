@@ -1,4 +1,4 @@
-using RangeFinder.IO;
+using RangeFinder.IO.Generation;
 using RangeFinder.Core;
 
 namespace RangeFinder.Tests;

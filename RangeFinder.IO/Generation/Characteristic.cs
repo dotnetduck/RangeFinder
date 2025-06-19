@@ -1,4 +1,4 @@
-namespace RangeFinder.IO;
+namespace RangeFinder.IO.Generation;
 
 /// <summary>
 /// Enumeration of available dataset characteristics for parameterized benchmarking.
