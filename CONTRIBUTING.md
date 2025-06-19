@@ -48,7 +48,7 @@ All contributions must include appropriate tests:
 dotnet test
 
 # Run specific test project
-dotnet test RangeFinderTests/
+dotnet test RangeFinder.Tests/
 ```
 
 **Test Categories:**
@@ -192,10 +192,13 @@ RangeFinder maintains strict performance requirements:
 ```
 RangeFinder/
 ├── RangeFinder.Core/      # Core library
-├── RangeFinderTests/      # Unit and integration tests
+├── RangeFinder.IO/        # File I/O and data generation utilities
+│   ├── Generation/        # Test data generation utilities  
+│   └── Serialization/     # CSV/Parquet serialization
+├── RangeFinder.Tests/     # Unit and integration tests
 ├── RangeFinder.Benchmark/ # Performance benchmarks
 ├── RangeFinder.Validator/ # Performance regression detection and validation
-└── RangeGenerator/        # Test data generation utilities
+└── RangeFinder.Visualizer/ # Avalonia-based range visualization tool
 ```
 
 ## Recognition
