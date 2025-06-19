@@ -31,7 +31,7 @@ public class RangeFinder<TNumber, TAssociated>
 
     public RangeFinder(IEnumerable<NumericRange<TNumber, TAssociated>> ranges)
     {
-        _sortedRanges = ranges.OrderBy(r => r.Start).ToArray();
+        _sortedRanges = [.. ranges.OrderBy(r => r.Start)];
         _canTerminateHere = new bool[_sortedRanges.Length];
         
         // Calculate max span for pruning
@@ -220,7 +220,7 @@ public class RangeFinder<TNumber, TAssociated>
         
         return QueryRangesAsyncCore(
             queryRange.Start,
-            range => queryRange.Overlaps(range),
+            queryRange.Overlaps,
             range => range.Start.CompareTo(queryRange.End) > 0,
             cancellationToken);
     }
