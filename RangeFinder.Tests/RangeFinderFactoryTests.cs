@@ -28,11 +28,10 @@ public class RangeFinderFactoryTests
     [Test]
     public void Create_FromNumericRanges_NullInput_ThrowsArgumentNullException()
     {
-#pragma warning disable CS8600 // Intentional null assignment for testing null handling
+#pragma warning disable CS8600, CS8604 // Intentional null assignment and passing for testing null handling
         IEnumerable<NumericRange<double, string>> ranges = null;
-#pragma warning restore CS8600
-
         var ex = Assert.Throws<ArgumentNullException>(() => RangeFinderFactory.Create(ranges));
+#pragma warning restore CS8600, CS8604
         Assert.That(ex.ParamName, Is.EqualTo("ranges"));
     }
 
@@ -58,11 +57,10 @@ public class RangeFinderFactoryTests
     [Test]
     public void Create_FromTuples_NullInput_ThrowsArgumentNullException()
     {
-#pragma warning disable CS8600 // Intentional null assignment for testing null handling
+#pragma warning disable CS8600, CS8604 // Intentional null assignment and passing for testing null handling
         IEnumerable<(double, double, string)> ranges = null;
-#pragma warning restore CS8600
-
         var ex = Assert.Throws<ArgumentNullException>(() => RangeFinderFactory.Create(ranges));
+#pragma warning restore CS8600, CS8604
         Assert.That(ex.ParamName, Is.EqualTo("ranges"));
     }
 
@@ -88,11 +86,10 @@ public class RangeFinderFactoryTests
     [Test]
     public void Create_FromTuplesWithoutValues_NullInput_ThrowsArgumentNullException()
     {
-#pragma warning disable CS8600 // Intentional null assignment for testing null handling
+#pragma warning disable CS8600, CS8604 // Intentional null assignment and passing for testing null handling
         IEnumerable<(double, double)> ranges = null;
-#pragma warning restore CS8600
-
         var ex = Assert.Throws<ArgumentNullException>(() => RangeFinderFactory.Create(ranges));
+#pragma warning restore CS8600, CS8604
         Assert.That(ex.ParamName, Is.EqualTo("ranges"));
     }
 
@@ -115,13 +112,13 @@ public class RangeFinderFactoryTests
     [Test]
     public void Create_FromArrays_NullStarts_ThrowsArgumentNullException()
     {
-#pragma warning disable CS8600 // Intentional null assignment for testing null handling
+#pragma warning disable CS8600, CS8604 // Intentional null assignment and passing for testing null handling
         double[] starts = null;
-#pragma warning restore CS8600
         var ends = new[] { 2.0, 4.0 };
         var values = new[] { "First", "Second" };
 
         var ex = Assert.Throws<ArgumentNullException>(() => RangeFinderFactory.Create(starts, ends, values));
+#pragma warning restore CS8600, CS8604
         Assert.That(ex.ParamName, Is.EqualTo("starts"));
     }
 
@@ -129,12 +126,12 @@ public class RangeFinderFactoryTests
     public void Create_FromArrays_NullEnds_ThrowsArgumentNullException()
     {
         var starts = new[] { 1.0, 3.0 };
-#pragma warning disable CS8600 // Intentional null assignment for testing null handling
+#pragma warning disable CS8600, CS8604 // Intentional null assignment and passing for testing null handling
         double[] ends = null;
-#pragma warning restore CS8600
         var values = new[] { "First", "Second" };
 
         var ex = Assert.Throws<ArgumentNullException>(() => RangeFinderFactory.Create(starts, ends, values));
+#pragma warning restore CS8600, CS8604
         Assert.That(ex.ParamName, Is.EqualTo("ends"));
     }
 
@@ -143,11 +140,11 @@ public class RangeFinderFactoryTests
     {
         var starts = new[] { 1.0, 3.0 };
         var ends = new[] { 2.0, 4.0 };
-#pragma warning disable CS8600 // Intentional null assignment for testing null handling
+#pragma warning disable CS8600, CS8604 // Intentional null assignment and passing for testing null handling
         string[] values = null;
-#pragma warning restore CS8600
 
         var ex = Assert.Throws<ArgumentNullException>(() => RangeFinderFactory.Create(starts, ends, values));
+#pragma warning restore CS8600, CS8604
         Assert.That(ex.ParamName, Is.EqualTo("values"));
     }
 
@@ -180,12 +177,12 @@ public class RangeFinderFactoryTests
     [Test]
     public void Create_FromStartEndArrays_NullStarts_ThrowsArgumentNullException()
     {
-#pragma warning disable CS8600 // Intentional null assignment for testing null handling
+#pragma warning disable CS8600, CS8604 // Intentional null assignment and passing for testing null handling
         double[] starts = null;
-#pragma warning restore CS8600
         var ends = new[] { 2.0, 4.0 };
 
         var ex = Assert.Throws<ArgumentNullException>(() => RangeFinderFactory.Create(starts, ends));
+#pragma warning restore CS8600, CS8604
         Assert.That(ex.ParamName, Is.EqualTo("starts"));
     }
 
@@ -193,11 +190,11 @@ public class RangeFinderFactoryTests
     public void Create_FromStartEndArrays_NullEnds_ThrowsArgumentNullException()
     {
         var starts = new[] { 1.0, 3.0 };
-#pragma warning disable CS8600 // Intentional null assignment for testing null handling
+#pragma warning disable CS8600, CS8604 // Intentional null assignment and passing for testing null handling
         double[] ends = null;
-#pragma warning restore CS8600
 
         var ex = Assert.Throws<ArgumentNullException>(() => RangeFinderFactory.Create(starts, ends));
+#pragma warning restore CS8600, CS8604
         Assert.That(ex.ParamName, Is.EqualTo("ends"));
     }
 
