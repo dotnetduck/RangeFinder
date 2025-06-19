@@ -1,5 +1,6 @@
 using RangeFinder.Core;
 using RangeFinder.IO;
+using RangeFinder.IO.Serialization;
 
 namespace RangeFinder.Tests;
 
