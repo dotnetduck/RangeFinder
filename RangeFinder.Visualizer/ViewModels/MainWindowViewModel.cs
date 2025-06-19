@@ -2,15 +2,18 @@ using System;
 using System.Collections.Generic;
 using System.Collections.ObjectModel;
 using System.ComponentModel;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Threading.Tasks;
 using RangeFinder.Core;
+using RangeFinder.IO;
 
 namespace RangeFinder.Visualizer.ViewModels;
 
 public class MainWindowViewModel : ViewModelBase
 {
-    private string _selectedDataset = "sparse";
+    private string _selectedDataset = "timeseries_sample.csv";
     private ObservableCollection<NumericRange<double, string>> _ranges = new();
     private double _viewportStart = 0.0;
     private double _viewportEnd = 100.0;
@@ -21,7 +24,10 @@ public class MainWindowViewModel : ViewModelBase
     {
         "sparse",
         "medium", 
-        "dense"
+        "dense",
+        "timeseries_sample.csv",
+        "overlapping_sample.csv", 
+        "large_dataset_sample.csv"
     };
 
     public string SelectedDataset
@@ -75,9 +81,31 @@ public class MainWindowViewModel : ViewModelBase
     {
         try
         {
-            // For now, just create some sample data since we need to fix the build first
-            var sampleRanges = GenerateSampleData(datasetName);
-            Ranges = new ObservableCollection<NumericRange<double, string>>(sampleRanges);
+            if (datasetName.EndsWith(".csv"))
+            {
+                // Load sample CSV file
+                LoadSampleCsvFile(datasetName);
+            }
+            else
+            {
+                // Generate sample data
+                var sampleRanges = GenerateSampleData(datasetName);
+                Ranges = new ObservableCollection<NumericRange<double, string>>(sampleRanges);
+                
+                if (Ranges.Any())
+                {
+                    DataMin = Ranges.Min(r => r.Start);
+                    DataMax = Ranges.Max(r => r.End);
+                    ViewportStart = DataMin;
+                    ViewportEnd = DataMax;
+                }
+            }
+        }
+        catch (Exception)
+        {
+            // Fall back to sparse data on error
+            var fallbackRanges = GenerateSampleData("sparse");
+            Ranges = new ObservableCollection<NumericRange<double, string>>(fallbackRanges);
             
             if (Ranges.Any())
             {
@@ -87,10 +115,47 @@ public class MainWindowViewModel : ViewModelBase
                 ViewportEnd = DataMax;
             }
         }
+    }
+
+    private void LoadSampleCsvFile(string fileName)
+    {
+        try
+        {
+            // Get the directory where the executable is located
+            var exeDirectory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
+            var filePath = Path.Combine(exeDirectory!, "SampleData", fileName);
+            
+            if (File.Exists(filePath))
+            {
+                var loadedRanges = RangeSerializer.ReadCsv<double, string>(filePath).ToList();
+                Ranges = new ObservableCollection<NumericRange<double, string>>(loadedRanges);
+                
+                if (Ranges.Any())
+                {
+                    DataMin = Ranges.Min(r => r.Start);
+                    DataMax = Ranges.Max(r => r.End);
+                    ViewportStart = DataMin;
+                    ViewportEnd = DataMax;
+                }
+            }
+            else
+            {
+                throw new FileNotFoundException($"Sample file not found: {filePath}");
+            }
+        }
         catch (Exception)
         {
-            // For now, just create empty collection
-            Ranges = new ObservableCollection<NumericRange<double, string>>();
+            // Fall back to generated data if file loading fails
+            var fallbackRanges = GenerateSampleData("sparse");
+            Ranges = new ObservableCollection<NumericRange<double, string>>(fallbackRanges);
+            
+            if (Ranges.Any())
+            {
+                DataMin = Ranges.Min(r => r.Start);
+                DataMax = Ranges.Max(r => r.End);
+                ViewportStart = DataMin;
+                ViewportEnd = DataMax;
+            }
         }
     }
 
@@ -147,6 +212,42 @@ public class MainWindowViewModel : ViewModelBase
         }
 
         return ranges;
+    }
+
+    public async Task LoadRangesFromFileAsync(string filePath)
+    {
+        try
+        {
+            IEnumerable<NumericRange<double, string>> loadedRanges;
+            
+            var extension = Path.GetExtension(filePath).ToLowerInvariant();
+            loadedRanges = extension switch
+            {
+                ".csv" => RangeSerializer.ReadCsv<double, string>(filePath),
+                ".parquet" => await RangeSerializer.ReadParquetAsync<double, string>(filePath),
+                _ => throw new NotSupportedException($"File format '{extension}' is not supported. Use .csv or .parquet files.")
+            };
+
+            var rangesList = loadedRanges.ToList();
+            if (rangesList.Count == 0)
+            {
+                throw new InvalidOperationException("The file contains no valid ranges.");
+            }
+
+            Ranges = new ObservableCollection<NumericRange<double, string>>(rangesList);
+            
+            DataMin = Ranges.Min(r => r.Start);
+            DataMax = Ranges.Max(r => r.End);
+            ViewportStart = DataMin;
+            ViewportEnd = DataMax;
+        }
+        catch (Exception ex)
+        {
+            // For now, fall back to sample data on error
+            // In a real app, you'd show an error dialog
+            LoadDataset("sparse");
+            throw new InvalidOperationException($"Failed to load file: {ex.Message}", ex);
+        }
     }
 
     public void OnPanRequested(double delta)
