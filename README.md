@@ -15,17 +15,31 @@ A high-performance .NET range query library for general numeric ranges.
 
 ## Quick Start
 
+### Construct a RangeFinder
+
 ```csharp
 using RangeFinder.Core;
 
 // Simple tuple-based creation
-var finder = RangeFinderFactory.Create(new[]
-{
+var finder = RangeFinderFactory.Create(
+[
     (1.0, 2.2, 100),
     (2.0, 3.2, 200),
     (3.0, 4.0, 300)
-});
+]);
 
+// Or create from NumericRange objects
+var ranges = new[]
+{
+    new NumericRange<double, int>(1.0, 2.2, 100),
+    new NumericRange<double, int>(2.0, 3.2, 200)
+};
+var finder2 = RangeFinderFactory.Create(ranges);
+```
+
+### Issue queries
+
+```csharp
 // Query overlapping ranges
 var values = finder.Query(2.0, 2.9);         // Returns: 100, 200
 var overlaps = finder.QueryRanges(2.0, 3.0); // Returns: [1.0,2.2]=100, [2.0,3.2]=200
