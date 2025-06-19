@@ -32,7 +32,7 @@ public class MainWindowViewModel : ViewModelBase
         {
             if (SetField(ref _selectedDataset, value))
             {
-                _ = LoadDatasetAsync(value);
+                LoadDataset(value);
             }
         }
     }
@@ -69,10 +69,10 @@ public class MainWindowViewModel : ViewModelBase
 
     public MainWindowViewModel()
     {
-        _ = LoadDatasetAsync(_selectedDataset);
+        LoadDataset(_selectedDataset);
     }
 
-    private async Task LoadDatasetAsync(string datasetName)
+    private void LoadDataset(string datasetName)
     {
         try
         {

@@ -125,7 +125,7 @@ public partial class EnhancedRange1DViewer : UserControl
 
     private void SetSmartInitialViewport()
     {
-        if (StringRanges?.Count == 0 || double.IsNaN(DataMin) || double.IsNaN(DataMax))
+        if (StringRanges == null || StringRanges.Count == 0 || double.IsNaN(DataMin) || double.IsNaN(DataMax))
             return;
 
         var dataSpan = DataMax - DataMin;
