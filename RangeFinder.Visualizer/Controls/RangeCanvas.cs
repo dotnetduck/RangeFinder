@@ -11,25 +11,25 @@ using System.Linq;
 namespace RangeFinder.Visualizer.Controls;
 
 /// <summary>
-/// Simplified high-performance canvas for rendering 1D ranges
+/// High-performance canvas for rendering 1D ranges
 /// </summary>
-public class SimpleRange1DCanvas : Control
+public class RangeCanvas : Control
 {
     public static readonly StyledProperty<ObservableCollection<NumericRange<double, string>>> StringRangesProperty =
-        AvaloniaProperty.Register<SimpleRange1DCanvas, ObservableCollection<NumericRange<double, string>>>(
+        AvaloniaProperty.Register<RangeCanvas, ObservableCollection<NumericRange<double, string>>>(
             nameof(StringRanges), new ObservableCollection<NumericRange<double, string>>());
 
     public static readonly StyledProperty<double> ViewportStartProperty =
-        AvaloniaProperty.Register<SimpleRange1DCanvas, double>(nameof(ViewportStart), 0.0);
+        AvaloniaProperty.Register<RangeCanvas, double>(nameof(ViewportStart), 0.0);
 
     public static readonly StyledProperty<double> ViewportEndProperty =
-        AvaloniaProperty.Register<SimpleRange1DCanvas, double>(nameof(ViewportEnd), 1000.0);
+        AvaloniaProperty.Register<RangeCanvas, double>(nameof(ViewportEnd), 1000.0);
 
     public static readonly StyledProperty<double> DataMinProperty =
-        AvaloniaProperty.Register<SimpleRange1DCanvas, double>(nameof(DataMin), double.NaN);
+        AvaloniaProperty.Register<RangeCanvas, double>(nameof(DataMin), double.NaN);
 
     public static readonly StyledProperty<double> DataMaxProperty =
-        AvaloniaProperty.Register<SimpleRange1DCanvas, double>(nameof(DataMax), double.NaN);
+        AvaloniaProperty.Register<RangeCanvas, double>(nameof(DataMax), double.NaN);
 
     public ObservableCollection<NumericRange<double, string>> StringRanges
     {
@@ -70,12 +70,12 @@ public class SimpleRange1DCanvas : Control
     private ToolTip? _currentToolTip;
     private List<List<NumericRange<double, string>>> _cachedLayers = new();
     
-    static SimpleRange1DCanvas()
+    static RangeCanvas()
     {
-        AffectsRender<SimpleRange1DCanvas>(StringRangesProperty, ViewportStartProperty, ViewportEndProperty);
+        AffectsRender<RangeCanvas>(StringRangesProperty, ViewportStartProperty, ViewportEndProperty);
     }
 
-    public SimpleRange1DCanvas()
+    public RangeCanvas()
     {
         // Enable keyboard input for navigation shortcuts
         Focusable = true;

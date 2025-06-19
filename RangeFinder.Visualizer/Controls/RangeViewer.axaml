@@ -4,7 +4,7 @@
              xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
              xmlns:controls="using:RangeFinder.Visualizer.Controls"
              mc:Ignorable="d" d:DesignWidth="800" d:DesignHeight="450"
-             x:Class="RangeFinder.Visualizer.Controls.EnhancedRange1DViewer">
+             x:Class="RangeFinder.Visualizer.Controls.RangeViewer">
     
     <Grid>
         <Grid.RowDefinitions>
@@ -18,7 +18,7 @@
                     HorizontalAlignment="Right"
                     Margin="5"
                     Spacing="5"
-                    IsVisible="{Binding ShowControls, RelativeSource={RelativeSource AncestorType=controls:EnhancedRange1DViewer}}">
+                    IsVisible="{Binding ShowControls, RelativeSource={RelativeSource AncestorType=controls:RangeViewer}}">
             
             <Button Name="ZoomInButton"
                     Content="🔍+"
@@ -44,7 +44,7 @@
                 BorderBrush="Gray" 
                 BorderThickness="1"
                 Background="White">
-            <controls:SimpleRange1DCanvas Name="VisualizationCanvas"/>
+            <controls:RangeCanvas Name="VisualizationCanvas"/>
         </Border>
     </Grid>
 </UserControl>

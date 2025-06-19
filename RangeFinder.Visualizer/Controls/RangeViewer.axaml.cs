@@ -9,26 +9,26 @@ using System.Linq;
 
 namespace RangeFinder.Visualizer.Controls;
 
-public partial class EnhancedRange1DViewer : UserControl
+public partial class RangeViewer : UserControl
 {
     public static readonly StyledProperty<ObservableCollection<NumericRange<double, string>>> StringRangesProperty =
-        AvaloniaProperty.Register<EnhancedRange1DViewer, ObservableCollection<NumericRange<double, string>>>(
+        AvaloniaProperty.Register<RangeViewer, ObservableCollection<NumericRange<double, string>>>(
             nameof(StringRanges), new ObservableCollection<NumericRange<double, string>>());
 
     public static readonly StyledProperty<double> ViewportStartProperty =
-        AvaloniaProperty.Register<EnhancedRange1DViewer, double>(nameof(ViewportStart), 0.0);
+        AvaloniaProperty.Register<RangeViewer, double>(nameof(ViewportStart), 0.0);
 
     public static readonly StyledProperty<double> ViewportEndProperty =
-        AvaloniaProperty.Register<EnhancedRange1DViewer, double>(nameof(ViewportEnd), 1000.0);
+        AvaloniaProperty.Register<RangeViewer, double>(nameof(ViewportEnd), 1000.0);
 
     public static readonly StyledProperty<double> DataMinProperty =
-        AvaloniaProperty.Register<EnhancedRange1DViewer, double>(nameof(DataMin), double.NaN);
+        AvaloniaProperty.Register<RangeViewer, double>(nameof(DataMin), double.NaN);
 
     public static readonly StyledProperty<double> DataMaxProperty =
-        AvaloniaProperty.Register<EnhancedRange1DViewer, double>(nameof(DataMax), double.NaN);
+        AvaloniaProperty.Register<RangeViewer, double>(nameof(DataMax), double.NaN);
 
     public static readonly StyledProperty<bool> ShowControlsProperty =
-        AvaloniaProperty.Register<EnhancedRange1DViewer, bool>(nameof(ShowControls), true);
+        AvaloniaProperty.Register<RangeViewer, bool>(nameof(ShowControls), true);
 
     // Events for external handling
     public event EventHandler<double>? PanRequested;
@@ -71,9 +71,9 @@ public partial class EnhancedRange1DViewer : UserControl
         set => SetValue(ShowControlsProperty, value);
     }
 
-    private SimpleRange1DCanvas? _canvas;
+    private RangeCanvas? _canvas;
 
-    public EnhancedRange1DViewer()
+    public RangeViewer()
     {
         InitializeComponent();
         this.Loaded += OnLoaded;
@@ -82,7 +82,7 @@ public partial class EnhancedRange1DViewer : UserControl
 
     private void OnLoaded(object? sender, RoutedEventArgs e)
     {
-        _canvas = this.FindControl<SimpleRange1DCanvas>("VisualizationCanvas");
+        _canvas = this.FindControl<RangeCanvas>("VisualizationCanvas");
         var zoomInButton = this.FindControl<Button>("ZoomInButton");
         var zoomOutButton = this.FindControl<Button>("ZoomOutButton");
         var resetButton = this.FindControl<Button>("ResetButton");
