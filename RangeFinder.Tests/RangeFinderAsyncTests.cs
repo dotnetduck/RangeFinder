@@ -125,7 +125,7 @@ public class RangeFinderAsyncTests
     }
 
     [Test]
-    public void QueryAsync_CancellationToken_ThrowsWhenCancelled()
+    public async Task QueryAsync_CancellationToken_ThrowsWhenCancelled()
     {
         // Create a large dataset to ensure we can cancel during enumeration
         var ranges = new List<NumericRange<double, int>>();
