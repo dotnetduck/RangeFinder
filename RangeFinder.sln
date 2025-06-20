@@ -2,8 +2,6 @@
 Microsoft Visual Studio Solution File, Format Version 12.00
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RangeFinder.Benchmark", "RangeFinder.Benchmark\RangeFinder.Benchmark.csproj", "{002A1559-1590-459A-BCA0-E491C92DBF7F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RangeFinder.Validator", "RangeFinder.Validator\RangeFinder.Validator.csproj", "{AAFF85A0-47EF-49A7-A84E-1158B73C9A3C}"
-EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RangeFinder.Tests", "RangeFinder.Tests\RangeFinder.Tests.csproj", "{6BBA4949-48D8-44D1-9555-B37BA4F93011}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RangeFinder.Core", "RangeFinder.Core\RangeFinder.Core.csproj", "{D876E2E5-6F44-4F57-8AA9-B6AC3724AD6F}"
