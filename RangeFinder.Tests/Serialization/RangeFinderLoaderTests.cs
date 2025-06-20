@@ -2,7 +2,7 @@ using RangeFinder.Core;
 using RangeFinder.IO;
 using RangeFinder.IO.Serialization;
 
-namespace RangeFinder.Tests;
+namespace RangeFinder.Tests.Serialization;
 
 /// <summary>
 /// Tests for RangeFinderLoader class.

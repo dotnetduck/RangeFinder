@@ -3,7 +3,7 @@ using RangeFinder.IO;
 using RangeFinder.IO.Generation;
 using System.Reflection;
 
-namespace RangeFinder.Tests;
+namespace RangeFinder.Tests.Generation;
 
 /// <summary>
 /// Tests for core dataset generation functionality.

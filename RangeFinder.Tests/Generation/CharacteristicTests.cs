@@ -1,7 +1,8 @@
 using RangeFinder.IO.Generation;
 using RangeFinder.Core;
+using RangeFinder.Tests;
 
-namespace RangeFinder.Tests;
+namespace RangeFinder.Tests.Generation;
 
 /// <summary>
 /// Tests for Characteristic enum functionality.

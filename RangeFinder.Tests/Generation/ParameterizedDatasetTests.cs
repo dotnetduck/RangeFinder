@@ -3,7 +3,7 @@ using RangeFinder.Core;
 using RangeFinder.IO.Generation;
 using Gen = RangeFinder.IO.Generation.Generator;
 
-namespace RangeFinder.Tests;
+namespace RangeFinder.Tests.Generation;
 
 /// <summary>
 /// Parameterized dataset tests demonstrating systematic performance validation
