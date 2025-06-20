@@ -20,6 +20,10 @@
         <PackageReference Include="RangeTree" Version="3.0.1" />
     </ItemGroup>
 
+    <PropertyGroup>
+        <WarningsNotAsErrors>NUnit1027</WarningsNotAsErrors>
+    </PropertyGroup>
+
     <ItemGroup>
         <Using Include="NUnit.Framework" />
     </ItemGroup>

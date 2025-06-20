@@ -1,210 +1,244 @@
+using FsCheck;
+using FsCheck.NUnit;
 using IntervalTree;
 using RangeFinder.Core;
 
 namespace RangeFinder.Tests.PropertyBased;
 
 /// <summary>
-/// Property-based compatibility tests that verify RangeFinder behavior against IntervalTree
-/// using the existing test infrastructure and simple random data generation.
+/// Custom generators for FsCheck property-based tests
+/// </summary>
+public static class RangeDataGenerators
+{
+    /// <summary>
+    /// Generates valid range tuples ensuring start <= end
+    /// </summary>
+    public static Arbitrary<(double start, double end)> ValidRangeTuple()
+    {
+        var gen = from x in Gen.Choose(-100, 100)
+                  from y in Gen.Choose(-100, 100)
+                  select x <= y ? ((double)x, (double)y) : ((double)y, (double)x); // Ensure start <= end
+        
+        return gen.ToArbitrary();
+    }
+
+    /// <summary>
+    /// Generates arrays of valid range tuples
+    /// </summary>
+    public static Arbitrary<(double start, double end)[]> ValidRangeArray()
+    {
+        var gen = from size in Gen.Choose(1, 20)
+                  from ranges in Gen.ArrayOf(size, ValidRangeTuple().Generator)
+                  select ranges;
+        
+        return gen.ToArbitrary();
+    }
+
+    /// <summary>
+    /// Generates query tuples ensuring start <= end
+    /// </summary>
+    public static Arbitrary<(double start, double end)> ValidQueryTuple()
+    {
+        var gen = from x in Gen.Choose(-200, 200)
+                  from y in Gen.Choose(-200, 200)
+                  select x <= y ? ((double)x, (double)y) : ((double)y, (double)x); // Ensure start <= end
+        
+        return gen.ToArbitrary();
+    }
+}
+
+/// <summary>
+/// Property-based compatibility tests using FsCheck that verify RangeFinder behavior 
+/// against IntervalTree using custom generators and factory methods.
 /// </summary>
 [TestFixture]
 public class CompatibilityTests
 {
-    private readonly Random _random = new(42); // Fixed seed for reproducibility
-
     /// <summary>
-    /// Tests that RangeFinder and IntervalTree produce identical results for random range queries
+    /// PROPERTY: RangeFinder and IntervalTree must always produce identical results
+    /// ∀ ranges, query. RangeFinder.Query(query) = IntervalTree.Query(query)
     /// </summary>
-    [Test]
-    public void RangeFinderEquivalentToIntervalTree_RandomRangeQueries()
+    [FsCheck.NUnit.Property(MaxTest = 100)]
+    public void RangeFinderEquivalentToIntervalTree_RangeQueries()
     {
-        for (int iteration = 0; iteration < 100; iteration++)
-        {
-            // Generate random range data
-            var rangeCount = _random.Next(1, 50);
-            var validRanges = GenerateRandomRanges(rangeCount);
-
-            // Generate random query
-            var queryStart = _random.NextDouble() * 100;
-            var queryEnd = _random.NextDouble() * 100;
-            var start = Math.Min(queryStart, queryEnd);
-            var end = Math.Max(queryStart, queryEnd);
-
-            // Build both data structures
-            var rangeFinder = RangeFinderFactory.Create(validRanges);
-            var intervalTree = new IntervalTree<double, int>();
-            for (int i = 0; i < validRanges.Length; i++)
+        var rangeArb = RangeDataGenerators.ValidRangeArray();
+        var queryArb = RangeDataGenerators.ValidQueryTuple();
+        
+        Prop.ForAll(rangeArb, queryArb, (rangeData, query) =>
             {
-                intervalTree.Add(validRanges[i].Item1, validRanges[i].Item2, i);
-            }
+                // Build both data structures using factory method
+                var rangeFinder = RangeFinderFactory.Create(rangeData);
+                var intervalTree = new IntervalTree<double, int>();
+                for (int i = 0; i < rangeData.Length; i++)
+                {
+                    intervalTree.Add(rangeData[i].start, rangeData[i].end, i);
+                }
 
-            // Verify results are identical
-            var rfResults = rangeFinder.Query(start, end).Count();
-            var itResults = intervalTree.Query(start, end).Count();
+                // ASSERTION: Results must always be identical
+                var rfResults = rangeFinder.Query(query.start, query.end).Count();
+                var itResults = intervalTree.Query(query.start, query.end).Count();
 
-            Assert.That(rfResults, Is.EqualTo(itResults), 
-                $"Results differ for iteration {iteration} with query [{start:F2}, {end:F2}] on {rangeCount} ranges");
-        }
+                return rfResults == itResults;
+            })
+            .QuickCheckThrowOnFailure();
     }
 
     /// <summary>
-    /// Tests that point queries equal range queries with same bounds
+    /// PROPERTY: Point query must equal range query with same start/end
+    /// ∀ ranges, point. Query(point) = Query(point, point)
     /// </summary>
-    [Test]
-    public void PointQueryEqualsRangeQuery_RandomData()
+    [FsCheck.NUnit.Property(MaxTest = 50)]
+    public void PointQueryEqualsRangeQuery()
     {
-        for (int iteration = 0; iteration < 50; iteration++)
-        {
-            var rangeCount = _random.Next(1, 30);
-            var validRanges = GenerateRandomRanges(rangeCount);
-            var point = _random.NextDouble() * 100;
-
-            var rangeFinder = RangeFinderFactory.Create(validRanges);
-
-            var pointResults = rangeFinder.Query(point).OrderBy(x => x).ToArray();
-            var rangeResults = rangeFinder.Query(point, point).OrderBy(x => x).ToArray();
-
-            Assert.That(pointResults, Is.EqualTo(rangeResults),
-                $"Point query differs from range query at iteration {iteration} for point {point:F2}");
-        }
-    }
-
-    /// <summary>
-    /// Tests that query results only contain overlapping ranges
-    /// </summary>
-    [Test]
-    public void QueryResultsOnlyContainOverlappingRanges_RandomData()
-    {
-        for (int iteration = 0; iteration < 50; iteration++)
-        {
-            var rangeCount = _random.Next(1, 30);
-            var validRanges = GenerateRandomRanges(rangeCount);
-
-            var queryStart = _random.NextDouble() * 100;
-            var queryEnd = _random.NextDouble() * 100;
-            var start = Math.Min(queryStart, queryEnd);
-            var end = Math.Max(queryStart, queryEnd);
-
-            var rangeFinder = RangeFinderFactory.Create(validRanges);
-            var results = rangeFinder.QueryRanges(start, end);
-
-            foreach (var result in results)
+        var rangeArb = RangeDataGenerators.ValidRangeArray();
+        
+        Prop.ForAll(rangeArb, Arb.From<double>(), (rangeData, point) =>
             {
-                Assert.That(result.Overlaps(start, end), Is.True,
-                    $"Range [{result.Start:F2}, {result.End:F2}] should overlap with query [{start:F2}, {end:F2}] at iteration {iteration}");
-            }
-        }
+                var rangeFinder = RangeFinderFactory.Create(rangeData);
+
+                var pointResults = rangeFinder.Query(point).OrderBy(x => x).ToArray();
+                var rangeResults = rangeFinder.Query(point, point).OrderBy(x => x).ToArray();
+
+                return pointResults.SequenceEqual(rangeResults);
+            })
+            .QuickCheckThrowOnFailure();
     }
 
     /// <summary>
-    /// Tests count property with random data
+    /// PROPERTY: Query results must only contain ranges that actually overlap
+    /// ∀ ranges, query. ∀ result ∈ Query(query). result overlaps query
     /// </summary>
-    [Test]
-    public void CountPropertyEqualsInputSize_RandomData()
+    [FsCheck.NUnit.Property(MaxTest = 50)]
+    public void QueryResultsOnlyContainOverlappingRanges()
     {
-        for (int iteration = 0; iteration < 30; iteration++)
-        {
-            var rangeCount = _random.Next(1, 100);
-            var validRanges = GenerateRandomRanges(rangeCount);
+        var rangeArb = RangeDataGenerators.ValidRangeArray();
+        var queryArb = RangeDataGenerators.ValidQueryTuple();
+        
+        Prop.ForAll(rangeArb, queryArb, (rangeData, query) =>
+            {
+                var rangeFinder = RangeFinderFactory.Create(rangeData);
+                var results = rangeFinder.QueryRanges(query.start, query.end);
 
-            var rangeFinder = RangeFinderFactory.Create(validRanges);
-
-            Assert.That(rangeFinder.Count, Is.EqualTo(validRanges.Length),
-                $"Count mismatch at iteration {iteration}");
-        }
+                // ASSERTION: Every result must overlap with query
+                return results.All(result => result.Overlaps(query.start, query.end));
+            })
+            .QuickCheckThrowOnFailure();
     }
 
     /// <summary>
-    /// Tests monotonicity property: expanding query bounds never reduces results
+    /// PROPERTY: Count must equal input size
+    /// ∀ ranges. RangeFinder(ranges).Count = |ranges|
     /// </summary>
-    [Test]
-    public void ExpandingQueryNeverReducesResults_RandomData()
+    [FsCheck.NUnit.Property(MaxTest = 50)]
+    public void CountPropertyEqualsInputSize()
     {
-        for (int iteration = 0; iteration < 30; iteration++)
-        {
-            var rangeCount = _random.Next(1, 30);
-            var validRanges = GenerateRandomRanges(rangeCount);
-
-            // Generate nested queries (query2 contains query1)
-            var start1 = _random.NextDouble() * 50 + 25; // [25, 75]
-            var end1 = start1 + _random.NextDouble() * 10; // [start1, start1+10]
-            var start2 = start1 - _random.NextDouble() * 25; // [0, start1]
-            var end2 = end1 + _random.NextDouble() * 25; // [end1, end1+25]
-
-            var rangeFinder = RangeFinderFactory.Create(validRanges);
-
-            var results1 = rangeFinder.Query(start1, end1).ToHashSet();
-            var results2 = rangeFinder.Query(start2, end2).ToHashSet();
-
-            Assert.That(results1.IsSubsetOf(results2), Is.True,
-                $"Smaller query results should be subset of larger query at iteration {iteration}");
-        }
+        var rangeArb = RangeDataGenerators.ValidRangeArray();
+        
+        Prop.ForAll(rangeArb, rangeData =>
+            {
+                var rangeFinder = RangeFinderFactory.Create(rangeData);
+                return rangeFinder.Count == rangeData.Length;
+            })
+            .QuickCheckThrowOnFailure();
     }
 
     /// <summary>
-    /// Tests that operations are deterministic
+    /// PROPERTY: Expanding query bounds never reduces results (Monotonicity)
+    /// ∀ ranges, q1, q2. q1 ⊆ q2 ⟹ Query(q1) ⊆ Query(q2)
     /// </summary>
-    [Test]
-    public void QueriesAreDeterministic_RandomData()
+    [FsCheck.NUnit.Property(MaxTest = 30)]
+    public void ExpandingQueryNeverReducesResults()
     {
-        for (int iteration = 0; iteration < 20; iteration++)
-        {
-            var rangeCount = _random.Next(1, 30);
-            var validRanges = GenerateRandomRanges(rangeCount);
+        var rangeArb = RangeDataGenerators.ValidRangeArray();
+        var queryArb = RangeDataGenerators.ValidQueryTuple();
+        
+        Prop.ForAll(rangeArb, queryArb, queryArb, (rangeData, query1, query2) =>
+            {
+                // Ensure query2 contains query1
+                var expandedQuery = (
+                    Math.Min(query1.start, query2.start),
+                    Math.Max(query1.end, query2.end)
+                );
 
-            var queryStart = _random.NextDouble() * 100;
-            var queryEnd = _random.NextDouble() * 100;
-            var start = Math.Min(queryStart, queryEnd);
-            var end = Math.Max(queryStart, queryEnd);
+                var rangeFinder = RangeFinderFactory.Create(rangeData);
 
-            // Build identical structures
-            var finder1 = RangeFinderFactory.Create(validRanges);
-            var finder2 = RangeFinderFactory.Create(validRanges);
+                // ASSERTION: Larger query must contain all results from smaller query
+                var results1 = rangeFinder.Query(query1.start, query1.end).ToHashSet();
+                var results2 = rangeFinder.Query(expandedQuery.Item1, expandedQuery.Item2).ToHashSet();
 
-            var results1 = finder1.Query(start, end).OrderBy(x => x).ToArray();
-            var results2 = finder2.Query(start, end).OrderBy(x => x).ToArray();
-
-            Assert.That(results1, Is.EqualTo(results2),
-                $"Determinism failed at iteration {iteration}");
-        }
+                return results1.IsSubsetOf(results2);
+            })
+            .QuickCheckThrowOnFailure();
     }
 
     /// <summary>
-    /// Tests empty dataset behavior
+    /// PROPERTY: Operations are deterministic
+    /// ∀ ranges, query. Query(ranges, query) = Query(ranges, query)
     /// </summary>
-    [Test]
+    [FsCheck.NUnit.Property(MaxTest = 30)]
+    public void QueriesAreDeterministic()
+    {
+        var rangeArb = RangeDataGenerators.ValidRangeArray();
+        var queryArb = RangeDataGenerators.ValidQueryTuple();
+        
+        Prop.ForAll(rangeArb, queryArb, (rangeData, query) =>
+            {
+                // Build identical structures using factory method
+                var finder1 = RangeFinderFactory.Create(rangeData);
+                var finder2 = RangeFinderFactory.Create(rangeData);
+
+                var results1 = finder1.Query(query.start, query.end).OrderBy(x => x).ToArray();
+                var results2 = finder2.Query(query.start, query.end).OrderBy(x => x).ToArray();
+
+                return results1.SequenceEqual(results2);
+            })
+            .QuickCheckThrowOnFailure();
+    }
+
+    /// <summary>
+    /// PROPERTY: Empty dataset always produces empty results
+    /// ∀ query. Query_on_EmptyDataset(query) = ∅
+    /// </summary>
+    [FsCheck.NUnit.Property(MaxTest = 20)]
     public void EmptyDatasetAlwaysProducesEmptyResults()
     {
-        var emptyFinder = RangeFinderFactory.Create(Array.Empty<(double, double)>());
+        var queryArb = RangeDataGenerators.ValidQueryTuple();
+        
+        Prop.ForAll(queryArb, Arb.From<double>(), (query, point) =>
+            {
+                var emptyFinder = RangeFinderFactory.Create(Array.Empty<(double, double)>());
 
-        for (int iteration = 0; iteration < 10; iteration++)
-        {
-            var queryStart = _random.NextDouble() * 100;
-            var queryEnd = _random.NextDouble() * 100;
-            var point = _random.NextDouble() * 100;
-            var start = Math.Min(queryStart, queryEnd);
-            var end = Math.Max(queryStart, queryEnd);
+                var rangeResults = emptyFinder.Query(query.start, query.end).ToArray();
+                var pointResults = emptyFinder.Query(point).ToArray();
 
-            var rangeResults = emptyFinder.Query(start, end).ToArray();
-            var pointResults = emptyFinder.Query(point).ToArray();
-
-            Assert.That(rangeResults, Is.Empty, $"Range query should be empty at iteration {iteration}");
-            Assert.That(pointResults, Is.Empty, $"Point query should be empty at iteration {iteration}");
-        }
+                return rangeResults.Length == 0 && pointResults.Length == 0;
+            })
+            .QuickCheckThrowOnFailure();
     }
 
     /// <summary>
-    /// Generates valid random ranges ensuring start <= end
+    /// PROPERTY: Factory methods produce equivalent results
+    /// ∀ ranges, query. FromTuples(ranges).Query(query) = FromArrays(ranges).Query(query)
     /// </summary>
-    private (double, double)[] GenerateRandomRanges(int count)
+    [FsCheck.NUnit.Property(MaxTest = 20)]
+    public void FactoryMethodsProduceEquivalentResults()
     {
-        var ranges = new (double, double)[count];
-        for (int i = 0; i < count; i++)
-        {
-            var start = _random.NextDouble() * 100;
-            var end = start + _random.NextDouble() * 20; // Ensure end >= start
-            ranges[i] = (start, end);
-        }
-        return ranges;
+        var rangeArb = RangeDataGenerators.ValidRangeArray();
+        var queryArb = RangeDataGenerators.ValidQueryTuple();
+        
+        Prop.ForAll(rangeArb, queryArb, (rangeData, query) =>
+            {
+                // Create using different factory methods
+                var fromTuples = RangeFinderFactory.Create(rangeData);
+                var fromArrays = RangeFinderFactory.Create(
+                    rangeData.Select(t => t.start).ToArray(),
+                    rangeData.Select(t => t.end).ToArray());
+
+                var results1 = fromTuples.Query(query.start, query.end).OrderBy(x => x).ToArray();
+                var results2 = fromArrays.Query(query.start, query.end).OrderBy(x => x).ToArray();
+
+                return results1.SequenceEqual(results2);
+            })
+            .QuickCheckThrowOnFailure();
     }
 }
