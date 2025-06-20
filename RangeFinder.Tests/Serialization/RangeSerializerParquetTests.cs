@@ -2,15 +2,15 @@ using RangeFinder.Core;
 using RangeFinder.IO;
 using RangeFinder.IO.Serialization;
 
-namespace RangeFinder.Tests;
+namespace RangeFinder.Tests.Serialization;
 
 [TestFixture]
-public class RangeSerializerCsvTests
+public class RangeSerializerParquetTests
 {
-    private string GetTempFilePath() => Path.GetTempFileName().Replace(".tmp", ".csv");
+    private string GetTempFilePath() => Path.GetTempFileName().Replace(".tmp", ".parquet");
 
     [Test]
-    public void CsvSaveAndLoad_IntegerRanges_PreservesData()
+    public void ParquetSaveAndLoad_IntegerRanges_PreservesData()
     {
         var tempFilePath = GetTempFilePath();
         try
@@ -22,8 +22,8 @@ public class RangeSerializerCsvTests
                 new NumericRange<int, string>(40, 50, "Range3")
             };
 
-            originalRanges.WriteCsv(tempFilePath);
-            var loadedRanges = RangeSerializer.ReadCsv<int, string>(tempFilePath).ToList();
+            originalRanges.WriteParquet(tempFilePath);
+            var loadedRanges = RangeSerializer.ReadParquet<int, string>(tempFilePath).ToList();
 
             Assert.That(loadedRanges, Is.EqualTo(originalRanges));
         }
@@ -35,7 +35,7 @@ public class RangeSerializerCsvTests
     }
 
     [Test]
-    public void CsvSaveAndLoad_DoubleRanges_PreservesData()
+    public void ParquetSaveAndLoad_DoubleRanges_PreservesData()
     {
         var tempFilePath = GetTempFilePath();
         try
@@ -47,17 +47,10 @@ public class RangeSerializerCsvTests
                 new NumericRange<double, int>(40.2, 50.8, 300)
             };
 
-            originalRanges.WriteCsv(tempFilePath);
-            var loadedRanges = RangeSerializer.ReadCsv<double, int>(tempFilePath).ToList();
+            originalRanges.WriteParquet(tempFilePath);
+            var loadedRanges = RangeSerializer.ReadParquet<double, int>(tempFilePath).ToList();
 
-            // For floating point, we need tolerance comparison
-            Assert.Multiple(() =>
-            {
-                Assert.That(loadedRanges, Has.Count.EqualTo(3));
-                Assert.That(loadedRanges.Select(r => r.Start), Is.EqualTo(originalRanges.Select(r => r.Start)).Within(0.001));
-                Assert.That(loadedRanges.Select(r => r.End), Is.EqualTo(originalRanges.Select(r => r.End)).Within(0.001));
-                Assert.That(loadedRanges.Select(r => r.Value), Is.EqualTo(originalRanges.Select(r => r.Value)));
-            });
+            Assert.That(loadedRanges, Is.EqualTo(originalRanges));
         }
         finally
         {
@@ -67,7 +60,7 @@ public class RangeSerializerCsvTests
     }
 
     [Test]
-    public void CsvSaveAndLoad_StringWithCommas_HandlesEscaping()
+    public void ParquetSaveAndLoad_StringWithCommas_HandlesEscaping()
     {
         var tempFilePath = GetTempFilePath();
         try
@@ -79,8 +72,8 @@ public class RangeSerializerCsvTests
                 new NumericRange<int, string>(40, 50, "Normal value")
             };
 
-            originalRanges.WriteCsv(tempFilePath);
-            var loadedRanges = RangeSerializer.ReadCsv<int, string>(tempFilePath).ToList();
+            originalRanges.WriteParquet(tempFilePath);
+            var loadedRanges = RangeSerializer.ReadParquet<int, string>(tempFilePath).ToList();
 
             Assert.That(loadedRanges, Is.EqualTo(originalRanges));
         }
@@ -92,7 +85,7 @@ public class RangeSerializerCsvTests
     }
 
     [Test]
-    public async Task CsvSaveAndLoadAsync_IntegerRanges_PreservesData()
+    public async Task ParquetSaveAndLoadAsync_IntegerRanges_PreservesData()
     {
         var tempFilePath = GetTempFilePath();
         try
@@ -104,8 +97,8 @@ public class RangeSerializerCsvTests
                 new NumericRange<int, string>(40, 50, "Range3")
             };
 
-            await originalRanges.WriteCsvAsync(tempFilePath);
-            var loadedRanges = (await RangeSerializer.ReadCsvAsync<int, string>(tempFilePath)).ToList();
+            await originalRanges.WriteParquetAsync(tempFilePath);
+            var loadedRanges = (await RangeSerializer.ReadParquetAsync<int, string>(tempFilePath)).ToList();
 
             Assert.That(loadedRanges, Is.EqualTo(originalRanges));
         }
@@ -117,15 +110,15 @@ public class RangeSerializerCsvTests
     }
 
     [Test]
-    public void CsvSaveAndLoad_EmptyCollection_CreatesEmptyFile()
+    public void ParquetSaveAndLoad_EmptyCollection_CreatesEmptyFile()
     {
         var tempFilePath = GetTempFilePath();
         try
         {
             var originalRanges = Array.Empty<NumericRange<int, string>>();
 
-            originalRanges.WriteCsv(tempFilePath);
-            var loadedRanges = RangeSerializer.ReadCsv<int, string>(tempFilePath).ToList();
+            originalRanges.WriteParquet(tempFilePath);
+            var loadedRanges = RangeSerializer.ReadParquet<int, string>(tempFilePath).ToList();
 
             Assert.That(loadedRanges, Is.Empty);
         }
@@ -137,7 +130,7 @@ public class RangeSerializerCsvTests
     }
 
     [Test]
-    public void CsvSaveAndLoad_NullValues_HandlesCorrectly()
+    public void ParquetSaveAndLoad_NullValues_HandlesCorrectly()
     {
         var tempFilePath = GetTempFilePath();
         try
@@ -149,17 +142,10 @@ public class RangeSerializerCsvTests
                 new NumericRange<int, string?>(40, 50, null)
             };
 
-            originalRanges.WriteCsv(tempFilePath);
-            var loadedRanges = RangeSerializer.ReadCsv<int, string?>(tempFilePath).ToList();
+            originalRanges.WriteParquet(tempFilePath);
+            var loadedRanges = RangeSerializer.ReadParquet<int, string?>(tempFilePath).ToList();
 
-            // CsvHelper converts null to empty string
-            var expectedRanges = new[]
-            {
-                new NumericRange<int, string?>(1, 10, string.Empty),
-                new NumericRange<int, string?>(20, 30, "Range2"),
-                new NumericRange<int, string?>(40, 50, string.Empty)
-            };
-            Assert.That(loadedRanges, Is.EqualTo(expectedRanges));
+            Assert.That(loadedRanges, Is.EqualTo(originalRanges));
         }
         finally
         {

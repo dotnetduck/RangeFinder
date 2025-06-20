@@ -1,6 +1,6 @@
 using RangeFinder.Core;
 
-namespace RangeFinder.Tests;
+namespace RangeFinder.Tests.Core;
 
 /// <summary>
 /// Pillar 1: Independent functionality tests for RangeFinder.

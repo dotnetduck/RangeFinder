@@ -4,7 +4,7 @@ using RangeFinder.IO;
 using RangeFinder.IO.Generation;
 using Gen = RangeFinder.IO.Generation.Generator;
 
-namespace RangeFinder.Tests;
+namespace RangeFinder.Tests.Core;
 
 /// <summary>
 /// Pillar 2: RangeTree compatibility validation tests.

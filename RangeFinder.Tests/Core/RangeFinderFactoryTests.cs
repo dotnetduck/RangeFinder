@@ -1,6 +1,6 @@
 using RangeFinder.Core;
 
-namespace RangeFinder.Tests;
+namespace RangeFinder.Tests.Core;
 
 /// <summary>
 /// Tests for RangeFinderFactory static methods.
