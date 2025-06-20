@@ -1,8 +1,8 @@
 using RangeFinder.Core;
-using RangeFinder.Generator;
+using RangeFinder.IO.Generation;
 using System.Numerics;
 
-namespace RangeGeneratorTests;
+namespace RangeFinder.Tests;
 
 /// <summary>
 /// Base class providing common test utilities and parameterized test data for RangeGenerator tests.

@@ -1,7 +1,8 @@
 using IntervalTree;
 using RangeFinder.Core;
-using RangeFinder.Generator;
-using Gen = RangeFinder.Generator.Generator;
+using RangeFinder.IO;
+using RangeFinder.IO.Generation;
+using Gen = RangeFinder.IO.Generation.Generator;
 
 namespace RangeFinder.Tests;
 

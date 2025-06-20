@@ -1,4 +1,4 @@
-using RangeFinder.Generator;
+using RangeFinder.IO.Generation;
 
 namespace RangeFinder.Validator;
 

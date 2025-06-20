@@ -1,7 +1,8 @@
 using RangeFinder.Core;
-using RangeFinder.Generator;
+using RangeFinder.IO;
+using RangeFinder.IO.Generation;
 
-namespace RangeGeneratorTests;
+namespace RangeFinder.Tests;
 
 /// <summary>
 /// Tests for dataset analysis functionality.

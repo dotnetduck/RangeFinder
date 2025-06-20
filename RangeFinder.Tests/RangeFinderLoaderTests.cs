@@ -1,5 +1,6 @@
 using RangeFinder.Core;
 using RangeFinder.IO;
+using RangeFinder.IO.Serialization;
 
 namespace RangeFinder.Tests;
 
@@ -157,11 +158,10 @@ public class RangeFinderLoaderTests
     [Test]
     public void FromCsv_NullFilePath_ThrowsArgumentNullException()
     {
-#pragma warning disable CS8600 // Intentional null assignment for testing null handling
+#pragma warning disable CS8600, CS8604 // Intentional null assignment and passing for testing null handling
         string filePath = null;
-#pragma warning restore CS8600
-
         var ex = Assert.Throws<ArgumentNullException>(() => RangeFinderLoader.FromCsv(filePath));
+#pragma warning restore CS8600, CS8604
         Assert.That(ex.ParamName, Is.EqualTo("filePath"));
     }
 
@@ -177,11 +177,10 @@ public class RangeFinderLoaderTests
     [Test]
     public void FromCsvAsync_NullFilePath_ThrowsArgumentNullException()
     {
-#pragma warning disable CS8600 // Intentional null assignment for testing null handling
+#pragma warning disable CS8600, CS8604 // Intentional null assignment and passing for testing null handling
         string filePath = null;
-#pragma warning restore CS8600
-
         Assert.ThrowsAsync<ArgumentNullException>(() => RangeFinderLoader.FromCsvAsync(filePath));
+#pragma warning restore CS8600, CS8604
     }
 
     #endregion
@@ -285,11 +284,10 @@ public class RangeFinderLoaderTests
     [Test]
     public void FromParquet_NullFilePath_ThrowsArgumentNullException()
     {
-#pragma warning disable CS8600 // Intentional null assignment for testing null handling
+#pragma warning disable CS8600, CS8604 // Intentional null assignment and passing for testing null handling
         string filePath = null;
-#pragma warning restore CS8600
-
         var ex = Assert.Throws<ArgumentNullException>(() => RangeFinderLoader.FromParquet(filePath));
+#pragma warning restore CS8600, CS8604
         Assert.That(ex.ParamName, Is.EqualTo("filePath"));
     }
 
@@ -305,13 +303,12 @@ public class RangeFinderLoaderTests
     [Test]
     public void FromParquetAsync_NullFilePath_ThrowsArgumentNullException()
     {
-#pragma warning disable CS8600 // Intentional null assignment for testing null handling
+        #pragma warning disable CS8600, CS8604 // Intentional null assignment and passing for testing null handling
         string filePath = null;
-#pragma warning restore CS8600
-
         Assert.ThrowsAsync<ArgumentNullException>(() => RangeFinderLoader.FromParquetAsync(filePath));
-    }
+        #pragma warning restore CS8600, CS8604
 
+    }
     #endregion
 
     #region Empty File Tests

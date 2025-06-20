@@ -9,9 +9,13 @@ RangeFinder is a high-performance .NET 8.0 range query library optimized for fas
 ## Solution Structure
 
 - **RangeFinder.Core/** - Main library with Core interfaces, Finders implementations, and Utilities
-- **RangeFinderTests/** - NUnit test suite
+- **RangeFinder.IO/** - File I/O and data generation utilities
+  - **Generation/** - Test data generation utilities and parameterized dataset creation
+  - **Serialization/** - CSV and Parquet serialization for range data
+- **RangeFinder.Tests/** - NUnit test suite with comprehensive unit and integration tests
 - **RangeFinder.Benchmark/** - BenchmarkDotNet performance tests
 - **RangeFinder.Validator/** - Performance regression validation and compatibility testing
+- **RangeFinder.Visualizer/** - Avalonia-based range visualization tool
 
 ## Development Commands
 
@@ -23,7 +27,7 @@ dotnet build
 dotnet test
 
 # Run specific test project
-dotnet test RangeFinderTests/
+dotnet test RangeFinder.Tests/
 
 # Run performance benchmarks
 dotnet run --project RangeFinder.Benchmark -c Release

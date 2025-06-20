@@ -1,7 +1,8 @@
-using RangeFinder.Generator;
+using RangeFinder.IO;
+using RangeFinder.IO.Generation;
 using System.Reflection;
 
-namespace RangeGeneratorTests;
+namespace RangeFinder.Tests;
 
 /// <summary>
 /// Tests for parameter validation functionality.

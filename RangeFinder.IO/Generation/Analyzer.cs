@@ -1,7 +1,7 @@
 using RangeFinder.Core;
 using System.Numerics;
 
-namespace RangeFinder.Generator;
+namespace RangeFinder.IO.Generation;
 
 public static class Analyzer
 {

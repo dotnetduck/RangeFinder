@@ -33,6 +33,5 @@
   <ItemGroup>
     <ProjectReference Include="../RangeFinder.Core/RangeFinder.Core.csproj" />
     <ProjectReference Include="../RangeFinder.IO/RangeFinder.IO.csproj" />
-    <ProjectReference Include="../RangeFinder.Generator/RangeFinder.Generator.csproj" />
   </ItemGroup>
 </Project>
