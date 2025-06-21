@@ -15,7 +15,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\RangeFinder.Core\RangeFinder.Core.csproj" />
-      <ProjectReference Include="..\RangeFinder.Generator\RangeFinder.Generator.csproj" />
+      <ProjectReference Include="..\RangeFinder.IO\RangeFinder.IO.csproj" />
     </ItemGroup>
 
     <!-- Clean BenchmarkDotNet artifacts with dotnet clean -->

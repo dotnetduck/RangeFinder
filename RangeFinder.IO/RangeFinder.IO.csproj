@@ -1,0 +1,36 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net8.0</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    
+    <!-- Package Information -->
+    <PackageId>RangeFinder.IO</PackageId>
+    <Version>0.2.0-preview</Version>
+    <Authors>dotnetduck</Authors>
+    <Copyright>Copyright (c) 2025- dotnetduck@gmail.com</Copyright>
+    <Description>Experimental file I/O and data generation utilities for RangeFinder library. Pre-release package with basic CSV and Parquet support.</Description>
+    <PackageProjectUrl>https://github.com/dotnetduck/RangeFinder</PackageProjectUrl>
+    <RepositoryUrl>https://github.com/dotnetduck/RangeFinder</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageTags>rangefinder;csv;parquet;serialization;data-generation</PackageTags>
+    <PackageReadmeFile>NUGET_README.md</PackageReadmeFile>
+    <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
+  </PropertyGroup>
+  
+  <ItemGroup>
+    <None Include="NUGET_README.md" Pack="true" PackagePath="\" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="../RangeFinder.Core/RangeFinder.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CsvHelper" Version="33.1.0" />
+    <PackageReference Include="Parquet.Net" Version="5.1.1" />
+  </ItemGroup>
+
+</Project>
