@@ -40,16 +40,7 @@ public class CompatibilityTests
                 var itResults = intervalTree.Query(query.start, query.end);
 
                 var comparison = rfResults.CompareAsSets(itResults);
-                if (!comparison.AreEqual)
-                {
-                    var debugMsg = $"RangeFinder vs IntervalTree mismatch\n" +
-                                  $"Query: [{query.start}, {query.end}]\n" +
-                                  $"RangeData: [{string.Join(", ", rangeData.Select(r => $"({r.start},{r.end})"))}]\n" +
-                                  $"{comparison.GetDescription()}";
-                    Console.WriteLine(debugMsg);
-                    TestContext.WriteLine(debugMsg);
-                }
-                return comparison.AreEqual;
+                return comparison.LogAndReturn("RangeFinder vs IntervalTree equivalence", query, rangeData);
             })
             .QuickCheckThrowOnFailure();
     }
@@ -68,7 +59,8 @@ public class CompatibilityTests
                 var pointResults = rangeFinder.Query(point);
                 var rangeResults = rangeFinder.Query(point, point);
 
-                return pointResults.CompareAsSets(rangeResults).AreEqual;
+                var comparison = pointResults.CompareAsSets(rangeResults);
+                return comparison.LogAndReturn("Point vs Range query equivalence", (point, point), new[] { (point, point) });
             })
             .QuickCheckThrowOnFailure();
     }
@@ -148,7 +140,8 @@ public class CompatibilityTests
                 var results1 = finder1.Query(query.start, query.end);
                 var results2 = finder2.Query(query.start, query.end);
 
-                return results1.CompareAsSets(results2).AreEqual;
+                var comparison = results1.CompareAsSets(results2);
+                return comparison.LogAndReturn("Query determinism", query, rangeData);
             })
             .QuickCheckThrowOnFailure();
     }
@@ -190,7 +183,8 @@ public class CompatibilityTests
                 var results1 = fromTuples.Query(query.start, query.end);
                 var results2 = fromArrays.Query(query.start, query.end);
 
-                return results1.CompareAsSets(results2).AreEqual;
+                var comparison = results1.CompareAsSets(results2);
+                return comparison.LogAndReturn("Query determinism", query, rangeData);
             })
             .QuickCheckThrowOnFailure();
     }
@@ -198,23 +192,29 @@ public class CompatibilityTests
     /// <summary>
     /// FAULT INJECTION TEST: Intentionally broken test to verify detection capabilities
     /// This test should ALWAYS FAIL to verify our test infrastructure works correctly.
+    /// Uses large datasets (15+ ranges) to test CSV serialization functionality.
     /// Normally commented out - only enable when testing the test framework itself.
     /// </summary>
-    // [FsCheck.NUnit.Property(MaxTest = 10)]
+    // [FsCheck.NUnit.Property(MaxTest = 5)]
     public void FaultInjection_IntentionallyBrokenTest()
     {
         Prop.ForAll<(double start, double end)[], (double start, double end)>((rangeData, query) =>
             {
+                // Force large dataset - pad with extra ranges if needed
+                var paddedRangeData = rangeData.Length >= 15 ? rangeData 
+                    : rangeData.Concat(Enumerable.Range(0, 15 - rangeData.Length)
+                                     .Select(i => (start: (double)i, end: (double)i + 10)))
+                                     .ToArray();
                 // Build RangeFinder normally
-                var rangeFinder = RangeFinderFactory.Create(rangeData);
+                var rangeFinder = RangeFinderFactory.Create(paddedRangeData);
                 
                 // Build IntervalTree with INTENTIONALLY WRONG logic (inject fault)
                 var intervalTree = new IntervalTree<double, int>();
-                for (int i = 0; i < rangeData.Length; i++)
+                for (int i = 0; i < paddedRangeData.Length; i++)
                 {
                     // FAULT: Add ranges with offset to cause mismatch (avoid ArgumentOutOfRangeException)
-                    var faultyStart = rangeData[i].start + 1000;  // Intentionally offset!
-                    var faultyEnd = rangeData[i].end + 1000;      // Intentionally offset!
+                    var faultyStart = paddedRangeData[i].start + 1000;  // Intentionally offset!
+                    var faultyEnd = paddedRangeData[i].end + 1000;      // Intentionally offset!
                     intervalTree.Add(faultyStart, faultyEnd, i);
                 }
 
@@ -224,19 +224,8 @@ public class CompatibilityTests
 
                 var comparison = rfResults.CompareAsSets(itResults);
                 
-                // Force debug output by using TestContext or throwing detailed exception
-                if (!comparison.AreEqual)
-                {
-                    var debugMsg = $"FAULT INJECTION: Expected mismatch detected\n" +
-                                  $"Query: [{query.start}, {query.end}]\n" +
-                                  $"RangeData: [{string.Join(", ", rangeData.Select(r => $"({r.start},{r.end})"))}]\n" +
-                                  $"{comparison.GetDescription()}";
-                    Console.WriteLine(debugMsg);
-                    TestContext.WriteLine(debugMsg);
-                }
-                
                 // This should return false most of the time due to injected fault
-                return comparison.AreEqual;
+                return comparison.LogAndReturn("FAULT INJECTION: Expected mismatch", query, paddedRangeData);
             })
             .QuickCheckThrowOnFailure();
     }

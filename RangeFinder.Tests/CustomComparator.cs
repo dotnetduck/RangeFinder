@@ -1,4 +1,5 @@
 using System.Numerics;
+using System.Text;
 using RangeFinder.Core;
 using RangeFinder.IO.Serialization;
 
@@ -83,34 +84,60 @@ public record SetDifference<T>(HashSet<T> OnlyInExpected, HashSet<T> OnlyInActua
     {
         if (!AreEqual)
         {
-            Console.WriteLine($"{context} failed:");
-            Console.WriteLine($"  Query: [{query.start}, {query.end}]");
-            
-            if (rangeData.Length <= 10)
-            {
-                Console.WriteLine($"  RangeData: [{string.Join(", ", rangeData.Select(r => $"({r.start},{r.end})"))}]");
-            }
-            else
-            {
-                // Export to CSV using existing RangeSerializer
-                var fileName = $"debug_ranges_{DateTime.Now:yyyyMMdd_HHmmss_fff}.csv";
-                var filePath = Path.Combine(Path.GetTempPath(), fileName);
-                
-                try
-                {
-                    // Convert tuples to NumericRange for serialization
-                    var ranges = rangeData.Select((r, i) => new NumericRange<TNumber, int>(r.start, r.end, i));
-                    ranges.WriteCsv(filePath);
-                    
-                    Console.WriteLine($"  RangeData ({rangeData.Length} ranges): [{string.Join(", ", rangeData.Take(5).Select(r => $"({r.start},{r.end})"))}] ... (full data saved to {filePath})");
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"  RangeData ({rangeData.Length} ranges): [{string.Join(", ", rangeData.Take(5).Select(r => $"({r.start},{r.end})"))}] ... (failed to save CSV: {ex.Message})");
-                }
-            }
-            
-            Console.WriteLine($"  {GetDescription()}");
+            var debugMsg = FormatRangeDebugMessage(context, query, rangeData);
+            Console.WriteLine(debugMsg);
+            TestContext.WriteLine(debugMsg);
         }
+    }
+    
+    /// <summary>
+    /// Formats a comprehensive debug message for range comparison failures
+    /// </summary>
+    public string FormatRangeDebugMessage<TNumber>(string context, (TNumber start, TNumber end) query, (TNumber start, TNumber end)[] rangeData)
+        where TNumber : INumber<TNumber>
+    {
+        var sb = new StringBuilder();
+        sb.AppendLine($"{context} failed:");
+        sb.AppendLine($"  Query: [{query.start}, {query.end}]");
+        
+        if (rangeData.Length <= 10)
+        {
+            sb.AppendLine($"  RangeData: [{string.Join(", ", rangeData.Select(r => $"({r.start},{r.end})"))}]");
+        }
+        else
+        {
+            // Export to CSV using existing RangeSerializer
+            var fileName = $"debug_ranges_{DateTime.Now:yyyyMMdd_HHmmss_fff}.csv";
+            var filePath = Path.Combine(Path.GetTempPath(), fileName);
+            
+            try
+            {
+                // Convert tuples to NumericRange for serialization
+                var ranges = rangeData.Select((r, i) => new NumericRange<TNumber, int>(r.start, r.end, i));
+                ranges.WriteCsv(filePath);
+                
+                sb.AppendLine($"  RangeData ({rangeData.Length} ranges): [{string.Join(", ", rangeData.Take(5).Select(r => $"({r.start},{r.end})"))}] ... (full data saved to {filePath})");
+            }
+            catch (Exception ex)
+            {
+                sb.AppendLine($"  RangeData ({rangeData.Length} ranges): [{string.Join(", ", rangeData.Take(5).Select(r => $"({r.start},{r.end})"))}] ... (failed to save CSV: {ex.Message})");
+            }
+        }
+        
+        sb.AppendLine($"  {GetDescription()}");
+        return sb.ToString();
+    }
+    
+    /// <summary>
+    /// Logs failure with context and comparison details for property-based tests
+    /// </summary>
+    public bool LogAndReturn<TNumber>(string testName, (TNumber start, TNumber end) query, (TNumber start, TNumber end)[] rangeData)
+        where TNumber : INumber<TNumber>
+    {
+        if (!AreEqual)
+        {
+            PrintRangeDebugInfo(testName, query, rangeData);
+        }
+        return AreEqual;
     }
 }
