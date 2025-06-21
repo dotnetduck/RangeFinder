@@ -6,65 +6,26 @@ using RangeFinder.Core;
 namespace RangeFinder.Tests.PropertyBased;
 
 /// <summary>
-/// Custom generators for FsCheck property-based tests
-/// </summary>
-public static class RangeDataGenerators
-{
-    /// <summary>
-    /// Generates valid range tuples ensuring start <= end
-    /// </summary>
-    public static Arbitrary<(double start, double end)> ValidRangeTuple()
-    {
-        var gen = from x in Gen.Choose(-100, 100)
-                  from y in Gen.Choose(-100, 100)
-                  select x <= y ? ((double)x, (double)y) : ((double)y, (double)x); // Ensure start <= end
-        
-        return gen.ToArbitrary();
-    }
-
-    /// <summary>
-    /// Generates arrays of valid range tuples
-    /// </summary>
-    public static Arbitrary<(double start, double end)[]> ValidRangeArray()
-    {
-        var gen = from size in Gen.Choose(1, 20)
-                  from ranges in Gen.ArrayOf(size, ValidRangeTuple().Generator)
-                  select ranges;
-        
-        return gen.ToArbitrary();
-    }
-
-    /// <summary>
-    /// Generates query tuples ensuring start <= end
-    /// </summary>
-    public static Arbitrary<(double start, double end)> ValidQueryTuple()
-    {
-        var gen = from x in Gen.Choose(-200, 200)
-                  from y in Gen.Choose(-200, 200)
-                  select x <= y ? ((double)x, (double)y) : ((double)y, (double)x); // Ensure start <= end
-        
-        return gen.ToArbitrary();
-    }
-}
-
-/// <summary>
 /// Property-based compatibility tests using FsCheck that verify RangeFinder behavior 
 /// against IntervalTree using custom generators and factory methods.
 /// </summary>
 [TestFixture]
 public class CompatibilityTests
 {
+    [OneTimeSetUp]
+    public void SetUp()
+    {
+        Arb.Register(typeof(RangeDataGenerators));
+    }
+
     /// <summary>
     /// PROPERTY: RangeFinder and IntervalTree must always produce identical results
     /// ∀ ranges, query. RangeFinder.Query(query) = IntervalTree.Query(query)
     /// </summary>
-    [FsCheck.NUnit.Property(MaxTest = 100)]
+    [FsCheck.NUnit.Property]
     public void RangeFinderEquivalentToIntervalTree_RangeQueries()
     {
-        var rangeArb = RangeDataGenerators.ValidRangeArray();
-        var queryArb = RangeDataGenerators.ValidQueryTuple();
-        
-        Prop.ForAll(rangeArb, queryArb, (rangeData, query) =>
+        Prop.ForAll<(double start, double end)[], (double start, double end)>((rangeData, query) =>
             {
                 // Build both data structures using factory method
                 var rangeFinder = RangeFinderFactory.Create(rangeData);
@@ -90,9 +51,7 @@ public class CompatibilityTests
     [FsCheck.NUnit.Property(MaxTest = 50)]
     public void PointQueryEqualsRangeQuery()
     {
-        var rangeArb = RangeDataGenerators.ValidRangeArray();
-        
-        Prop.ForAll(rangeArb, Arb.From<double>(), (rangeData, point) =>
+        Prop.ForAll<(double start, double end)[], double>((rangeData, point) =>
             {
                 var rangeFinder = RangeFinderFactory.Create(rangeData);
 
@@ -111,10 +70,7 @@ public class CompatibilityTests
     [FsCheck.NUnit.Property(MaxTest = 50)]
     public void QueryResultsOnlyContainOverlappingRanges()
     {
-        var rangeArb = RangeDataGenerators.ValidRangeArray();
-        var queryArb = RangeDataGenerators.ValidQueryTuple();
-        
-        Prop.ForAll(rangeArb, queryArb, (rangeData, query) =>
+        Prop.ForAll<(double start, double end)[], (double start, double end)>((rangeData, query) =>
             {
                 var rangeFinder = RangeFinderFactory.Create(rangeData);
                 var results = rangeFinder.QueryRanges(query.start, query.end);
@@ -132,9 +88,7 @@ public class CompatibilityTests
     [FsCheck.NUnit.Property(MaxTest = 50)]
     public void CountPropertyEqualsInputSize()
     {
-        var rangeArb = RangeDataGenerators.ValidRangeArray();
-        
-        Prop.ForAll(rangeArb, rangeData =>
+        Prop.ForAll<(double start, double end)[]>(rangeData =>
             {
                 var rangeFinder = RangeFinderFactory.Create(rangeData);
                 return rangeFinder.Count == rangeData.Length;
@@ -149,10 +103,7 @@ public class CompatibilityTests
     [FsCheck.NUnit.Property(MaxTest = 30)]
     public void ExpandingQueryNeverReducesResults()
     {
-        var rangeArb = RangeDataGenerators.ValidRangeArray();
-        var queryArb = RangeDataGenerators.ValidQueryTuple();
-        
-        Prop.ForAll(rangeArb, queryArb, queryArb, (rangeData, query1, query2) =>
+        Prop.ForAll<(double start, double end)[], (double start, double end), (double start, double end)>((rangeData, query1, query2) =>
             {
                 // Ensure query2 contains query1
                 var expandedQuery = (
@@ -178,10 +129,7 @@ public class CompatibilityTests
     [FsCheck.NUnit.Property(MaxTest = 30)]
     public void QueriesAreDeterministic()
     {
-        var rangeArb = RangeDataGenerators.ValidRangeArray();
-        var queryArb = RangeDataGenerators.ValidQueryTuple();
-        
-        Prop.ForAll(rangeArb, queryArb, (rangeData, query) =>
+        Prop.ForAll<(double start, double end)[], (double start, double end)>((rangeData, query) =>
             {
                 // Build identical structures using factory method
                 var finder1 = RangeFinderFactory.Create(rangeData);
@@ -202,11 +150,9 @@ public class CompatibilityTests
     [FsCheck.NUnit.Property(MaxTest = 20)]
     public void EmptyDatasetAlwaysProducesEmptyResults()
     {
-        var queryArb = RangeDataGenerators.ValidQueryTuple();
-        
-        Prop.ForAll(queryArb, Arb.From<double>(), (query, point) =>
+        Prop.ForAll<(double start, double end), double>((query, point) =>
             {
-                var emptyFinder = RangeFinderFactory.Create(Array.Empty<(double, double)>());
+                var emptyFinder = RangeFinderFactory.Create(Array.Empty<(double start, double end)>());
 
                 var rangeResults = emptyFinder.Query(query.start, query.end).ToArray();
                 var pointResults = emptyFinder.Query(point).ToArray();
@@ -223,10 +169,7 @@ public class CompatibilityTests
     [FsCheck.NUnit.Property(MaxTest = 20)]
     public void FactoryMethodsProduceEquivalentResults()
     {
-        var rangeArb = RangeDataGenerators.ValidRangeArray();
-        var queryArb = RangeDataGenerators.ValidQueryTuple();
-        
-        Prop.ForAll(rangeArb, queryArb, (rangeData, query) =>
+        Prop.ForAll<(double start, double end)[], (double start, double end)>((rangeData, query) =>
             {
                 // Create using different factory methods
                 var fromTuples = RangeFinderFactory.Create(rangeData);
