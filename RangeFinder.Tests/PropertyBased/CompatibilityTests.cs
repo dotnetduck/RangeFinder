@@ -22,15 +22,25 @@ public class CompatibilityTests
     
     /// <summary>
     /// Manual seed for deterministic test reproduction. Set this to reproduce specific failures.
+    /// Note: This controls our custom generators and logging, but FsCheck has its own internal seeding.
     /// If null, a random seed will be generated and displayed at test start.
     /// </summary>
     private static int? ManualSeed = null;
     
     /// <summary>
-    /// Current seed being used for this test run
+    /// Current seed being used for this test run (for logging and reference)
     /// </summary>
     private static int CurrentSeed;
     
+    
+    /// <summary>
+    /// Prints seed information for each test execution
+    /// </summary>
+    private static void PrintTestSeed(string testName)
+    {
+        Console.WriteLine($"[{testName}] Using seed: {CurrentSeed}");
+        TestContext.WriteLine($"[{testName}] Using seed: {CurrentSeed}");
+    }
     
     /// <summary>
     /// Logs failure with context and comparison details for property-based tests
@@ -60,12 +70,37 @@ public class CompatibilityTests
         return comparison.AreEqual;
     }
     
+    /// <summary>
+    /// Custom Property attribute that uses our seed for deterministic testing
+    /// </summary>
+    public class SeededPropertyAttribute : FsCheck.NUnit.PropertyAttribute
+    {
+        public SeededPropertyAttribute(int maxTest = 100) : base()
+        {
+            MaxTest = maxTest;
+            if (ManualSeed.HasValue)
+            {
+                var seed = ManualSeed.Value;
+                Replay = $"{seed},{seed}";
+            }
+        }
+    }
+
     [OneTimeSetUp]
     public void SetUp()
     {
         // Initialize deterministic seed for property testing
         CurrentSeed = ManualSeed ?? new System.Random().Next();
         Console.WriteLine($"\n=== PROPERTY TEST SEED: {CurrentSeed} ===");
+        if (ManualSeed.HasValue)
+        {
+            Console.WriteLine($"Using MANUAL seed: {CurrentSeed}");
+        }
+        else
+        {
+            Console.WriteLine($"Using random seed: {CurrentSeed}");
+            Console.WriteLine("FsCheck will use its own random seed - check failure output for FsCheck seed");
+        }
         Console.WriteLine($"To reproduce failures, set ManualSeed = {CurrentSeed} in CompatibilityTests.cs");
         Console.WriteLine("========================================\n");
         TestContext.WriteLine($"Property Test Seed: {CurrentSeed}");
@@ -78,14 +113,16 @@ public class CompatibilityTests
             TestContext.WriteLine("Verbose mode enabled: will print results for all property tests");
         }
     }
+    
 
     /// <summary>
     /// PROPERTY: RangeFinder and IntervalTree must always produce identical results
     /// ∀ ranges, query. RangeFinder.Query(query) = IntervalTree.Query(query)
     /// </summary>
-    [FsCheck.NUnit.Property]
+    [SeededProperty(100)]
     public void RangeFinderEquivalentToIntervalTree_RangeQueries()
     {
+        PrintTestSeed(nameof(RangeFinderEquivalentToIntervalTree_RangeQueries));
         Prop.ForAll<(double start, double end)[], (double start, double end)>((rangeData, query) =>
             {
                 // Build both data structures using factory method
@@ -113,6 +150,7 @@ public class CompatibilityTests
     [FsCheck.NUnit.Property(MaxTest = 50)]
     public void PointQueryEqualsRangeQuery()
     {
+        PrintTestSeed(nameof(PointQueryEqualsRangeQuery));
         Prop.ForAll<(double start, double end)[], double>((rangeData, point) =>
             {
                 var rangeFinder = RangeFinderFactory.Create(rangeData);
@@ -133,6 +171,7 @@ public class CompatibilityTests
     [FsCheck.NUnit.Property(MaxTest = 50)]
     public void QueryResultsOnlyContainOverlappingRanges()
     {
+        PrintTestSeed(nameof(QueryResultsOnlyContainOverlappingRanges));
         Prop.ForAll<(double start, double end)[], (double start, double end)>((rangeData, query) =>
             {
                 var rangeFinder = RangeFinderFactory.Create(rangeData);
@@ -151,6 +190,7 @@ public class CompatibilityTests
     [FsCheck.NUnit.Property(MaxTest = 50)]
     public void CountPropertyEqualsInputSize()
     {
+        PrintTestSeed(nameof(CountPropertyEqualsInputSize));
         Prop.ForAll<(double start, double end)[]>(rangeData =>
             {
                 var rangeFinder = RangeFinderFactory.Create(rangeData);
