@@ -15,7 +15,7 @@ public class Printer
         string testName,
         (TNumber start, TNumber end) query,
         (TNumber start, TNumber end)[] rangeData,
-        int seed,
+        string seed,
         bool verbose)
         where TNumber : INumber<TNumber>
     {
