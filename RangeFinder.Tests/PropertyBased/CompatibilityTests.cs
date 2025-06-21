@@ -78,7 +78,7 @@ return Printer.LogAndReturn(
                 var comparison = pointResults.CompareAsSets(rangeResults);
                 return Printer.LogAndReturn(
                     comparison, "Point vs Range query equivalence",
-                    (point, point), new[] { (point, point) }, VerboseMode);
+                    (point, point), rangeData, VerboseMode);
             })
             .QuickCheckThrowOnFailure();
     }
