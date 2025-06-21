@@ -39,7 +39,9 @@ public class CompatibilityTests
                 var rfResults = rangeFinder.Query(query.start, query.end);
                 var itResults = intervalTree.Query(query.start, query.end);
 
-                return rfResults.CompareAsSets(itResults).AreEqual;
+                var comparison = rfResults.CompareAsSets(itResults);
+                comparison.PrintRangeDebugInfo("RangeFinder vs IntervalTree mismatch", query, rangeData);
+                return comparison.AreEqual;
             })
             .QuickCheckThrowOnFailure();
     }

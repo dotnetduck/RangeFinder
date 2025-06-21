@@ -1,3 +1,7 @@
+using System.Numerics;
+using RangeFinder.Core;
+using RangeFinder.IO.Serialization;
+
 namespace RangeFinder.Tests;
 
 /// <summary>
@@ -44,5 +48,69 @@ public record SetDifference<T>(HashSet<T> OnlyInExpected, HashSet<T> OnlyInActua
             parts.Add($"Only in actual: [{string.Join(", ", OnlyInActual)}]");
             
         return string.Join("; ", parts);
+    }
+    
+    /// <summary>
+    /// Prints detailed debug information if sets are not equal
+    /// </summary>
+    public void PrintDebugInfo(string context = "Set comparison")
+    {
+        if (!AreEqual)
+        {
+            Console.WriteLine($"{context} failed:");
+            Console.WriteLine($"  {GetDescription()}");
+        }
+    }
+    
+    /// <summary>
+    /// Prints detailed debug information with additional context data
+    /// </summary>
+    public void PrintDebugInfo<TContext>(string context, TContext contextData)
+    {
+        if (!AreEqual)
+        {
+            Console.WriteLine($"{context} failed:");
+            Console.WriteLine($"  Context: {contextData}");
+            Console.WriteLine($"  {GetDescription()}");
+        }
+    }
+    
+    /// <summary>
+    /// Prints detailed debug information for range comparison failures with data export
+    /// </summary>
+    public void PrintRangeDebugInfo<TNumber>(string context, (TNumber start, TNumber end) query, (TNumber start, TNumber end)[] rangeData)
+        where TNumber : INumber<TNumber>
+    {
+        if (!AreEqual)
+        {
+            Console.WriteLine($"{context} failed:");
+            Console.WriteLine($"  Query: [{query.start}, {query.end}]");
+            
+            if (rangeData.Length <= 10)
+            {
+                Console.WriteLine($"  RangeData: [{string.Join(", ", rangeData.Select(r => $"({r.start},{r.end})"))}]");
+            }
+            else
+            {
+                // Export to CSV using existing RangeSerializer
+                var fileName = $"debug_ranges_{DateTime.Now:yyyyMMdd_HHmmss_fff}.csv";
+                var filePath = Path.Combine(Path.GetTempPath(), fileName);
+                
+                try
+                {
+                    // Convert tuples to NumericRange for serialization
+                    var ranges = rangeData.Select((r, i) => new NumericRange<TNumber, int>(r.start, r.end, i));
+                    ranges.WriteCsv(filePath);
+                    
+                    Console.WriteLine($"  RangeData ({rangeData.Length} ranges): [{string.Join(", ", rangeData.Take(5).Select(r => $"({r.start},{r.end})"))}] ... (full data saved to {filePath})");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"  RangeData ({rangeData.Length} ranges): [{string.Join(", ", rangeData.Take(5).Select(r => $"({r.start},{r.end})"))}] ... (failed to save CSV: {ex.Message})");
+                }
+            }
+            
+            Console.WriteLine($"  {GetDescription()}");
+        }
     }
 }
