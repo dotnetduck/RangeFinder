@@ -29,14 +29,16 @@ public static class RangeDataGenerators
         if (rangeData.Length == 0)
             return (0.0, 0.0);
 
-        var rand = new System.Random(123);
+        var rand = new System.Random();
 
-        // Randomly select a query range from the provided data
-        var valIndex1 = rand.Next(0, rangeData.Length);
-        var valIndex2 = rand.Next(0, rangeData.Length);
-
-        var val1 = rangeData[valIndex1].start * rand.NextDouble();
-        var val2 = rangeData[valIndex2].end;
-        return val1 <= val2 ? (val1, val2) : (val2, val1);
+        // Generate a query range that intersects with some of the data
+        var minStart = rangeData.Min(r => r.start);
+        var maxEnd = rangeData.Max(r => r.end);
+        
+        // Create a query range within the bounds of the data
+        var queryStart = minStart + (maxEnd - minStart) * rand.NextDouble() * 0.8;
+        var queryEnd = queryStart + (maxEnd - queryStart) * rand.NextDouble();
+        
+        return (queryStart, queryEnd);
     }
 }
