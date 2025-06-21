@@ -17,6 +17,7 @@ public class RangeFinderTests
         new(5.0, 6.0, 5), new(6.0, 20.0, 6)
     };
 
+
     #region Range Query Tests
 
     [TestCase(2.5, 5.1, 4)]
