@@ -2,26 +2,15 @@
 
 A high-performance .NET range query library for general numeric ranges.
 
-> **⚠️ Stability Notice**: RangeFinder is in pre-1.0 development. While the core public API is stable, we recommend waiting for v1.0.0 before adopting in mission-critical production systems. Suitable for evaluation, prototyping, and non-critical applications.
-
 ## What's New in v0.2.0
 
-### Critical Bug Fixes
-- **🔧 Fixed negative range handling** - Resolves incorrect query results for ranges with negative values  
-- **⚠️ Important**: Users on v0.1.x with negative-value ranges must update to v0.2.0
+### 🔧 Bug Fixes
+- **Fixed negative range handling** - Resolves incorrect query results when ranges contain negative values (does not affect positive-only ranges)
 
-### New Features
+### ✨ New Features
 - **RangeFinder.Visualizer** - Avalonia-based visualization tool for range data
 - **RangeFinderFactory** - Simplified factory methods for RangeFinder construction from various data sources
 - **Serialization Support** - CSV and Parquet serialization for range data via RangeFinder.IO
-
-### Architecture Improvements
-- **Modularization** - Migrated Generator functionality to separate RangeFinder.IO project
-- **Enhanced Testing** - Property-based testing with validator migration
-- **Test Organization** - Reorganized test structure into logical subdirectories
-
-### Breaking Changes
-- Generator functionality moved from Core to RangeFinder.IO project
 
 ## Features
 
@@ -60,6 +49,10 @@ var overlaps = finder.QueryRanges(2.0, 3.0); // Returns: [1.0,2.2]=100, [2.0,3.2
 
 - .NET 8.0 or later
 - Supports any `INumber<T>` numeric type (int, double, decimal, etc.)
+
+## Development Status
+
+RangeFinder is actively developed toward v1.0. The core API is stable and ready for evaluation, prototyping, and non-critical applications. For mission-critical systems, consider waiting for v1.0.0.
 
 ## Documentation
 
