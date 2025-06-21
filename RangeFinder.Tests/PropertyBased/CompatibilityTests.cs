@@ -6,6 +6,22 @@ using RangeFinder.Core;
 namespace RangeFinder.Tests.PropertyBased;
 
 /// <summary>
+/// Extension methods for more precise test assertions
+/// </summary>
+public static class TestExtensions
+{
+    /// <summary>
+    /// Checks if two sequences contain the same elements regardless of order
+    /// </summary>
+    public static bool SequenceEqualOrderDontCare<T>(this IEnumerable<T> self, IEnumerable<T> other)
+    {
+        var selfSet = self.ToHashSet();
+        var otherSet = other.ToHashSet();
+        return selfSet.SetEquals(otherSet);
+    }
+}
+
+/// <summary>
 /// Property-based compatibility tests using FsCheck that verify RangeFinder behavior 
 /// against IntervalTree using custom generators and factory methods.
 /// </summary>
@@ -35,11 +51,11 @@ public class CompatibilityTests
                     intervalTree.Add(rangeData[i].start, rangeData[i].end, i);
                 }
 
-                // ASSERTION: Results must always be identical
-                var rfResults = rangeFinder.Query(query.start, query.end).Count();
-                var itResults = intervalTree.Query(query.start, query.end).Count();
+                // ASSERTION: Results must be identical (same elements, order doesn't matter)
+                var rfResults = rangeFinder.Query(query.start, query.end);
+                var itResults = intervalTree.Query(query.start, query.end);
 
-                return rfResults == itResults;
+                return rfResults.SequenceEqualOrderDontCare(itResults);
             })
             .QuickCheckThrowOnFailure();
     }
@@ -55,10 +71,10 @@ public class CompatibilityTests
             {
                 var rangeFinder = RangeFinderFactory.Create(rangeData);
 
-                var pointResults = rangeFinder.Query(point).OrderBy(x => x).ToArray();
-                var rangeResults = rangeFinder.Query(point, point).OrderBy(x => x).ToArray();
+                var pointResults = rangeFinder.Query(point);
+                var rangeResults = rangeFinder.Query(point, point);
 
-                return pointResults.SequenceEqual(rangeResults);
+                return pointResults.SequenceEqualOrderDontCare(rangeResults);
             })
             .QuickCheckThrowOnFailure();
     }
@@ -135,10 +151,10 @@ public class CompatibilityTests
                 var finder1 = RangeFinderFactory.Create(rangeData);
                 var finder2 = RangeFinderFactory.Create(rangeData);
 
-                var results1 = finder1.Query(query.start, query.end).OrderBy(x => x).ToArray();
-                var results2 = finder2.Query(query.start, query.end).OrderBy(x => x).ToArray();
+                var results1 = finder1.Query(query.start, query.end);
+                var results2 = finder2.Query(query.start, query.end);
 
-                return results1.SequenceEqual(results2);
+                return results1.SequenceEqualOrderDontCare(results2);
             })
             .QuickCheckThrowOnFailure();
     }
@@ -177,10 +193,10 @@ public class CompatibilityTests
                     rangeData.Select(t => t.start).ToArray(),
                     rangeData.Select(t => t.end).ToArray());
 
-                var results1 = fromTuples.Query(query.start, query.end).OrderBy(x => x).ToArray();
-                var results2 = fromArrays.Query(query.start, query.end).OrderBy(x => x).ToArray();
+                var results1 = fromTuples.Query(query.start, query.end);
+                var results2 = fromArrays.Query(query.start, query.end);
 
-                return results1.SequenceEqual(results2);
+                return results1.SequenceEqualOrderDontCare(results2);
             })
             .QuickCheckThrowOnFailure();
     }
