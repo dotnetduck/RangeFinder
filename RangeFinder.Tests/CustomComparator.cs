@@ -6,7 +6,7 @@ namespace RangeFinder.Tests;
 public static class CustomComparator
 {
     /// <summary>
-    /// Compares two sequences and returns detailed difference information
+    /// Compares this sequence with another as sets and returns detailed difference information
     /// </summary>
     public static SetDifference<T> CompareAsSets<T>(this IEnumerable<T> actual, IEnumerable<T> expected)
     {
