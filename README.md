@@ -4,7 +4,7 @@ A high-performance .NET range query library for general numeric ranges.
 
 [![.NET](https://img.shields.io/badge/.NET-8.0%20or%20later-blue)](https://dotnet.microsoft.com/download)
 [![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
-[![nuget](https://img.shields.io/badge/nuget-v0.1.1-blue)](https://www.nuget.org/packages/RangeFinder/)
+[![nuget](https://img.shields.io/badge/nuget-v0.2.0--pre-blue)](https://www.nuget.org/packages/RangeFinder/)
 
 ## Features
 
@@ -65,7 +65,7 @@ Please refer a detailed performance analysis at
 var range = new NumericRange<double, int>(1.0, 5.0, 42);
 
 // Range finder for efficient queries
-var finder = new RangeFinder<double, int>(ranges);
+var finder = RangeFinderFactory.Create(ranges);
 ```
 
 ### Query Methods
