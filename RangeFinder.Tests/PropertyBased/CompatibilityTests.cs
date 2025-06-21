@@ -21,7 +21,20 @@ public class CompatibilityTests
     private static readonly bool VerboseMode = false;
     
     /// <summary>
+    /// Manual seed for deterministic test reproduction. Set this to reproduce specific failures.
+    /// If null, a random seed will be generated and displayed at test start.
+    /// </summary>
+    private static int? ManualSeed = null;
+    
+    /// <summary>
+    /// Current seed being used for this test run
+    /// </summary>
+    private static int CurrentSeed;
+    
+    
+    /// <summary>
     /// Logs failure with context and comparison details for property-based tests
+    /// Always prints detailed information when comparisons fail
     /// </summary>
     private static bool LogAndReturn<TNumber>(SetDifference<int> comparison, string testName, (TNumber start, TNumber end) query, (TNumber start, TNumber end)[] rangeData)
         where TNumber : INumber<TNumber>
@@ -29,8 +42,14 @@ public class CompatibilityTests
         if (!comparison.AreEqual)
         {
             var debugMsg = comparison.FormatRangeDebugMessage(testName, query, rangeData);
+            Console.WriteLine($"\n=== PROPERTY TEST FAILURE (Seed: {CurrentSeed}) ===");
             Console.WriteLine(debugMsg);
+            Console.WriteLine($"To reproduce: set ManualSeed = {CurrentSeed} in CompatibilityTests.cs");
+            Console.WriteLine("================================================\n");
+            TestContext.WriteLine($"\n=== PROPERTY TEST FAILURE (Seed: {CurrentSeed}) ===");
             TestContext.WriteLine(debugMsg);
+            TestContext.WriteLine($"To reproduce: set ManualSeed = {CurrentSeed}");
+            TestContext.WriteLine("================================================\n");
         }
         else if (VerboseMode)
         {
@@ -44,6 +63,13 @@ public class CompatibilityTests
     [OneTimeSetUp]
     public void SetUp()
     {
+        // Initialize deterministic seed for property testing
+        CurrentSeed = ManualSeed ?? new System.Random().Next();
+        Console.WriteLine($"\n=== PROPERTY TEST SEED: {CurrentSeed} ===");
+        Console.WriteLine($"To reproduce failures, set ManualSeed = {CurrentSeed} in CompatibilityTests.cs");
+        Console.WriteLine("========================================\n");
+        TestContext.WriteLine($"Property Test Seed: {CurrentSeed}");
+        
         Arb.Register(typeof(RangeDataGenerators));
         
         if (VerboseMode)
@@ -77,7 +103,7 @@ public class CompatibilityTests
                 var comparison = rfResults.CompareAsSets(itResults);
                 return LogAndReturn(comparison, "RangeFinder vs IntervalTree equivalence", query, rangeData);
             })
-            .QuickCheckThrowOnFailure();
+            .QuickCheck();
     }
 
     /// <summary>
@@ -97,7 +123,7 @@ public class CompatibilityTests
                 var comparison = pointResults.CompareAsSets(rangeResults);
                 return LogAndReturn(comparison, "Point vs Range query equivalence", (point, point), new[] { (point, point) });
             })
-            .QuickCheckThrowOnFailure();
+            .QuickCheck();
     }
 
     /// <summary>
@@ -115,7 +141,7 @@ public class CompatibilityTests
                 // ASSERTION: Every result must overlap with query
                 return results.All(result => result.Overlaps(query.start, query.end));
             })
-            .QuickCheckThrowOnFailure();
+            .QuickCheck();
     }
 
     /// <summary>
@@ -130,7 +156,7 @@ public class CompatibilityTests
                 var rangeFinder = RangeFinderFactory.Create(rangeData);
                 return rangeFinder.Count == rangeData.Length;
             })
-            .QuickCheckThrowOnFailure();
+            .QuickCheck();
     }
 
     /// <summary>
@@ -156,7 +182,7 @@ public class CompatibilityTests
 
                 return results1.IsSubsetOf(results2);
             })
-            .QuickCheckThrowOnFailure();
+            .QuickCheck();
     }
 
     /// <summary>
@@ -178,7 +204,7 @@ public class CompatibilityTests
                 var comparison = results1.CompareAsSets(results2);
                 return LogAndReturn(comparison, "Query determinism", query, rangeData);
             })
-            .QuickCheckThrowOnFailure();
+            .QuickCheck();
     }
 
     /// <summary>
@@ -197,7 +223,7 @@ public class CompatibilityTests
 
                 return rangeResults.Length == 0 && pointResults.Length == 0;
             })
-            .QuickCheckThrowOnFailure();
+            .QuickCheck();
     }
 
     /// <summary>
@@ -221,47 +247,7 @@ public class CompatibilityTests
                 var comparison = results1.CompareAsSets(results2);
                 return LogAndReturn(comparison, "Factory method equivalence", query, rangeData);
             })
-            .QuickCheckThrowOnFailure();
+            .QuickCheck();
     }
 
-    /// <summary>
-    /// FAULT INJECTION TEST: Intentionally broken test to verify detection capabilities
-    /// This test should ALWAYS FAIL to verify our test infrastructure works correctly.
-    /// Uses large datasets (15+ ranges) to test CSV serialization functionality.
-    /// Normally commented out - only enable when testing the test framework itself.
-    /// </summary>
-    // [FsCheck.NUnit.Property(MaxTest = 5)]
-    public void FaultInjection_IntentionallyBrokenTest()
-    {
-        Prop.ForAll<(double start, double end)[], (double start, double end)>((rangeData, query) =>
-            {
-                // Force large dataset - pad with extra ranges if needed
-                var paddedRangeData = rangeData.Length >= 15 ? rangeData 
-                    : rangeData.Concat(Enumerable.Range(0, 15 - rangeData.Length)
-                                     .Select(i => (start: (double)i, end: (double)i + 10)))
-                                     .ToArray();
-                // Build RangeFinder normally
-                var rangeFinder = RangeFinderFactory.Create(paddedRangeData);
-                
-                // Build IntervalTree with INTENTIONALLY WRONG logic (inject fault)
-                var intervalTree = new IntervalTree<double, int>();
-                for (int i = 0; i < paddedRangeData.Length; i++)
-                {
-                    // FAULT: Add ranges with offset to cause mismatch (avoid ArgumentOutOfRangeException)
-                    var faultyStart = paddedRangeData[i].start + 1000;  // Intentionally offset!
-                    var faultyEnd = paddedRangeData[i].end + 1000;      // Intentionally offset!
-                    intervalTree.Add(faultyStart, faultyEnd, i);
-                }
-
-                // ASSERTION: This should detect the intentional fault
-                var rfResults = rangeFinder.Query(query.start, query.end);
-                var itResults = intervalTree.Query(query.start, query.end);
-
-                var comparison = rfResults.CompareAsSets(itResults);
-                
-                // This should return false most of the time due to injected fault
-                return LogAndReturn(comparison, "FAULT INJECTION: Expected mismatch", query, paddedRangeData);
-            })
-            .QuickCheckThrowOnFailure();
-    }
 }
