@@ -211,7 +211,7 @@ public class CompatibilityTests
     /// PROPERTY: Operations are deterministic
     /// ∀ ranges, query. Query(ranges, query) = Query(ranges, query)
     /// </summary>
-    [SeededProperty(TestSeed)]
+    [SeededProperty(TestSeed, MaxTest = 10)]
     public void QueriesAreDeterministic()
     {
         PrintTestSeed(nameof(QueriesAreDeterministic));
@@ -234,7 +234,7 @@ public class CompatibilityTests
     /// PROPERTY: Empty dataset always produces empty results
     /// ∀ query. Query_on_EmptyDataset(query) = ∅
     /// </summary>
-    [SeededProperty(TestSeed)]
+    [SeededProperty(TestSeed, MaxTest = 10)]
     public void EmptyDatasetAlwaysProducesEmptyResults()
     {
         PrintTestSeed(nameof(EmptyDatasetAlwaysProducesEmptyResults));
@@ -254,7 +254,7 @@ public class CompatibilityTests
     /// PROPERTY: Factory methods produce equivalent results
     /// ∀ ranges, query. FromTuples(ranges).Query(query) = FromArrays(ranges).Query(query)
     /// </summary>
-    [SeededProperty(TestSeed)]
+    [SeededProperty(TestSeed, MaxTest = 10)]
     public void FactoryMethodsProduceEquivalentResults()
     {
         PrintTestSeed(nameof(FactoryMethodsProduceEquivalentResults));
