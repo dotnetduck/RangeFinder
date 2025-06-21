@@ -21,16 +21,10 @@ public class CompatibilityTests
     private static readonly bool VerboseMode = false;
     
     /// <summary>
-    /// Manual seed for deterministic test reproduction. Set this to reproduce specific failures.
-    /// Note: This controls our custom generators and logging, but FsCheck has its own internal seeding.
-    /// If null, a random seed will be generated and displayed at test start.
+    /// Deterministic seed for property-based tests. Change this value to reproduce specific failures.
+    /// All property tests will use this seed for consistent, reproducible behavior.
     /// </summary>
-    private static int? ManualSeed = null;
-    
-    /// <summary>
-    /// Current seed being used for this test run (for logging and reference)
-    /// </summary>
-    private static int CurrentSeed;
+    private const int TestSeed = 12345;
     
     
     /// <summary>
@@ -38,8 +32,8 @@ public class CompatibilityTests
     /// </summary>
     private static void PrintTestSeed(string testName)
     {
-        Console.WriteLine($"[{testName}] Using seed: {CurrentSeed}");
-        TestContext.WriteLine($"[{testName}] Using seed: {CurrentSeed}");
+        Console.WriteLine($"[{testName}] Using seed: {TestSeed}");
+        TestContext.WriteLine($"[{testName}] Using seed: {TestSeed}");
     }
     
     /// <summary>
@@ -52,13 +46,13 @@ public class CompatibilityTests
         if (!comparison.AreEqual)
         {
             var debugMsg = comparison.FormatRangeDebugMessage(testName, query, rangeData);
-            Console.WriteLine($"\n=== PROPERTY TEST FAILURE (Seed: {CurrentSeed}) ===");
+            Console.WriteLine($"\n=== PROPERTY TEST FAILURE (Seed: {TestSeed}) ===");
             Console.WriteLine(debugMsg);
-            Console.WriteLine($"To reproduce: set ManualSeed = {CurrentSeed} in CompatibilityTests.cs");
+            Console.WriteLine($"To reproduce: set TestSeed = {TestSeed} in CompatibilityTests.cs");
             Console.WriteLine("================================================\n");
-            TestContext.WriteLine($"\n=== PROPERTY TEST FAILURE (Seed: {CurrentSeed}) ===");
+            TestContext.WriteLine($"\n=== PROPERTY TEST FAILURE (Seed: {TestSeed}) ===");
             TestContext.WriteLine(debugMsg);
-            TestContext.WriteLine($"To reproduce: set ManualSeed = {CurrentSeed}");
+            TestContext.WriteLine($"To reproduce: set TestSeed = {TestSeed}");
             TestContext.WriteLine("================================================\n");
         }
         else if (VerboseMode)
@@ -71,39 +65,26 @@ public class CompatibilityTests
     }
     
     /// <summary>
-    /// Custom Property attribute that uses our seed for deterministic testing
+    /// Custom Property attribute that uses our const seed for deterministic testing
     /// </summary>
     public class SeededPropertyAttribute : FsCheck.NUnit.PropertyAttribute
     {
         public SeededPropertyAttribute(int maxTest = 100) : base()
         {
             MaxTest = maxTest;
-            if (ManualSeed.HasValue)
-            {
-                var seed = ManualSeed.Value;
-                Replay = $"{seed},{seed}";
-            }
+            Replay = TestSeed + "," + TestSeed; // Use const value
         }
     }
 
     [OneTimeSetUp]
     public void SetUp()
     {
-        // Initialize deterministic seed for property testing
-        CurrentSeed = ManualSeed ?? new System.Random().Next();
-        Console.WriteLine($"\n=== PROPERTY TEST SEED: {CurrentSeed} ===");
-        if (ManualSeed.HasValue)
-        {
-            Console.WriteLine($"Using MANUAL seed: {CurrentSeed}");
-        }
-        else
-        {
-            Console.WriteLine($"Using random seed: {CurrentSeed}");
-            Console.WriteLine("FsCheck will use its own random seed - check failure output for FsCheck seed");
-        }
-        Console.WriteLine($"To reproduce failures, set ManualSeed = {CurrentSeed} in CompatibilityTests.cs");
+        // Display deterministic seed for property testing
+        Console.WriteLine($"\n=== PROPERTY TEST SEED: {TestSeed} ===");
+        Console.WriteLine("All property tests use this fixed seed for deterministic behavior");
+        Console.WriteLine($"To reproduce failures, set TestSeed = {TestSeed} in CompatibilityTests.cs");
         Console.WriteLine("========================================\n");
-        TestContext.WriteLine($"Property Test Seed: {CurrentSeed}");
+        TestContext.WriteLine($"Property Test Seed: {TestSeed}");
         
         Arb.Register(typeof(RangeDataGenerators));
         
@@ -119,7 +100,7 @@ public class CompatibilityTests
     /// PROPERTY: RangeFinder and IntervalTree must always produce identical results
     /// ∀ ranges, query. RangeFinder.Query(query) = IntervalTree.Query(query)
     /// </summary>
-    [SeededProperty(100)]
+    [SeededProperty(TestSeed)]
     public void RangeFinderEquivalentToIntervalTree_RangeQueries()
     {
         PrintTestSeed(nameof(RangeFinderEquivalentToIntervalTree_RangeQueries));
@@ -147,7 +128,7 @@ public class CompatibilityTests
     /// PROPERTY: Point query must equal range query with same start/end
     /// ∀ ranges, point. Query(point) = Query(point, point)
     /// </summary>
-    [FsCheck.NUnit.Property(MaxTest = 50)]
+    [SeededProperty(TestSeed)]
     public void PointQueryEqualsRangeQuery()
     {
         PrintTestSeed(nameof(PointQueryEqualsRangeQuery));
@@ -168,7 +149,7 @@ public class CompatibilityTests
     /// PROPERTY: Query results must only contain ranges that actually overlap
     /// ∀ ranges, query. ∀ result ∈ Query(query). result overlaps query
     /// </summary>
-    [FsCheck.NUnit.Property(MaxTest = 50)]
+    [SeededProperty(TestSeed)]
     public void QueryResultsOnlyContainOverlappingRanges()
     {
         PrintTestSeed(nameof(QueryResultsOnlyContainOverlappingRanges));
@@ -187,7 +168,7 @@ public class CompatibilityTests
     /// PROPERTY: Count must equal input size
     /// ∀ ranges. RangeFinder(ranges).Count = |ranges|
     /// </summary>
-    [FsCheck.NUnit.Property(MaxTest = 50)]
+    [SeededProperty(TestSeed)]
     public void CountPropertyEqualsInputSize()
     {
         PrintTestSeed(nameof(CountPropertyEqualsInputSize));
@@ -203,9 +184,10 @@ public class CompatibilityTests
     /// PROPERTY: Expanding query bounds never reduces results (Monotonicity)
     /// ∀ ranges, q1, q2. q1 ⊆ q2 ⟹ Query(q1) ⊆ Query(q2)
     /// </summary>
-    [FsCheck.NUnit.Property(MaxTest = 30)]
+    [SeededProperty(TestSeed)]
     public void ExpandingQueryNeverReducesResults()
     {
+        PrintTestSeed(nameof(ExpandingQueryNeverReducesResults));
         Prop.ForAll<(double start, double end)[], (double start, double end), (double start, double end)>((rangeData, query1, query2) =>
             {
                 // Ensure query2 contains query1
@@ -229,9 +211,10 @@ public class CompatibilityTests
     /// PROPERTY: Operations are deterministic
     /// ∀ ranges, query. Query(ranges, query) = Query(ranges, query)
     /// </summary>
-    [FsCheck.NUnit.Property(MaxTest = 30)]
+    [SeededProperty(TestSeed)]
     public void QueriesAreDeterministic()
     {
+        PrintTestSeed(nameof(QueriesAreDeterministic));
         Prop.ForAll<(double start, double end)[], (double start, double end)>((rangeData, query) =>
             {
                 // Build identical structures using factory method
@@ -251,9 +234,10 @@ public class CompatibilityTests
     /// PROPERTY: Empty dataset always produces empty results
     /// ∀ query. Query_on_EmptyDataset(query) = ∅
     /// </summary>
-    [FsCheck.NUnit.Property(MaxTest = 20)]
+    [SeededProperty(TestSeed)]
     public void EmptyDatasetAlwaysProducesEmptyResults()
     {
+        PrintTestSeed(nameof(EmptyDatasetAlwaysProducesEmptyResults));
         Prop.ForAll<(double start, double end), double>((query, point) =>
             {
                 var emptyFinder = RangeFinderFactory.Create(Array.Empty<(double start, double end)>());
@@ -270,9 +254,10 @@ public class CompatibilityTests
     /// PROPERTY: Factory methods produce equivalent results
     /// ∀ ranges, query. FromTuples(ranges).Query(query) = FromArrays(ranges).Query(query)
     /// </summary>
-    [FsCheck.NUnit.Property(MaxTest = 20)]
+    [SeededProperty(TestSeed)]
     public void FactoryMethodsProduceEquivalentResults()
     {
+        PrintTestSeed(nameof(FactoryMethodsProduceEquivalentResults));
         Prop.ForAll<(double start, double end)[], (double start, double end)>((rangeData, query) =>
             {
                 // Create using different factory methods
