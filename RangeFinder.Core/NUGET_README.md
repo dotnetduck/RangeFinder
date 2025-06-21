@@ -8,7 +8,7 @@ A high-performance .NET range query library for general numeric ranges.
 
 ### Critical Bug Fixes
 - **🔧 Fixed negative range handling** - Resolves incorrect query results for ranges with negative values
-- **⚠️ Important**: All users on v0.1.x should update to v0.2.0 to ensure correct behavior
+- **⚠️ Important**: Users on v0.1.x with negative-value ranges must update to v0.2.0
 
 ### New Features  
 - **RangeFinderFactory** - Simplified factory methods for RangeFinder construction from various data sources
