@@ -10,7 +10,7 @@ A high-performance .NET range query library for general numeric ranges.
 
 - **High Performance**: Fast construction, fast query
 - **Generic Support**: Works with any numeric type using [`INumber<TSelf>`](https://learn.microsoft.com/en-us/dotnet/api/system.numerics.inumber-1) interface
-- **Memory Efficient**: Predictable allocation patterns with low GC pressure
+- **Memory Efficient**: Designed to predictable allocation patterns with low GC pressure
 - **Compatibility**: RangeTree-compatible [Query APIs](#migration-from-rangetree) for easy migration
 - **Visualization**: Interactive range visualization with RangeFinder.Visualizer
 - **Serialization**: CSV and Parquet data import/export support

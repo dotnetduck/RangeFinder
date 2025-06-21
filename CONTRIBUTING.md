@@ -13,7 +13,7 @@ Thank you for your interest in contributing to RangeFinder! This document provid
 1. **Fork the repository** on GitHub
 2. **Clone your fork** locally:
    ```bash
-   git clone https://github.com/dotnetduck/RangeFinder.git
+   git clone https://github.com/your-username/RangeFinder.git
    cd RangeFinder
    ```
 3. **Build and test** to ensure everything works:
