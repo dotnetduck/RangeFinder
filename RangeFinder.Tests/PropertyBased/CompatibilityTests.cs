@@ -6,22 +6,6 @@ using RangeFinder.Core;
 namespace RangeFinder.Tests.PropertyBased;
 
 /// <summary>
-/// Extension methods for more precise test assertions
-/// </summary>
-public static class TestExtensions
-{
-    /// <summary>
-    /// Checks if two sequences contain the same elements regardless of order
-    /// </summary>
-    public static bool SequenceEqualOrderDontCare<T>(this IEnumerable<T> self, IEnumerable<T> other)
-    {
-        var selfSet = self.ToHashSet();
-        var otherSet = other.ToHashSet();
-        return selfSet.SetEquals(otherSet);
-    }
-}
-
-/// <summary>
 /// Property-based compatibility tests using FsCheck that verify RangeFinder behavior 
 /// against IntervalTree using custom generators and factory methods.
 /// </summary>
@@ -55,7 +39,7 @@ public class CompatibilityTests
                 var rfResults = rangeFinder.Query(query.start, query.end);
                 var itResults = intervalTree.Query(query.start, query.end);
 
-                return rfResults.SequenceEqualOrderDontCare(itResults);
+                return CustomAssert.SetEquals(rfResults, itResults);
             })
             .QuickCheckThrowOnFailure();
     }
@@ -74,7 +58,7 @@ public class CompatibilityTests
                 var pointResults = rangeFinder.Query(point);
                 var rangeResults = rangeFinder.Query(point, point);
 
-                return pointResults.SequenceEqualOrderDontCare(rangeResults);
+                return CustomAssert.SetEquals(pointResults, rangeResults);
             })
             .QuickCheckThrowOnFailure();
     }
@@ -154,7 +138,7 @@ public class CompatibilityTests
                 var results1 = finder1.Query(query.start, query.end);
                 var results2 = finder2.Query(query.start, query.end);
 
-                return results1.SequenceEqualOrderDontCare(results2);
+                return CustomAssert.SetEquals(results1, results2);
             })
             .QuickCheckThrowOnFailure();
     }
@@ -196,7 +180,7 @@ public class CompatibilityTests
                 var results1 = fromTuples.Query(query.start, query.end);
                 var results2 = fromArrays.Query(query.start, query.end);
 
-                return results1.SequenceEqualOrderDontCare(results2);
+                return CustomAssert.SetEquals(results1, results2);
             })
             .QuickCheckThrowOnFailure();
     }
