@@ -55,10 +55,10 @@ public class CompatibilityTests
                 var itResults = intervalTree.Query(query.start, query.end);
 
                 var comparison = rfResults.CompareAsSets(itResults);
-                return Printer.LogAndReturn(
+return Printer.LogAndReturn(
                     comparison, "RangeFinder vs IntervalTree equivalence", query, rangeData, VerboseMode);
             })
-            .QuickCheck();
+            .QuickCheckThrowOnFailure();
     }
 
     /// <summary>
@@ -80,7 +80,7 @@ public class CompatibilityTests
                     comparison, "Point vs Range query equivalence",
                     (point, point), new[] { (point, point) }, VerboseMode);
             })
-            .QuickCheck();
+            .QuickCheckThrowOnFailure();
     }
 
     /// <summary>
@@ -98,7 +98,7 @@ public class CompatibilityTests
                 // ASSERTION: Every result must overlap with query
                 return results.All(result => result.Overlaps(query.start, query.end));
             })
-            .QuickCheck();
+            .QuickCheckThrowOnFailure();
     }
 
     /// <summary>
@@ -113,7 +113,7 @@ public class CompatibilityTests
                 var rangeFinder = RangeFinderFactory.Create(rangeData);
                 return rangeFinder.Count == rangeData.Length;
             })
-            .QuickCheck();
+            .QuickCheckThrowOnFailure();
     }
 
     /// <summary>
@@ -139,7 +139,7 @@ public class CompatibilityTests
 
                 return results1.IsSubsetOf(results2);
             })
-            .QuickCheck();
+            .QuickCheckThrowOnFailure();
     }
 
     /// <summary>
@@ -162,7 +162,7 @@ public class CompatibilityTests
                 return Printer.LogAndReturn(
                     comparison, "Query determinism", query, rangeData, VerboseMode);
             })
-            .QuickCheck();
+            .QuickCheckThrowOnFailure();
     }
 
     /// <summary>
@@ -181,7 +181,7 @@ public class CompatibilityTests
 
                 return rangeResults.Length == 0 && pointResults.Length == 0;
             })
-            .QuickCheck();
+            .QuickCheckThrowOnFailure();
     }
 
     /// <summary>
@@ -206,6 +206,6 @@ public class CompatibilityTests
                 return Printer.LogAndReturn(
                     comparison, "Factory method equivalence", query, rangeData, VerboseMode);
             })
-            .QuickCheck();
+            .QuickCheckThrowOnFailure();
     }
 }
