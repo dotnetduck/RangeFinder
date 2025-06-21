@@ -21,17 +21,12 @@ public class Printer
         if (!comparison.AreEqual)
         {
             var debugMsg = comparison.FormatRangeDebugMessage(testName, query, rangeData);
-            Console.WriteLine($"\n=== PROPERTY TEST FAILURE ===");
-            Console.WriteLine(debugMsg);
-            Console.WriteLine("================================================\n");
-            TestContext.WriteLine($"\n=== PROPERTY TEST FAILURE) ===");
+            TestContext.Write($"\n💣PROPERTY TEST FAILURE: ");
             TestContext.WriteLine(debugMsg);
-            TestContext.WriteLine("================================================\n");
         }
         else if (verbose)
         {
-            var successMsg = $"{testName} passed: Query=[{query.start}, {query.end}], RangeCount={rangeData.Length}";
-            Console.WriteLine(successMsg);
+            var successMsg = $"{testName} passed: Query=[{query.start}, {query.end}], RangeCount={rangeData.Length}, ResultCount={comparison.OnlyInActual.Count}";
             TestContext.WriteLine(successMsg);
         }
         return comparison.AreEqual;
