@@ -9,7 +9,7 @@ Thank you for your interest in contributing to RangeFinder! This document provid
 1. **Fork the repository** on GitHub
 2. **Clone your fork** locally:
    ```bash
-   git clone https://github.com/your-username/RangeFinder.git
+   git clone https://github.com/dotnetduck/RangeFinder.git
    cd RangeFinder
    ```
 3. **Build and test** to ensure everything works:
@@ -64,9 +64,9 @@ RangeFinder prioritizes performance above convenience. When contributing:
    ```bash
    dotnet run --project RangeFinder.Benchmark -c Release
    ```
-2. **Run performance guardian** to detect regressions:
+2. **Run performance benchmarks** to detect regressions:
    ```bash
-   dotnet run --project RangeFinder.Validator -c Release -- --guardian
+   dotnet run --project RangeFinder.Benchmark -c Release
    ```
 3. **Avoid allocations** in hot paths
 4. **Prefer arrays over lists** for performance-critical code
@@ -167,7 +167,7 @@ Add support for custom comparison operators in NumericRange.
 
 **Current manual process:**
 1. Verify all tests pass locally: `dotnet test`
-2. Run performance guardian: `dotnet run --project RangeFinder.Validator -c Release -- --guardian`
+2. Run performance benchmarks: `dotnet run --project RangeFinder.Benchmark -c Release`
 3. Manual code review by maintainers
 4. Manual merge after approval
 
@@ -178,7 +178,7 @@ RangeFinder maintains strict performance requirements:
 - **Query performance**: Must remain O(log N + K)
 - **Construction performance**: Should scale linearly or better
 - **Memory efficiency**: Minimize allocations in query paths
-- **Regression detection**: Use RangeFinder.Validator for validation
+- **Regression detection**: Use benchmarks for performance validation
 
 ## Getting Help
 
@@ -196,8 +196,7 @@ RangeFinder/
 │   ├── Generation/        # Test data generation utilities  
 │   └── Serialization/     # CSV/Parquet serialization
 ├── RangeFinder.Tests/     # Unit and integration tests
-├── RangeFinder.Benchmark/ # Performance benchmarks
-├── RangeFinder.Validator/ # Performance regression detection and validation
+├── RangeFinder.Benchmark/ # Performance benchmarks and validation
 └── RangeFinder.Visualizer/ # Avalonia-based range visualization tool
 ```
 

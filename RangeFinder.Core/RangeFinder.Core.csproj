@@ -7,7 +7,7 @@
         
         <!-- Package Information -->
         <PackageId>RangeFinder</PackageId>
-        <Version>0.2.0-pre</Version>
+        <Version>0.2.0</Version>
         <Authors>dotnetduck</Authors>
         <Copyright>Copyright (c) 2025- dotnetduck@gmail.com</Copyright>
         <Description>A high-performance .NET range query library for general numeric ranges.</Description>
