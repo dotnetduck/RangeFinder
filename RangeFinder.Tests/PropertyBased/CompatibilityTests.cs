@@ -39,7 +39,7 @@ public class CompatibilityTests
                 var rfResults = rangeFinder.Query(query.start, query.end);
                 var itResults = intervalTree.Query(query.start, query.end);
 
-                return CustomAssert.SetEquals(rfResults, itResults);
+                return rfResults.CompareAsSets(itResults).AreEqual;
             })
             .QuickCheckThrowOnFailure();
     }
@@ -58,7 +58,7 @@ public class CompatibilityTests
                 var pointResults = rangeFinder.Query(point);
                 var rangeResults = rangeFinder.Query(point, point);
 
-                return CustomAssert.SetEquals(pointResults, rangeResults);
+                return pointResults.CompareAsSets(rangeResults).AreEqual;
             })
             .QuickCheckThrowOnFailure();
     }
@@ -138,7 +138,7 @@ public class CompatibilityTests
                 var results1 = finder1.Query(query.start, query.end);
                 var results2 = finder2.Query(query.start, query.end);
 
-                return CustomAssert.SetEquals(results1, results2);
+                return results1.CompareAsSets(results2).AreEqual;
             })
             .QuickCheckThrowOnFailure();
     }
@@ -180,7 +180,7 @@ public class CompatibilityTests
                 var results1 = fromTuples.Query(query.start, query.end);
                 var results2 = fromArrays.Query(query.start, query.end);
 
-                return CustomAssert.SetEquals(results1, results2);
+                return results1.CompareAsSets(results2).AreEqual;
             })
             .QuickCheckThrowOnFailure();
     }
