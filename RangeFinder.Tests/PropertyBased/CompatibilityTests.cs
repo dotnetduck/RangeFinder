@@ -48,15 +48,15 @@ public class CompatibilityTests
                     intervalTree.Add(rangeData[i].start, rangeData[i].end, i);
                 }
 
-                var query = RangeDataGenerators.ExtractQueryRange(rangeData);
+                var queryPoint = RangeDataGenerators.ExtractQueryPoint(rangeData);
 
                 // ASSERTION: Results must be identical (same elements, order doesn't matter)
-                var rfResults = rangeFinder.Query(query.start, query.end);
-                var itResults = intervalTree.Query(query.start, query.end);
+                var rfResults = rangeFinder.Query(queryPoint);
+                var itResults = intervalTree.Query(queryPoint);
 
                 var comparison = rfResults.CompareAsSets(itResults);
 return Printer.LogAndReturn(
-                    comparison, "RangeFinder vs IntervalTree equivalence", query, rangeData, VerboseMode);
+                    comparison, "RangeFinder vs IntervalTree equivalence", (queryPoint, queryPoint), rangeData, VerboseMode);
             })
             .QuickCheckThrowOnFailure();
     }

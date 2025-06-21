@@ -31,14 +31,31 @@ public static class RangeDataGenerators
 
         var rand = new System.Random();
 
-        // Generate a query range that intersects with some of the data
-        var minStart = rangeData.Min(r => r.start);
-        var maxEnd = rangeData.Max(r => r.end);
+        // Select a random range from the data to ensure overlap
+        var selectedRange = rangeData[rand.Next(rangeData.Length)];
         
-        // Create a query range within the bounds of the data
-        var queryStart = minStart + (maxEnd - minStart) * rand.NextDouble() * 0.8;
-        var queryEnd = queryStart + (maxEnd - queryStart) * rand.NextDouble();
+        // Generate a point within this range to ensure intersection
+        var point = selectedRange.start + (selectedRange.end - selectedRange.start) * rand.NextDouble();
         
+        // Create a query range around this point
+        var rangeSize = (selectedRange.end - selectedRange.start) * (0.5 + rand.NextDouble() * 0.5);
+        var queryStart = point - rangeSize * rand.NextDouble();
+        var queryEnd = point + rangeSize * rand.NextDouble();
+
         return (queryStart, queryEnd);
+    }
+
+    public static double ExtractQueryPoint((double start, double end)[] rangeData)
+    {
+        if (rangeData.Length == 0)
+            return 0.0;
+
+        var rand = new System.Random();
+
+        // Select a random range from the data
+        var selectedRange = rangeData[rand.Next(rangeData.Length)];
+        
+        // Generate a point within this range to ensure intersection
+        return selectedRange.start + (selectedRange.end - selectedRange.start) * rand.NextDouble();
     }
 }
