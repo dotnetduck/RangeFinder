@@ -1,3 +1,4 @@
+using IntervalTree;
 using RangeFinder.Core;
 using RangeFinder.Tests.Helper;
 
@@ -107,22 +108,15 @@ public class RangeFinderNegativeValueTests
     public void Query_CrossingZero_HandlesNegativeToPositiveCorrectly()
     {
         var rangeFinder = new RangeFinder<double, int>(TestRangesWithNegatives);
+        var intervalTree = new IntervalTree<double,int>();
+        foreach (var range in TestRangesWithNegatives)
+            intervalTree.Add(range.Start, range.End, range.Value);
         
-        // Query that crosses zero should find ranges that overlap with the crossing region
-        var actualRanges = rangeFinder.QueryRanges(-0.5, 0.5).ToArray();
-        var expectedValues = new[] { 102, 103, 104 }; // Ranges that contain values in [-0.5, 0.5]
-        
-        var actualValues = actualRanges.Select(r => r.Value).ToArray();
+        var actualValues = rangeFinder.Query(-0.5, 0.5).ToArray();
+        var expectedValues = intervalTree.Query(-0.5, 0.5);
+            
         var difference = actualValues.CompareAsSets(expectedValues);
-        
-        if (!difference.AreEqual)
-        {
-            var rangeData = TestRangesWithNegatives.Select(r => (r.Start, r.End)).ToArray();
-            difference.PrintRangeDebugInfo("Cross-zero query [-0.5, 0.5]", (-0.5, 0.5), rangeData);
-        }
-        
-        Assert.That(difference.AreEqual, Is.True, 
-            $"Cross-zero query failed. {difference.GetDescription()}");
+        Assert.IsTrue(difference.AreEqual, $"Crossing zero query failed. {difference.GetDescription()}");
     }
 
     [Test]
