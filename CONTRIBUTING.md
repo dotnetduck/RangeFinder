@@ -4,6 +4,10 @@
 
 Thank you for your interest in contributing to RangeFinder! This document provides guidelines for contributing to this high-performance range query library.
 
+## Project Status
+
+> **⚠️ Pre-1.0 Development**: RangeFinder is currently in active development toward v1.0.0. While the public API is stable, breaking changes may occasionally occur before v1.0. For significant contributions, consider waiting until v1.0.0 release for better API stability.
+
 ## Getting Started
 
 1. **Fork the repository** on GitHub

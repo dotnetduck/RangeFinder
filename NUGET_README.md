@@ -55,10 +55,14 @@ var overlaps = finder.QueryRanges(2.0, 3.0); // Returns: [1.0,2.2]=100, [2.0,3.2
 - .NET 8.0 or later
 - Supports any `INumber<T>` numeric type (int, double, decimal, etc.)
 
+## Stability Notice
+
+RangeFinder is currently in pre-1.0 development. While the core public API is stable and breaking changes are uncommon, we recommend waiting for v1.0.0 before adopting in mission-critical production systems. The library is suitable for evaluation, prototyping, and non-critical applications.
+
 ## Documentation
 
 For complete documentation, examples, and performance benchmarks, visit the [GitHub repository](https://github.com/dotnetduck/RangeFinder).
 
 ## License
 
-MIT License
+MIT License - provided "as is" without warranty of any kind.
