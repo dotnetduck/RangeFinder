@@ -4,14 +4,16 @@ A high-performance .NET range query library for general numeric ranges.
 
 [![.NET](https://img.shields.io/badge/.NET-8.0%20or%20later-blue)](https://dotnet.microsoft.com/download)
 [![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
-[![nuget](https://img.shields.io/badge/nuget-v0.1.1-blue)](https://www.nuget.org/packages/RangeFinder/)
+[![nuget](https://img.shields.io/badge/nuget-v0.2.0-blue)](https://www.nuget.org/packages/RangeFinder/)
 
 ## Features
 
-- **High Performance**: Fast construction, fast query.
+- **High Performance**: Fast construction, fast query
 - **Generic Support**: Works with any numeric type using [`INumber<TSelf>`](https://learn.microsoft.com/en-us/dotnet/api/system.numerics.inumber-1) interface
-- **Memory Efficient**: Predictable allocation patterns with low GC pressure (not yet measured)
+- **Memory Efficient**: Designed to predictable allocation patterns with low GC pressure
 - **Compatibility**: RangeTree-compatible [Query APIs](#migration-from-rangetree) for easy migration
+- **Visualization**: Interactive range visualization with RangeFinder.Visualizer
+- **Serialization**: CSV and Parquet data import/export support
 
 ## Quick Start
 
@@ -99,6 +101,22 @@ var results = finder.Query(2.0, 4.0); // Same API!
 - **Dynamic insertion**: Not supported - requires all ranges during construction
 - **Query API**: Compatible method signatures and behavior
 - **Performance focus**: Optimized for fast construction and queries
+
+## Architecture
+
+### Core Projects
+
+- **RangeFinder.Core** - Main library with range finding algorithms
+- **RangeFinder.IO** - File I/O and data generation utilities
+- **RangeFinder.Visualizer** - Avalonia-based range visualization tool
+- **RangeFinder.Benchmark** - Performance testing and validation
+
+### What's New in v0.2.0
+
+- **RangeFinder.Visualizer** - Interactive range visualization tool
+- **RangeFinderFactory** - Simplified creation from various data sources
+- **CSV/Parquet Support** - Import and export range data
+- **Enhanced Testing** - Property-based testing and improved coverage
 
 ## Requirements
 
