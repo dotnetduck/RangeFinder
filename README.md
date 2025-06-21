@@ -65,7 +65,7 @@ Please refer a detailed performance analysis at
 var range = new NumericRange<double, int>(1.0, 5.0, 42);
 
 // Range finder for efficient queries
-var finder = new RangeFinder<double, int>(ranges);
+var finder = RangeFinderFactory.Create(ranges);
 ```
 
 ### Query Methods

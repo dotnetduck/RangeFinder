@@ -105,7 +105,6 @@ public class RangeFinder<TNumber, TAssociated>
         
         // Start searching from the pruned range start
         var prunedRangeStart = queryRange.Start - _maxSpanOfTheRangesForPruning;
-        if (prunedRangeStart < TNumber.Zero) prunedRangeStart = TNumber.Zero;
         
         // Binary search for starting position
         var startIndex = BinarySearchForStart(prunedRangeStart);
@@ -142,7 +141,6 @@ public class RangeFinder<TNumber, TAssociated>
         
         // Start searching from the pruned range start
         var prunedRangeStart = value - _maxSpanOfTheRangesForPruning;
-        if (prunedRangeStart < TNumber.Zero) prunedRangeStart = TNumber.Zero;
         
         // Binary search for starting position
         var startIndex = BinarySearchForStart(prunedRangeStart);

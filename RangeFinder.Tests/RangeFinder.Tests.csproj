@@ -11,12 +11,18 @@
 
     <ItemGroup>
         <PackageReference Include="coverlet.collector" Version="6.0.0" />
+        <PackageReference Include="FsCheck" Version="2.16.5" />
+        <PackageReference Include="FsCheck.NUnit" Version="2.16.5" />
         <PackageReference Include="Microsoft.NET.Test.Sdk" Version="17.8.0" />
         <PackageReference Include="NUnit" Version="3.14.0" />
         <PackageReference Include="NUnit.Analyzers" Version="3.9.0" />
         <PackageReference Include="NUnit3TestAdapter" Version="4.5.0" />
         <PackageReference Include="RangeTree" Version="3.0.1" />
     </ItemGroup>
+
+    <PropertyGroup>
+        <WarningsNotAsErrors>NUnit1027</WarningsNotAsErrors>
+    </PropertyGroup>
 
     <ItemGroup>
         <Using Include="NUnit.Framework" />

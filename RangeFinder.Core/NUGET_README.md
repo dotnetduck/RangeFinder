@@ -22,7 +22,7 @@ var ranges = new List<NumericRange<double, string>>
 };
 
 // Build range finder
-var finder = new RangeFinder<double, string>(ranges);
+var finder = RangeFinderFactory.Create(ranges);
 
 // Query overlapping ranges
 var overlaps = finder.QueryRanges(4.0, 6.0); // Returns: Range1, Range2

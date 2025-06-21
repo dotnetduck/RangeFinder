@@ -1,5 +1,7 @@
+using FsCheck;
 using RangeFinder.Core;
 using RangeFinder.IO.Generation;
+using System.Diagnostics;
 using System.Numerics;
 
 namespace RangeFinder.Tests;
@@ -311,6 +313,71 @@ public abstract class TestBase
             Assert.That(executionTime, Is.LessThan(expectedMaxDuration), 
                 $"{operation} for {datasetSize} elements took {executionTime.TotalMilliseconds:F1}ms, " +
                 $"expected < {expectedMaxDuration.TotalMilliseconds:F1}ms");
+        }
+
+        /// <summary>
+        /// Measures execution time with detailed timing information for performance comparisons.
+        /// </summary>
+        public static (TimeSpan elapsed, T result) MeasureWithResult<T>(Func<T> action)
+        {
+            var stopwatch = Stopwatch.StartNew();
+            var result = action();
+            stopwatch.Stop();
+            return (stopwatch.Elapsed, result);
+        }
+    }
+
+    /// <summary>
+    /// Helper methods for property-based testing integration.
+    /// </summary>
+    protected static class PropertyTestHelpers
+    {
+        /// <summary>
+        /// Validates that a property holds for all characteristic types using existing generators.
+        /// </summary>
+        public static void CheckPropertyAcrossCharacteristics<T>(
+            Func<Characteristic, Parameter, T> dataGenerator,
+            Func<T, bool> propertyValidator,
+            string testName,
+            int testSize = TestSizes.Small)
+        {
+            var characteristics = new[]
+            {
+                Characteristic.Uniform,
+                Characteristic.DenseOverlapping,
+                Characteristic.SparseNonOverlapping,
+                Characteristic.Clustered
+            };
+            
+            foreach (var characteristic in characteristics)
+            {
+                try
+                {
+                    var parameters = characteristic switch
+                    {
+                        Characteristic.Uniform => RangeParameterFactory.Uniform(testSize),
+                        Characteristic.DenseOverlapping => RangeParameterFactory.DenseOverlapping(testSize),
+                        Characteristic.SparseNonOverlapping => RangeParameterFactory.SparseNonOverlapping(testSize),
+                        Characteristic.Clustered => RangeParameterFactory.Clustered(testSize),
+                        _ => throw new ArgumentException($"Unknown characteristic: {characteristic}")
+                    };
+                    
+                    var testData = dataGenerator(characteristic, parameters);
+                    var result = propertyValidator(testData);
+                    
+                    if (!result)
+                    {
+                        throw new Exception($"Property validation failed for {characteristic}");
+                    }
+                    
+                    Console.WriteLine($"✅ {testName} passed for {characteristic}");
+                }
+                catch (Exception ex)
+                {
+                    Console.WriteLine($"❌ {testName} failed for {characteristic}: {ex.Message}");
+                    throw;
+                }
+            }
         }
     }
 }

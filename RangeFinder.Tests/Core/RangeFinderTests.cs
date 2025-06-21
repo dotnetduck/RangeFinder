@@ -1,4 +1,6 @@
+using IntervalTree;
 using RangeFinder.Core;
+using RangeFinder.Tests.Helper;
 
 namespace RangeFinder.Tests.Core;
 
@@ -17,286 +19,94 @@ public class RangeFinderTests
         new(5.0, 6.0, 5), new(6.0, 20.0, 6)
     };
 
-    #region Range Query Tests
-
-    [TestCase(2.5, 5.1, 4)]
-    [TestCase(-5, 4.0, 4)]
-    [TestCase(10.0, 15.0, 1)]
-    public void Query_RangeQuery_ReturnsCorrectCount(
-        double queryStart, double queryEnd, int expectedCount)
+    private static readonly List<NumericRange<double, int>> TestRangesWithNegatives = new()
     {
-        var rangeFinder = new RangeFinder<double, int>(TestRanges);
-        
-        var result = rangeFinder.QueryRanges(queryStart, queryEnd).ToArray();
-        
-        Assert.That(result, Has.Length.EqualTo(expectedCount));
+        new(-10.0, -5.0, 101),
+        new(-3.0, 2.0, 102),
+        new(-1.0, 1.0, 103),
+        new(0.0, 5.0, 104),
+        new(3.0, 8.0, 105),
+        new(-8.0, -2.0, 106),
+        new(-15.0, 15.0, 107)
+    };
+
+    public static IEnumerable<TestCaseData> RangeQueryCases()
+    {
+        // positive only
+        yield return new TestCaseData(2.5, 5.1, "overlap in middle (TestRanges)", TestRanges);
+        yield return new TestCaseData(-5, 4.0, "query before and into range (TestRanges)", TestRanges);
+        yield return new TestCaseData(10.0, 15.0, "inside large range only (TestRanges)", TestRanges);
+        // negative only
+        yield return new TestCaseData(-12.0, -1.0, "covers multiple negative ranges (TestRangesWithNegatives)", TestRangesWithNegatives);
+        yield return new TestCaseData(-5.0, 0.0, "boundary at zero (TestRangesWithNegatives)", TestRangesWithNegatives);
+        yield return new TestCaseData(-2.0, 2.0, "crossing zero (TestRangesWithNegatives)", TestRangesWithNegatives);
+        yield return new TestCaseData(0.0, 10.0, "zero to positive (TestRangesWithNegatives)", TestRangesWithNegatives);
+        yield return new TestCaseData(-20.0, 20.0, "covers all ranges (TestRangesWithNegatives)", TestRangesWithNegatives);
+        yield return new TestCaseData(-6.0, -6.0, "point query in negative range (TestRangesWithNegatives)", TestRangesWithNegatives);
+        yield return new TestCaseData(-100.0, -50.0, "outside all ranges (TestRangesWithNegatives)", TestRangesWithNegatives);
+        yield return new TestCaseData(-9.0, -6.0, "purely negative, excludes positive (TestRangesWithNegatives)", TestRangesWithNegatives);
+        yield return new TestCaseData(2.0, -2.0, "empty interval (start > end) (TestRangesWithNegatives)", TestRangesWithNegatives);
+        yield return new TestCaseData(double.MinValue, double.MaxValue, "extreme values, should cover all (TestRangesWithNegatives)", TestRangesWithNegatives);
+        yield return new TestCaseData(0.0, 0.0, "single point at zero (TestRangesWithNegatives)", TestRangesWithNegatives);
     }
 
-    [Test]
-    public void Query_RangeQuery_ConsistentResults()
+    public static IEnumerable<TestCaseData> PointQueryCases()
     {
-        var rangeFinder = new RangeFinder<double, int>(TestRanges);
-
-        var testCases = new[]
-        {
-            new NumericRange<double, object>(0, 1),
-            new NumericRange<double, object>(1, 2),
-            new NumericRange<double, object>(2, 3),
-            new NumericRange<double, object>(3, 4),
-            new NumericRange<double, object>(4, 5),
-            new NumericRange<double, object>(5, 6),
-            new NumericRange<double, object>(1.5, 4.5),
-            new NumericRange<double, object>(0, 10),
-            new NumericRange<double, object>(15, 25)
-        };
-
-        foreach (var queryRange in testCases)
-        {
-            var results = rangeFinder.QueryRanges(queryRange.Start, queryRange.End)
-                .OrderBy(r => r.Start)
-                .ThenBy(r => r.End)
-                .ToArray();
-
-            // Basic validation - should return consistent results
-            Assert.That(results, Is.Not.Null);
-        }
+        // positive only
+        yield return new TestCaseData(1.5, "point in two ranges (TestRanges)", TestRanges);
+        yield return new TestCaseData(2.0, "point in three ranges (TestRanges)", TestRanges);
+        yield return new TestCaseData(4.0, "point at boundary (TestRanges)", TestRanges);
+        yield return new TestCaseData(0.5, "point before all ranges (TestRanges)", TestRanges);
+        yield return new TestCaseData(25.0, "point after all ranges (TestRanges)", TestRanges);
+        yield return new TestCaseData(5.5, "point in one range (TestRanges)", TestRanges);
+        yield return new TestCaseData(6.0, "point at boundary of two ranges (TestRanges)", TestRanges);
+        // negative only
+        yield return new TestCaseData(-7.0, "inside two negative ranges (TestRangesWithNegatives)", TestRangesWithNegatives);
+        yield return new TestCaseData(-3.0, "at boundary of two negative ranges (TestRangesWithNegatives)", TestRangesWithNegatives);
+        yield return new TestCaseData(0.0, "at zero, inside three ranges (TestRangesWithNegatives)", TestRangesWithNegatives);
+        yield return new TestCaseData(-1.0, "inside multiple crossing zero (TestRangesWithNegatives)", TestRangesWithNegatives);
+        yield return new TestCaseData(-12.0, "outside all negative ranges (TestRangesWithNegatives)", TestRangesWithNegatives);
+        yield return new TestCaseData(100.0, "far outside all ranges (TestRangesWithNegatives)", TestRangesWithNegatives);
+        yield return new TestCaseData(double.MinValue, "extreme negative (TestRangesWithNegatives)", TestRangesWithNegatives);
+        yield return new TestCaseData(double.MaxValue, "extreme positive (TestRangesWithNegatives)", TestRangesWithNegatives);
     }
 
-    #endregion
-
-    #region Point Query Tests
-
-    [TestCase(1.5, 2)] // Point in ranges [1.0,2.2] and [1.0,4.0]
-    [TestCase(2.0, 3)] // Point in ranges [2.0,2.5], [1.0,4.0], and touches [1.0,2.2]
-    [TestCase(4.0, 2)] // Point at boundaries of ranges [1.0,4.0] and [4.0,5.0]
-    [TestCase(0.5, 0)] // Point before all ranges
-    [TestCase(25.0, 0)] // Point after all ranges
-    [TestCase(5.5, 1)] // Point in range [5.0,6.0]
-    [TestCase(6.0, 2)] // Point at boundary of [5.0,6.0] and [6.0,20.0]
-    public void Query_PointQuery_ReturnsCorrectCount(
-        double point, int expectedCount)
+    /// <summary>
+    /// Compares RangeFinder and IntervalTree for a variety of range queries, including positive, negative, and edge cases.
+    /// </summary>
+    [Test, TestCaseSource(nameof(RangeQueryCases))]
+    public void Query_RangeQuery(double queryStart, double queryEnd, string intention, IEnumerable<NumericRange<double, int>> ranges)
     {
-        var rangeFinder = new RangeFinder<double, int>(TestRanges);
-        
-        var result = rangeFinder.QueryRanges(point).ToArray();
-        
-        Assert.That(result, Has.Length.EqualTo(expectedCount));
-    }
-
-    [Test]
-    public void Query_PointQuery_ReturnsCorrectRanges()
-    {
-        var rangeFinder = new RangeFinder<double, int>(TestRanges);
-        
-        // Test point 2.0 which should be in ranges [2.0,2.5], [1.0,4.0], and at boundary of [1.0,2.2]
-        var result = rangeFinder.QueryRanges(2.0).OrderBy(r => r.Value).ToArray();
-        
-        Assert.That(result, Has.Length.EqualTo(3));
-        Assert.That(result[0].Value, Is.EqualTo(1)); // [1.0,2.2]
-        Assert.That(result[1].Value, Is.EqualTo(2)); // [2.0,2.5] 
-        Assert.That(result[2].Value, Is.EqualTo(3)); // [1.0,4.0]
-    }
-
-    [Test]
-    public void Query_PointQuery_ConsistentWithRangeQuery()
-    {
-        var rangeFinder = new RangeFinder<double, int>(TestRanges);
-        
-        // Test several points to ensure point query gives same results as range query with same start/end
-        var testPoints = new[] { 1.0, 2.0, 3.0, 4.0, 5.0, 6.0, 10.0 };
-        
-        foreach (var point in testPoints)
-        {
-            var pointResult = rangeFinder.QueryRanges(point).OrderBy(r => r.Value).ToArray();
-            var rangeResult = rangeFinder.QueryRanges(point, point).OrderBy(r => r.Value).ToArray();
-            
-            Assert.That(pointResult, Has.Length.EqualTo(rangeResult.Length),
-                $"Point query and range query should return same count for value {point}");
-            
-            for (int i = 0; i < pointResult.Length; i++)
-            {
-                Assert.That(pointResult[i].Value, Is.EqualTo(rangeResult[i].Value),
-                    $"Point query and range query should return same ranges for value {point}");
-            }
-        }
-    }
-
-    #endregion
-
-    #region Edge Cases and Boundary Tests
-
-    [Test]
-    public void Query_EmptyDataset_ReturnsEmptyResult()
-    {
-        var emptyRanges = new List<NumericRange<double, int>>();
-        var rangeFinder = new RangeFinder<double, int>(emptyRanges);
-        
-        var rangeResult = rangeFinder.QueryRanges(1.0, 2.0).ToArray();
-        var pointResult = rangeFinder.QueryRanges(1.0).ToArray();
-        
-        Assert.That(rangeResult, Is.Empty);
-        Assert.That(pointResult, Is.Empty);
-    }
-
-    [Test]
-    public void Query_SingleRange_BoundaryConditions()
-    {
-        var singleRange = new List<NumericRange<double, int>>
-        {
-            new(1.0, 2.0, 1)
-        };
-        var rangeFinder = new RangeFinder<double, int>(singleRange);
-        
-        // Point at start boundary
-        Assert.That(rangeFinder.QueryRanges(1.0).Count(), Is.EqualTo(1));
-        
-        // Point at end boundary  
-        Assert.That(rangeFinder.QueryRanges(2.0).Count(), Is.EqualTo(1));
-        
-        // Point inside range
-        Assert.That(rangeFinder.QueryRanges(1.5).Count(), Is.EqualTo(1));
-        
-        // Point before range
-        Assert.That(rangeFinder.QueryRanges(0.5), Is.Empty);
-        
-        // Point after range
-        Assert.That(rangeFinder.QueryRanges(2.5), Is.Empty);
-    }
-
-    [Test]
-    public void Query_OverlappingRanges_ReturnsAllContaining()
-    {
-        var overlappingRanges = new List<NumericRange<double, int>>
-        {
-            new(1.0, 5.0, 1),  // Large range
-            new(2.0, 3.0, 2),  // Contained within first
-            new(4.0, 6.0, 3)   // Overlaps with first
-        };
-        var rangeFinder = new RangeFinder<double, int>(overlappingRanges);
-        
-        // Point 2.5 should be in ranges 1 and 2
-        var result = rangeFinder.QueryRanges(2.5).OrderBy(r => r.Value).ToArray();
-        Assert.That(result, Has.Length.EqualTo(2));
-        Assert.That(result[0].Value, Is.EqualTo(1));
-        Assert.That(result[1].Value, Is.EqualTo(2));
-        
-        // Point 4.5 should be in ranges 1 and 3
-        result = rangeFinder.QueryRanges(4.5).OrderBy(r => r.Value).ToArray();
-        Assert.That(result, Has.Length.EqualTo(2));
-        Assert.That(result[0].Value, Is.EqualTo(1));
-        Assert.That(result[1].Value, Is.EqualTo(3));
-    }
-
-    #endregion
-
-    #region Performance and Optimization Tests
-
-    [Test]
-    public void Query_EarlyTermination_WorksCorrectly()
-    {
-        // Create ranges where early termination should be beneficial
-        var ranges = new[]
-        {
-            new NumericRange<double, int>(1, 2, 1),   // _canTerminateHere[0] should be false
-            new NumericRange<double, int>(3, 4, 2),   // _canTerminateHere[1] should be false  
-            new NumericRange<double, int>(5, 6, 3),   // _canTerminateHere[2] should be true (no later range ends after this starts)
-            new NumericRange<double, int>(7, 8, 4),   // _canTerminateHere[3] should be true
-            new NumericRange<double, int>(9, 10, 5)   // _canTerminateHere[4] should be true
-        };
-
         var rangeFinder = new RangeFinder<double, int>(ranges);
-        
-        // Query that should find some ranges and terminate early
-        var queryRange = new NumericRange<double, object>(0, 6.5);
-        var results = rangeFinder.QueryRanges(queryRange.Start, queryRange.End).ToArray();
-        
-        // Should find ranges [1,2], [3,4], [5,6] but not [7,8], [9,10]
-        Assert.That(results, Has.Length.EqualTo(3));
-        Assert.That(results.Any(r => r.Start == 1), Is.True);
-        Assert.That(results.Any(r => r.Start == 3), Is.True);
-        Assert.That(results.Any(r => r.Start == 5), Is.True);
-        Assert.That(results.Any(r => r.Start == 7), Is.False);
-        Assert.That(results.Any(r => r.Start == 9), Is.False);
+        var intervalTree = new IntervalTree<double, int>();
+        foreach (var range in ranges)
+            intervalTree.Add(range.Start, range.End, range.Value);
+        var expectedValues = intervalTree.Query(queryStart, queryEnd);
+        var actualValues = rangeFinder.QueryRanges(queryStart, queryEnd).Select(r => r.Value).ToArray();
+        var difference = actualValues.CompareAsSets(expectedValues);
+        Assert.IsTrue(difference.AreEqual, $"[{intention}] Query [{queryStart}, {queryEnd}] failed. {difference.GetDescription()}");
     }
 
-    [Test]
-    public void Query_LargeDataset_PerformanceConsistency()
+    /// <summary>
+    /// Compares RangeFinder and IntervalTree for a variety of point queries, including positive, negative, and edge cases.
+    /// </summary>
+    [Test, TestCaseSource(nameof(PointQueryCases))]
+    public void Query_PointQuery(double point, string intention, IEnumerable<NumericRange<double, int>> ranges)
     {
-        // Generate larger dataset for performance testing
-        var random = new Random(42);
-        var ranges = new List<NumericRange<double, int>>();
-
-        for (var i = 0; i < 1000; i++)
-        {
-            var start = i * 1.0 + random.NextDouble() * 0.5;
-            var duration = random.NextDouble() * 5 + 1;
-            ranges.Add(new NumericRange<double, int>(start, start + duration, i));
-        }
-
         var rangeFinder = new RangeFinder<double, int>(ranges);
-
-        // Generate query ranges
-        var queryRanges = new List<NumericRange<double, object>>();
-        for (var i = 0; i < 50; i++)
-        {
-            var queryStart = random.NextDouble() * 1000 * 0.8;
-            var queryDuration = random.NextDouble() * 10 + 5;
-            queryRanges.Add(new NumericRange<double, object>(queryStart, queryStart + queryDuration));
-        }
-
-        // Test each query range - should complete without issues
-        foreach (var queryRange in queryRanges)
-        {
-            var results = rangeFinder.QueryRanges(queryRange.Start, queryRange.End)
-                .OrderBy(r => r.Start)
-                .ThenBy(r => r.End)
-                .ToArray();
-
-            Assert.That(results, Is.Not.Null);
-        }
+        var intervalTree = new IntervalTree<double, int>();
+        foreach (var range in ranges)
+            intervalTree.Add(range.Start, range.End, range.Value);
+        var actual = rangeFinder.QueryRanges(point).Select(r => r.Value).ToArray();
+        var expected = intervalTree.Query(point, point);
+        var difference = actual.CompareAsSets(expected);
+        Assert.IsTrue(difference.AreEqual, $"[{intention}] Point query at {point} failed. {difference.GetDescription()}");
     }
 
-    #endregion
-
-    #region Generic Type Tests
-
-    [Test]
-    public void Query_IntegerType_WorksCorrectly()
+    private static string GetRangeSetName(IEnumerable<NumericRange<double, int>> ranges)
     {
-        var intRanges = new List<NumericRange<int, string>>
-        {
-            new(1, 5, "Range1"),
-            new(3, 7, "Range2"),
-            new(10, 15, "Range3")
-        };
-        
-        var rangeFinder = new RangeFinder<int, string>(intRanges);
-        
-        // Point query
-        var pointResult = rangeFinder.QueryRanges(4).ToArray();
-        Assert.That(pointResult, Has.Length.EqualTo(2));
-        
-        // Range query
-        var rangeResult = rangeFinder.QueryRanges(2, 6).ToArray();
-        Assert.That(rangeResult, Has.Length.EqualTo(2));
+        if (ReferenceEquals(ranges, TestRanges)) return "TestRanges";
+        if (ReferenceEquals(ranges, TestRangesWithNegatives)) return "TestRangesWithNegatives";
+        return "CustomRanges";
     }
-
-    [Test] 
-    public void Query_DifferentAssociatedTypes_WorksCorrectly()
-    {
-        var stringValueRanges = new List<NumericRange<double, string>>
-        {
-            new(1.0, 2.0, "First"),
-            new(1.5, 2.5, "Second")
-        };
-        
-        var rangeFinder = new RangeFinder<double, string>(stringValueRanges);
-        var result = rangeFinder.QueryRanges(1.7).ToArray();
-        
-        Assert.That(result, Has.Length.EqualTo(2));
-        Assert.That(result.Select(r => r.Value), Contains.Item("First"));
-        Assert.That(result.Select(r => r.Value), Contains.Item("Second"));
-    }
-
-    #endregion
 }
