@@ -2,6 +2,8 @@ using FsCheck;
 using FsCheck.NUnit;
 using IntervalTree;
 using RangeFinder.Core;
+using System.Numerics;
+using RangeFinder.Tests.Helper;
 
 namespace RangeFinder.Tests.PropertyBased;
 
@@ -12,10 +14,43 @@ namespace RangeFinder.Tests.PropertyBased;
 [TestFixture]
 public class CompatibilityTests
 {
+    /// <summary>
+    /// Enable verbose mode to print results for all property tests (success and failure)
+    /// Set to true for detailed debugging, false for normal operation
+    /// </summary>
+    private static readonly bool VerboseMode = false;
+    
+    /// <summary>
+    /// Logs failure with context and comparison details for property-based tests
+    /// </summary>
+    private static bool LogAndReturn<TNumber>(SetDifference<int> comparison, string testName, (TNumber start, TNumber end) query, (TNumber start, TNumber end)[] rangeData)
+        where TNumber : INumber<TNumber>
+    {
+        if (!comparison.AreEqual)
+        {
+            var debugMsg = comparison.FormatRangeDebugMessage(testName, query, rangeData);
+            Console.WriteLine(debugMsg);
+            TestContext.WriteLine(debugMsg);
+        }
+        else if (VerboseMode)
+        {
+            var successMsg = $"{testName} passed: Query=[{query.start}, {query.end}], RangeCount={rangeData.Length}";
+            Console.WriteLine(successMsg);
+            TestContext.WriteLine(successMsg);
+        }
+        return comparison.AreEqual;
+    }
+    
     [OneTimeSetUp]
     public void SetUp()
     {
         Arb.Register(typeof(RangeDataGenerators));
+        
+        if (VerboseMode)
+        {
+            Console.WriteLine("Verbose mode enabled: will print results for all property tests");
+            TestContext.WriteLine("Verbose mode enabled: will print results for all property tests");
+        }
     }
 
     /// <summary>
@@ -40,7 +75,7 @@ public class CompatibilityTests
                 var itResults = intervalTree.Query(query.start, query.end);
 
                 var comparison = rfResults.CompareAsSets(itResults);
-                return comparison.LogAndReturn("RangeFinder vs IntervalTree equivalence", query, rangeData);
+                return LogAndReturn(comparison, "RangeFinder vs IntervalTree equivalence", query, rangeData);
             })
             .QuickCheckThrowOnFailure();
     }
@@ -60,7 +95,7 @@ public class CompatibilityTests
                 var rangeResults = rangeFinder.Query(point, point);
 
                 var comparison = pointResults.CompareAsSets(rangeResults);
-                return comparison.LogAndReturn("Point vs Range query equivalence", (point, point), new[] { (point, point) });
+                return LogAndReturn(comparison, "Point vs Range query equivalence", (point, point), new[] { (point, point) });
             })
             .QuickCheckThrowOnFailure();
     }
@@ -141,7 +176,7 @@ public class CompatibilityTests
                 var results2 = finder2.Query(query.start, query.end);
 
                 var comparison = results1.CompareAsSets(results2);
-                return comparison.LogAndReturn("Query determinism", query, rangeData);
+                return LogAndReturn(comparison, "Query determinism", query, rangeData);
             })
             .QuickCheckThrowOnFailure();
     }
@@ -184,7 +219,7 @@ public class CompatibilityTests
                 var results2 = fromArrays.Query(query.start, query.end);
 
                 var comparison = results1.CompareAsSets(results2);
-                return comparison.LogAndReturn("Query determinism", query, rangeData);
+                return LogAndReturn(comparison, "Factory method equivalence", query, rangeData);
             })
             .QuickCheckThrowOnFailure();
     }
@@ -225,7 +260,7 @@ public class CompatibilityTests
                 var comparison = rfResults.CompareAsSets(itResults);
                 
                 // This should return false most of the time due to injected fault
-                return comparison.LogAndReturn("FAULT INJECTION: Expected mismatch", query, paddedRangeData);
+                return LogAndReturn(comparison, "FAULT INJECTION: Expected mismatch", query, paddedRangeData);
             })
             .QuickCheckThrowOnFailure();
     }

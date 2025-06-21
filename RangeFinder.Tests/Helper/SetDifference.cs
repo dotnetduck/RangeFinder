@@ -3,27 +3,7 @@ using System.Text;
 using RangeFinder.Core;
 using RangeFinder.IO.Serialization;
 
-namespace RangeFinder.Tests;
-
-/// <summary>
-/// Custom assertions for property-based testing
-/// </summary>
-public static class CustomComparator
-{
-    /// <summary>
-    /// Compares this sequence with another as sets and returns detailed difference information
-    /// </summary>
-    public static SetDifference<T> CompareAsSets<T>(this IEnumerable<T> actual, IEnumerable<T> expected)
-    {
-        var expectedSet = expected.ToHashSet();
-        var actualSet = actual.ToHashSet();
-        
-        var onlyInExpected = expectedSet.Except(actualSet).ToHashSet();
-        var onlyInActual = actualSet.Except(expectedSet).ToHashSet();
-        
-        return new SetDifference<T>(onlyInExpected, onlyInActual);
-    }
-}
+namespace RangeFinder.Tests.Helper;
 
 /// <summary>
 /// Contains difference information between two sets
@@ -128,16 +108,4 @@ public record SetDifference<T>(HashSet<T> OnlyInExpected, HashSet<T> OnlyInActua
         return sb.ToString();
     }
     
-    /// <summary>
-    /// Logs failure with context and comparison details for property-based tests
-    /// </summary>
-    public bool LogAndReturn<TNumber>(string testName, (TNumber start, TNumber end) query, (TNumber start, TNumber end)[] rangeData)
-        where TNumber : INumber<TNumber>
-    {
-        if (!AreEqual)
-        {
-            PrintRangeDebugInfo(testName, query, rangeData);
-        }
-        return AreEqual;
-    }
 }
