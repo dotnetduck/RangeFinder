@@ -1,5 +1,5 @@
 using FsCheck;
-using FSC = FsCheck.NUnit;
+using FsC = FsCheck.NUnit;
 using IntervalTree;
 using RangeFinder.Core;
 using RangeFinder.Tests.Helper;
@@ -35,7 +35,7 @@ public class CompatibilityTests
     /// PROPERTY: RangeFinder and IntervalTree must always produce identical results
     /// ∀ ranges, query. RangeFinder.Query(query) = IntervalTree.Query(query)
     /// </summary>
-    [FSC.Property]
+    [FsC.Property]
     public void RangeFinderEquivalentToIntervalTree_RangeQueries()
     {
         Prop.ForAll<(double start, double end)[]>(rangeData =>
@@ -65,7 +65,7 @@ public class CompatibilityTests
     /// PROPERTY: Point query must equal range query with same start/end
     /// ∀ ranges, point. Query(point) = Query(point, point)
     /// </summary>
-    [FSC.Property]
+    [FsC.Property]
     public void PointQueryEqualsRangeQuery()
     {
         Prop.ForAll<(double start, double end)[], double>((rangeData, point) =>
@@ -87,7 +87,7 @@ public class CompatibilityTests
     /// PROPERTY: Query results must only contain ranges that actually overlap
     /// ∀ ranges, query. ∀ result ∈ Query(query). result overlaps query
     /// </summary>
-    [FSC.Property]
+    [FsC.Property]
     public void QueryResultsOnlyContainOverlappingRanges()
     {
         Prop.ForAll<(double start, double end)[], (double start, double end)>((rangeData, query) =>
@@ -105,7 +105,7 @@ public class CompatibilityTests
     /// PROPERTY: Count must equal input size
     /// ∀ ranges. RangeFinder(ranges).Count = |ranges|
     /// </summary>
-    [FSC.Property]
+    [FsC.Property]
     public void CountPropertyEqualsInputSize()
     {
         Prop.ForAll<(double start, double end)[]>(rangeData =>
@@ -120,7 +120,7 @@ public class CompatibilityTests
     /// PROPERTY: Expanding query bounds never reduces results (Monotonicity)
     /// ∀ ranges, q1, q2. q1 ⊆ q2 ⟹ Query(q1) ⊆ Query(q2)
     /// </summary>
-    [FSC.Property]
+    [FsC.Property]
     public void ExpandingQueryNeverReducesResults()
     {
         Prop.ForAll<(double start, double end)[], (double start, double end), (double start, double end)>((rangeData, query1, query2) =>
@@ -146,7 +146,7 @@ public class CompatibilityTests
     /// PROPERTY: Operations are deterministic
     /// ∀ ranges, query. Query(ranges, query) = Query(ranges, query)
     /// </summary>
-    [FSC.Property]
+    [FsC.Property]
     public void QueriesAreDeterministic()
     {
         Prop.ForAll<(double start, double end)[], (double start, double end)>((rangeData, query) =>
@@ -169,7 +169,7 @@ public class CompatibilityTests
     /// PROPERTY: Empty dataset always produces empty results
     /// ∀ query. Query_on_EmptyDataset(query) = ∅
     /// </summary>
-    [FSC.Property]
+    [FsC.Property]
     public void EmptyDatasetAlwaysProducesEmptyResults()
     {
         Prop.ForAll<(double start, double end), double>((query, point) =>
@@ -188,7 +188,7 @@ public class CompatibilityTests
     /// PROPERTY: Factory methods produce equivalent results
     /// ∀ ranges, query. FromTuples(ranges).Query(query) = FromArrays(ranges).Query(query)
     /// </summary>
-    [FSC.Property]
+    [FsC.Property]
     public void FactoryMethodsProduceEquivalentResults()
     {
         Prop.ForAll<(double start, double end)[], (double start, double end)>((rangeData, query) =>
