@@ -1,8 +1,7 @@
 using FsCheck;
-using FsCheck.NUnit;
+using FSC = FsCheck.NUnit;
 using IntervalTree;
 using RangeFinder.Core;
-using System.Numerics;
 using RangeFinder.Tests.Helper;
 
 namespace RangeFinder.Tests.PropertyBased;
@@ -18,13 +17,7 @@ public class CompatibilityTests
     /// Enable verbose mode to print results for all property tests (success and failure)
     /// Set to true for detailed debugging, false for normal operation
     /// </summary>
-    private static readonly bool VerboseMode = true;
-
-    /// <summary>
-    /// Deterministic seed for property-based tests. Change this value to reproduce specific failures.
-    /// All property tests will use this seed for consistent, reproducible behavior.
-    /// </summary>
-    private const string TestSeed = "12345,12345";
+    private const bool VerboseMode = true;
 
     [OneTimeSetUp]
     public void SetUp()
@@ -43,7 +36,7 @@ public class CompatibilityTests
     /// PROPERTY: RangeFinder and IntervalTree must always produce identical results
     /// ∀ ranges, query. RangeFinder.Query(query) = IntervalTree.Query(query)
     /// </summary>
-    [FsCheck.NUnit.Property(Replay= TestSeed, MaxTest = 100)]
+    [FSC.Property]
     public void RangeFinderEquivalentToIntervalTree_RangeQueries()
     {
         Prop.ForAll<(double start, double end)[], (double start, double end)>((rangeData, query) =>
@@ -62,7 +55,7 @@ public class CompatibilityTests
 
                 var comparison = rfResults.CompareAsSets(itResults);
                 return Printer.LogAndReturn(
-                    comparison, "RangeFinder vs IntervalTree equivalence", query, rangeData, TestSeed, VerboseMode);
+                    comparison, "RangeFinder vs IntervalTree equivalence", query, rangeData, VerboseMode);
             })
             .QuickCheck();
     }
@@ -71,7 +64,7 @@ public class CompatibilityTests
     /// PROPERTY: Point query must equal range query with same start/end
     /// ∀ ranges, point. Query(point) = Query(point, point)
     /// </summary>
-    [FsCheck.NUnit.Property(Replay= TestSeed)]
+    [FSC.Property]
     public void PointQueryEqualsRangeQuery()
     {
         Prop.ForAll<(double start, double end)[], double>((rangeData, point) =>
@@ -84,7 +77,7 @@ public class CompatibilityTests
                 var comparison = pointResults.CompareAsSets(rangeResults);
                 return Printer.LogAndReturn(
                     comparison, "Point vs Range query equivalence",
-                    (point, point), new[] { (point, point) }, TestSeed, VerboseMode);
+                    (point, point), new[] { (point, point) }, VerboseMode);
             })
             .QuickCheck();
     }
@@ -93,7 +86,7 @@ public class CompatibilityTests
     /// PROPERTY: Query results must only contain ranges that actually overlap
     /// ∀ ranges, query. ∀ result ∈ Query(query). result overlaps query
     /// </summary>
-    [FsCheck.NUnit.Property(Replay= TestSeed)]
+    [FSC.Property]
     public void QueryResultsOnlyContainOverlappingRanges()
     {
         Prop.ForAll<(double start, double end)[], (double start, double end)>((rangeData, query) =>
@@ -111,7 +104,7 @@ public class CompatibilityTests
     /// PROPERTY: Count must equal input size
     /// ∀ ranges. RangeFinder(ranges).Count = |ranges|
     /// </summary>
-    [FsCheck.NUnit.Property(Replay= TestSeed)]
+    [FSC.Property]
     public void CountPropertyEqualsInputSize()
     {
         Prop.ForAll<(double start, double end)[]>(rangeData =>
@@ -126,7 +119,7 @@ public class CompatibilityTests
     /// PROPERTY: Expanding query bounds never reduces results (Monotonicity)
     /// ∀ ranges, q1, q2. q1 ⊆ q2 ⟹ Query(q1) ⊆ Query(q2)
     /// </summary>
-    [FsCheck.NUnit.Property(Replay= TestSeed)]
+    [FSC.Property]
     public void ExpandingQueryNeverReducesResults()
     {
         Prop.ForAll<(double start, double end)[], (double start, double end), (double start, double end)>((rangeData, query1, query2) =>
@@ -152,7 +145,7 @@ public class CompatibilityTests
     /// PROPERTY: Operations are deterministic
     /// ∀ ranges, query. Query(ranges, query) = Query(ranges, query)
     /// </summary>
-    [FsCheck.NUnit.Property(Replay= TestSeed)]
+    [FSC.Property]
     public void QueriesAreDeterministic()
     {
         Prop.ForAll<(double start, double end)[], (double start, double end)>((rangeData, query) =>
@@ -166,7 +159,7 @@ public class CompatibilityTests
 
                 var comparison = results1.CompareAsSets(results2);
                 return Printer.LogAndReturn(
-                    comparison, "Query determinism", query, rangeData, TestSeed, VerboseMode);
+                    comparison, "Query determinism", query, rangeData, VerboseMode);
             })
             .QuickCheck();
     }
@@ -175,7 +168,7 @@ public class CompatibilityTests
     /// PROPERTY: Empty dataset always produces empty results
     /// ∀ query. Query_on_EmptyDataset(query) = ∅
     /// </summary>
-    [FsCheck.NUnit.Property(Replay= TestSeed)]
+    [FSC.Property]
     public void EmptyDatasetAlwaysProducesEmptyResults()
     {
         Prop.ForAll<(double start, double end), double>((query, point) =>
@@ -194,7 +187,7 @@ public class CompatibilityTests
     /// PROPERTY: Factory methods produce equivalent results
     /// ∀ ranges, query. FromTuples(ranges).Query(query) = FromArrays(ranges).Query(query)
     /// </summary>
-    [FsCheck.NUnit.Property(Replay= TestSeed)]
+    [FSC.Property]
     public void FactoryMethodsProduceEquivalentResults()
     {
         Prop.ForAll<(double start, double end)[], (double start, double end)>((rangeData, query) =>
@@ -210,9 +203,8 @@ public class CompatibilityTests
 
                 var comparison = results1.CompareAsSets(results2);
                 return Printer.LogAndReturn(
-                    comparison, "Factory method equivalence", query, rangeData, TestSeed, VerboseMode);
+                    comparison, "Factory method equivalence", query, rangeData, VerboseMode);
             })
             .QuickCheck();
     }
-
 }

@@ -15,20 +15,17 @@ public class Printer
         string testName,
         (TNumber start, TNumber end) query,
         (TNumber start, TNumber end)[] rangeData,
-        string seed,
         bool verbose)
         where TNumber : INumber<TNumber>
     {
         if (!comparison.AreEqual)
         {
             var debugMsg = comparison.FormatRangeDebugMessage(testName, query, rangeData);
-            Console.WriteLine($"\n=== PROPERTY TEST FAILURE (Seed: {seed}) ===");
+            Console.WriteLine($"\n=== PROPERTY TEST FAILURE ===");
             Console.WriteLine(debugMsg);
-            Console.WriteLine($"To reproduce: set TestSeed = {seed} in CompatibilityTests.cs");
             Console.WriteLine("================================================\n");
-            TestContext.WriteLine($"\n=== PROPERTY TEST FAILURE (Seed: {seed}) ===");
+            TestContext.WriteLine($"\n=== PROPERTY TEST FAILURE) ===");
             TestContext.WriteLine(debugMsg);
-            TestContext.WriteLine($"To reproduce: set TestSeed = {seed}");
             TestContext.WriteLine("================================================\n");
         }
         else if (verbose)
