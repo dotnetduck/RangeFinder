@@ -26,8 +26,11 @@ public class Printer
         }
         else if (verbose)
         {
+            if(rangeData.Length < comparison.ActualCount)
+                Console.WriteLine($"Warning(Potentially dup results): Range data length ({rangeData.Length}) is less than actual count ({comparison.ActualCount})");
+
             var successMsg = $"{testName} passed: Query=[{query.start}, {query.end}],"+
-            $"RangeCount={rangeData.Length}, Count={comparison.ActualCount}";
+            $"RangeCount={rangeData.Length}, ResultCount={comparison.ActualCount}";
             TestContext.WriteLine(successMsg);
         }
         return comparison.AreEqual;
