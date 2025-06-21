@@ -26,44 +26,6 @@ public class CompatibilityTests
     /// </summary>
     private const int TestSeed = 12345;
     
-    
-    /// <summary>
-    /// Prints seed information for each test execution
-    /// </summary>
-    private static void PrintTestSeed(string testName)
-    {
-        Console.WriteLine($"[{testName}] Using seed: {TestSeed}");
-        TestContext.WriteLine($"[{testName}] Using seed: {TestSeed}");
-    }
-    
-    /// <summary>
-    /// Logs failure with context and comparison details for property-based tests
-    /// Always prints detailed information when comparisons fail
-    /// </summary>
-    private static bool LogAndReturn<TNumber>(SetDifference<int> comparison, string testName, (TNumber start, TNumber end) query, (TNumber start, TNumber end)[] rangeData)
-        where TNumber : INumber<TNumber>
-    {
-        if (!comparison.AreEqual)
-        {
-            var debugMsg = comparison.FormatRangeDebugMessage(testName, query, rangeData);
-            Console.WriteLine($"\n=== PROPERTY TEST FAILURE (Seed: {TestSeed}) ===");
-            Console.WriteLine(debugMsg);
-            Console.WriteLine($"To reproduce: set TestSeed = {TestSeed} in CompatibilityTests.cs");
-            Console.WriteLine("================================================\n");
-            TestContext.WriteLine($"\n=== PROPERTY TEST FAILURE (Seed: {TestSeed}) ===");
-            TestContext.WriteLine(debugMsg);
-            TestContext.WriteLine($"To reproduce: set TestSeed = {TestSeed}");
-            TestContext.WriteLine("================================================\n");
-        }
-        else if (VerboseMode)
-        {
-            var successMsg = $"{testName} passed: Query=[{query.start}, {query.end}], RangeCount={rangeData.Length}";
-            Console.WriteLine(successMsg);
-            TestContext.WriteLine(successMsg);
-        }
-        return comparison.AreEqual;
-    }
-    
     /// <summary>
     /// Custom Property attribute that uses our const seed for deterministic testing
     /// </summary>
@@ -103,7 +65,6 @@ public class CompatibilityTests
     [SeededProperty(TestSeed)]
     public void RangeFinderEquivalentToIntervalTree_RangeQueries()
     {
-        PrintTestSeed(nameof(RangeFinderEquivalentToIntervalTree_RangeQueries));
         Prop.ForAll<(double start, double end)[], (double start, double end)>((rangeData, query) =>
             {
                 // Build both data structures using factory method
@@ -119,7 +80,8 @@ public class CompatibilityTests
                 var itResults = intervalTree.Query(query.start, query.end);
 
                 var comparison = rfResults.CompareAsSets(itResults);
-                return LogAndReturn(comparison, "RangeFinder vs IntervalTree equivalence", query, rangeData);
+                return Printer.LogAndReturn(
+                    comparison, "RangeFinder vs IntervalTree equivalence", query, rangeData, TestSeed, VerboseMode);
             })
             .QuickCheck();
     }
@@ -131,7 +93,6 @@ public class CompatibilityTests
     [SeededProperty(TestSeed)]
     public void PointQueryEqualsRangeQuery()
     {
-        PrintTestSeed(nameof(PointQueryEqualsRangeQuery));
         Prop.ForAll<(double start, double end)[], double>((rangeData, point) =>
             {
                 var rangeFinder = RangeFinderFactory.Create(rangeData);
@@ -140,7 +101,9 @@ public class CompatibilityTests
                 var rangeResults = rangeFinder.Query(point, point);
 
                 var comparison = pointResults.CompareAsSets(rangeResults);
-                return LogAndReturn(comparison, "Point vs Range query equivalence", (point, point), new[] { (point, point) });
+                return Printer.LogAndReturn(
+                    comparison, "Point vs Range query equivalence",
+                    (point, point), new[] { (point, point) }, TestSeed, VerboseMode);
             })
             .QuickCheck();
     }
@@ -152,7 +115,6 @@ public class CompatibilityTests
     [SeededProperty(TestSeed)]
     public void QueryResultsOnlyContainOverlappingRanges()
     {
-        PrintTestSeed(nameof(QueryResultsOnlyContainOverlappingRanges));
         Prop.ForAll<(double start, double end)[], (double start, double end)>((rangeData, query) =>
             {
                 var rangeFinder = RangeFinderFactory.Create(rangeData);
@@ -171,7 +133,6 @@ public class CompatibilityTests
     [SeededProperty(TestSeed)]
     public void CountPropertyEqualsInputSize()
     {
-        PrintTestSeed(nameof(CountPropertyEqualsInputSize));
         Prop.ForAll<(double start, double end)[]>(rangeData =>
             {
                 var rangeFinder = RangeFinderFactory.Create(rangeData);
@@ -187,7 +148,6 @@ public class CompatibilityTests
     [SeededProperty(TestSeed)]
     public void ExpandingQueryNeverReducesResults()
     {
-        PrintTestSeed(nameof(ExpandingQueryNeverReducesResults));
         Prop.ForAll<(double start, double end)[], (double start, double end), (double start, double end)>((rangeData, query1, query2) =>
             {
                 // Ensure query2 contains query1
@@ -214,7 +174,6 @@ public class CompatibilityTests
     [SeededProperty(TestSeed, MaxTest = 10)]
     public void QueriesAreDeterministic()
     {
-        PrintTestSeed(nameof(QueriesAreDeterministic));
         Prop.ForAll<(double start, double end)[], (double start, double end)>((rangeData, query) =>
             {
                 // Build identical structures using factory method
@@ -225,7 +184,8 @@ public class CompatibilityTests
                 var results2 = finder2.Query(query.start, query.end);
 
                 var comparison = results1.CompareAsSets(results2);
-                return LogAndReturn(comparison, "Query determinism", query, rangeData);
+                return Printer.LogAndReturn(
+                    comparison, "Query determinism", query, rangeData, TestSeed, VerboseMode);
             })
             .QuickCheck();
     }
@@ -237,7 +197,6 @@ public class CompatibilityTests
     [SeededProperty(TestSeed, MaxTest = 10)]
     public void EmptyDatasetAlwaysProducesEmptyResults()
     {
-        PrintTestSeed(nameof(EmptyDatasetAlwaysProducesEmptyResults));
         Prop.ForAll<(double start, double end), double>((query, point) =>
             {
                 var emptyFinder = RangeFinderFactory.Create(Array.Empty<(double start, double end)>());
@@ -257,7 +216,6 @@ public class CompatibilityTests
     [SeededProperty(TestSeed, MaxTest = 10)]
     public void FactoryMethodsProduceEquivalentResults()
     {
-        PrintTestSeed(nameof(FactoryMethodsProduceEquivalentResults));
         Prop.ForAll<(double start, double end)[], (double start, double end)>((rangeData, query) =>
             {
                 // Create using different factory methods
@@ -270,7 +228,8 @@ public class CompatibilityTests
                 var results2 = fromArrays.Query(query.start, query.end);
 
                 var comparison = results1.CompareAsSets(results2);
-                return LogAndReturn(comparison, "Factory method equivalence", query, rangeData);
+                return Printer.LogAndReturn(
+                    comparison, "Factory method equivalence", query, rangeData, TestSeed, VerboseMode);
             })
             .QuickCheck();
     }
