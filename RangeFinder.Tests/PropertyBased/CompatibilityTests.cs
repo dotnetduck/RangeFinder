@@ -40,7 +40,15 @@ public class CompatibilityTests
                 var itResults = intervalTree.Query(query.start, query.end);
 
                 var comparison = rfResults.CompareAsSets(itResults);
-                comparison.PrintRangeDebugInfo("RangeFinder vs IntervalTree mismatch", query, rangeData);
+                if (!comparison.AreEqual)
+                {
+                    var debugMsg = $"RangeFinder vs IntervalTree mismatch\n" +
+                                  $"Query: [{query.start}, {query.end}]\n" +
+                                  $"RangeData: [{string.Join(", ", rangeData.Select(r => $"({r.start},{r.end})"))}]\n" +
+                                  $"{comparison.GetDescription()}";
+                    Console.WriteLine(debugMsg);
+                    TestContext.WriteLine(debugMsg);
+                }
                 return comparison.AreEqual;
             })
             .QuickCheckThrowOnFailure();
@@ -183,6 +191,52 @@ public class CompatibilityTests
                 var results2 = fromArrays.Query(query.start, query.end);
 
                 return results1.CompareAsSets(results2).AreEqual;
+            })
+            .QuickCheckThrowOnFailure();
+    }
+
+    /// <summary>
+    /// FAULT INJECTION TEST: Intentionally broken test to verify detection capabilities
+    /// This test should ALWAYS FAIL to verify our test infrastructure works correctly.
+    /// Normally commented out - only enable when testing the test framework itself.
+    /// </summary>
+    // [FsCheck.NUnit.Property(MaxTest = 10)]
+    public void FaultInjection_IntentionallyBrokenTest()
+    {
+        Prop.ForAll<(double start, double end)[], (double start, double end)>((rangeData, query) =>
+            {
+                // Build RangeFinder normally
+                var rangeFinder = RangeFinderFactory.Create(rangeData);
+                
+                // Build IntervalTree with INTENTIONALLY WRONG logic (inject fault)
+                var intervalTree = new IntervalTree<double, int>();
+                for (int i = 0; i < rangeData.Length; i++)
+                {
+                    // FAULT: Add ranges with offset to cause mismatch (avoid ArgumentOutOfRangeException)
+                    var faultyStart = rangeData[i].start + 1000;  // Intentionally offset!
+                    var faultyEnd = rangeData[i].end + 1000;      // Intentionally offset!
+                    intervalTree.Add(faultyStart, faultyEnd, i);
+                }
+
+                // ASSERTION: This should detect the intentional fault
+                var rfResults = rangeFinder.Query(query.start, query.end);
+                var itResults = intervalTree.Query(query.start, query.end);
+
+                var comparison = rfResults.CompareAsSets(itResults);
+                
+                // Force debug output by using TestContext or throwing detailed exception
+                if (!comparison.AreEqual)
+                {
+                    var debugMsg = $"FAULT INJECTION: Expected mismatch detected\n" +
+                                  $"Query: [{query.start}, {query.end}]\n" +
+                                  $"RangeData: [{string.Join(", ", rangeData.Select(r => $"({r.start},{r.end})"))}]\n" +
+                                  $"{comparison.GetDescription()}";
+                    Console.WriteLine(debugMsg);
+                    TestContext.WriteLine(debugMsg);
+                }
+                
+                // This should return false most of the time due to injected fault
+                return comparison.AreEqual;
             })
             .QuickCheckThrowOnFailure();
     }
