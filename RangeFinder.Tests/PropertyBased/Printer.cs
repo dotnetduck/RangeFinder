@@ -26,7 +26,8 @@ public class Printer
         }
         else if (verbose)
         {
-            var successMsg = $"{testName} passed: Query=[{query.start}, {query.end}], RangeCount={rangeData.Length}, ResultCount={comparison.OnlyInActual.Count}";
+            var successMsg = $"{testName} passed: Query=[{query.start}, {query.end}],"+
+            $"RangeCount={rangeData.Length}, Count={comparison.ActualCount}";
             TestContext.WriteLine(successMsg);
         }
         return comparison.AreEqual;

@@ -26,7 +26,6 @@ public class CompatibilityTests
         
         if (VerboseMode)
         {
-            Console.WriteLine("Verbose mode enabled: will print results for all property tests");
             TestContext.WriteLine("Verbose mode enabled: will print results for all property tests");
         }
     }
@@ -39,7 +38,7 @@ public class CompatibilityTests
     [FSC.Property]
     public void RangeFinderEquivalentToIntervalTree_RangeQueries()
     {
-        Prop.ForAll<(double start, double end)[], (double start, double end)>((rangeData, query) =>
+        Prop.ForAll<(double start, double end)[]>(rangeData =>
             {
                 // Build both data structures using factory method
                 var rangeFinder = RangeFinderFactory.Create(rangeData);
@@ -48,6 +47,8 @@ public class CompatibilityTests
                 {
                     intervalTree.Add(rangeData[i].start, rangeData[i].end, i);
                 }
+
+                var query = RangeDataGenerators.ExtractQueryRange(rangeData);
 
                 // ASSERTION: Results must be identical (same elements, order doesn't matter)
                 var rfResults = rangeFinder.Query(query.start, query.end);

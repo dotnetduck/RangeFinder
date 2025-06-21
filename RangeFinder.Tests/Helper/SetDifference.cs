@@ -8,7 +8,8 @@ namespace RangeFinder.Tests.Helper;
 /// <summary>
 /// Contains difference information between two sets
 /// </summary>
-public record SetDifference<T>(HashSet<T> OnlyInExpected, HashSet<T> OnlyInActual)
+public record SetDifference<T>(HashSet<T> OnlyInExpected, HashSet<T> OnlyInActual, int ActualCount, int ExpectedCount)
+    where T : notnull
 {
     /// <summary>
     /// True if both sets are equal (no differences)
@@ -21,13 +22,13 @@ public record SetDifference<T>(HashSet<T> OnlyInExpected, HashSet<T> OnlyInActua
     public string GetDescription()
     {
         if (AreEqual) return "Sets are equal";
-        
+
         var parts = new List<string>();
         if (OnlyInExpected.Count > 0)
             parts.Add($"Only in expected: [{string.Join(", ", OnlyInExpected)}]");
         if (OnlyInActual.Count > 0)
             parts.Add($"Only in actual: [{string.Join(", ", OnlyInActual)}]");
-            
+
         return string.Join("; ", parts);
     }
     
