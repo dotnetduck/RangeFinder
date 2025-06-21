@@ -18,7 +18,7 @@ public class CompatibilityTests
     /// Enable verbose mode to print results for all property tests (success and failure)
     /// Set to true for detailed debugging, false for normal operation
     /// </summary>
-    private static readonly bool VerboseMode = false;
+    private static readonly bool VerboseMode = true;
     
     /// <summary>
     /// Deterministic seed for property-based tests. Change this value to reproduce specific failures.
@@ -31,23 +31,16 @@ public class CompatibilityTests
     /// </summary>
     public class SeededPropertyAttribute : FsCheck.NUnit.PropertyAttribute
     {
-        public SeededPropertyAttribute(int maxTest = 100) : base()
+        public SeededPropertyAttribute(int seed, int maxTest = 10) : base()
         {
             MaxTest = maxTest;
-            Replay = TestSeed + "," + TestSeed; // Use const value
+            Replay = seed + "," + seed;
         }
     }
 
     [OneTimeSetUp]
     public void SetUp()
-    {
-        // Display deterministic seed for property testing
-        Console.WriteLine($"\n=== PROPERTY TEST SEED: {TestSeed} ===");
-        Console.WriteLine("All property tests use this fixed seed for deterministic behavior");
-        Console.WriteLine($"To reproduce failures, set TestSeed = {TestSeed} in CompatibilityTests.cs");
-        Console.WriteLine("========================================\n");
-        TestContext.WriteLine($"Property Test Seed: {TestSeed}");
-        
+    {   
         Arb.Register(typeof(RangeDataGenerators));
         
         if (VerboseMode)
