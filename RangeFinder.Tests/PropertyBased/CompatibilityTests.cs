@@ -55,7 +55,7 @@ public class CompatibilityTests
                 var itResults = intervalTree.Query(queryPoint);
 
                 var comparison = rfResults.CompareAsSets(itResults);
-return Printer.LogAndReturn(
+                return Printer.LogAndReturn(
                     comparison, "RangeFinder vs IntervalTree equivalence", (queryPoint, queryPoint), rangeData, VerboseMode);
             })
             .QuickCheckThrowOnFailure();
