@@ -1,5 +1,4 @@
 using RangeFinder.Core;
-using RangeFinder.Tests.Helper;
 
 namespace RangeFinder.Tests.Core;
 
@@ -76,13 +75,23 @@ public class RangeFinderTests
     [Test, TestCaseSource(nameof(RangeQueryCases))]
     public void Query_RangeQuery(double queryStart, double queryEnd, string intention, IEnumerable<NumericRange<double, int>> ranges)
     {
-        RangeFinder<double, int> rangeFinder = new(ranges);
-        LinearRangeFinder<double, int> linearRangeFinder = new(ranges);
+        var rangeFinder = new RangeFinder<double, int>(ranges);
+        var linearRangeFinder = new LinearRangeFinder<double, int>(ranges);
 
-        int[] expectedValues = [.. linearRangeFinder.QueryRanges(queryStart, queryEnd).Select(r => r.Value)];
-        int[] actualValues = [.. rangeFinder.QueryRanges(queryStart, queryEnd).Select(r => r.Value)];
-        SetDifference<int> difference = actualValues.CompareAsSets(expectedValues);
-        Assert.That(difference.AreEqual, Is.True, $"[{intention}] Query [{queryStart}, {queryEnd}] failed. {difference.GetDescription()}");
+        var expectedRanges = linearRangeFinder.QueryRanges(queryStart, queryEnd).OrderBy(r => r.Start).ThenBy(r => r.End).ToArray();
+        var actualRanges = rangeFinder.QueryRanges(queryStart, queryEnd).OrderBy(r => r.Start).ThenBy(r => r.End).ToArray();
+        
+        Assert.Multiple(() =>
+        {
+            Assert.That(actualRanges, Has.Length.EqualTo(expectedRanges.Length), $"[{intention}] Count mismatch for query [{queryStart}, {queryEnd}]");
+            
+            for (int i = 0; i < expectedRanges.Length; i++)
+            {
+                Assert.That(actualRanges[i].Start, Is.EqualTo(expectedRanges[i].Start), $"[{intention}] Start mismatch at index {i}");
+                Assert.That(actualRanges[i].End, Is.EqualTo(expectedRanges[i].End), $"[{intention}] End mismatch at index {i}");
+                Assert.That(actualRanges[i].Value, Is.EqualTo(expectedRanges[i].Value), $"[{intention}] Value mismatch at index {i}");
+            }
+        });
     }
 
     /// <summary>
@@ -91,13 +100,23 @@ public class RangeFinderTests
     [Test, TestCaseSource(nameof(PointQueryCases))]
     public void Query_PointQuery(double point, string intention, IEnumerable<NumericRange<double, int>> ranges)
     {
-        RangeFinder<double, int> rangeFinder = new(ranges);
-        LinearRangeFinder<double, int> linearRangeFinder = new(ranges);
+        var rangeFinder = new RangeFinder<double, int>(ranges);
+        var linearRangeFinder = new LinearRangeFinder<double, int>(ranges);
 
-        int[] actual = [.. rangeFinder.QueryRanges(point).Select(r => r.Value)];
-        int[] expected = [.. linearRangeFinder.QueryRanges(point).Select(r => r.Value)];
-        SetDifference<int> difference = actual.CompareAsSets(expected);
-        Assert.That(difference.AreEqual, Is.True, $"[{intention}] Point query at {point} failed. {difference.GetDescription()}");
+        var actualRanges = rangeFinder.QueryRanges(point).OrderBy(r => r.Start).ThenBy(r => r.End).ToArray();
+        var expectedRanges = linearRangeFinder.QueryRanges(point).OrderBy(r => r.Start).ThenBy(r => r.End).ToArray();
+        
+        Assert.Multiple(() =>
+        {
+            Assert.That(actualRanges, Has.Length.EqualTo(expectedRanges.Length), $"[{intention}] Count mismatch for point query at {point}");
+            
+            for (int i = 0; i < expectedRanges.Length; i++)
+            {
+                Assert.That(actualRanges[i].Start, Is.EqualTo(expectedRanges[i].Start), $"[{intention}] Start mismatch at index {i}");
+                Assert.That(actualRanges[i].End, Is.EqualTo(expectedRanges[i].End), $"[{intention}] End mismatch at index {i}");
+                Assert.That(actualRanges[i].Value, Is.EqualTo(expectedRanges[i].Value), $"[{intention}] Value mismatch at index {i}");
+            }
+        });
     }
 
 }

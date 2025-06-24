@@ -13,16 +13,15 @@ internal class LinearRangeFinderTests
     public void QueryRanges_SimpleOverlap_ReturnsCorrectRanges()
     {
         // Arrange
-        (double, double, string)[] ranges = [
-            (1.0, 3.0, "A"),
-            (2.0, 4.0, "B"),
-            (5.0, 7.0, "C")
+        NumericRange<double, string>[] ranges = [
+            new(1.0, 3.0, "A"),
+            new(2.0, 4.0, "B"),
+            new(5.0, 7.0, "C")
         ];
-        IEnumerable<NumericRange<double, string>> numericRanges = ranges.Select(r => new NumericRange<double, string>(r.Item1, r.Item2, r.Item3));
-        LinearRangeFinder<double, string> finder = new(numericRanges);
+        var finder = new LinearRangeFinder<double, string>(ranges);
 
         // Act
-        List<NumericRange<double, string>> results = [.. finder.QueryRanges(2.5, 3.5)];
+        var results = finder.QueryRanges(2.5, 3.5).ToList();
 
         // Assert
         Assert.That(results, Has.Count.EqualTo(2));
@@ -34,16 +33,15 @@ internal class LinearRangeFinderTests
     public void QueryRanges_PointQuery_ReturnsContainingRanges()
     {
         // Arrange
-        (double, double, string)[] ranges = [
-            (1.0, 3.0, "A"),
-            (2.0, 4.0, "B"),
-            (5.0, 7.0, "C")
+        NumericRange<double, string>[] ranges = [
+            new(1.0, 3.0, "A"),
+            new(2.0, 4.0, "B"),
+            new(5.0, 7.0, "C")
         ];
-        IEnumerable<NumericRange<double, string>> numericRanges = ranges.Select(r => new NumericRange<double, string>(r.Item1, r.Item2, r.Item3));
-        LinearRangeFinder<double, string> finder = new(numericRanges);
+        var finder = new LinearRangeFinder<double, string>(ranges);
 
         // Act
-        List<NumericRange<double, string>> results = [.. finder.QueryRanges(2.5)];
+        var results = finder.QueryRanges(2.5).ToList();
 
         // Assert
         Assert.That(results, Has.Count.EqualTo(2));
@@ -55,15 +53,14 @@ internal class LinearRangeFinderTests
     public void QueryRanges_NoOverlap_ReturnsEmpty()
     {
         // Arrange
-        (double, double, string)[] ranges = [
-            (1.0, 2.0, "A"),
-            (3.0, 4.0, "B")
+        NumericRange<double, string>[] ranges = [
+            new(1.0, 2.0, "A"),
+            new(3.0, 4.0, "B")
         ];
-        IEnumerable<NumericRange<double, string>> numericRanges = ranges.Select(r => new NumericRange<double, string>(r.Item1, r.Item2, r.Item3));
-        LinearRangeFinder<double, string> finder = new(numericRanges);
+        var finder = new LinearRangeFinder<double, string>(ranges);
 
         // Act
-        List<NumericRange<double, string>> results = [.. finder.QueryRanges(2.5, 2.8)];
+        var results = finder.QueryRanges(2.5, 2.8).ToList();
 
         // Assert
         Assert.That(results, Is.Empty);
@@ -73,10 +70,10 @@ internal class LinearRangeFinderTests
     public void EmptyDataset_ReturnsEmptyResults()
     {
         // Arrange
-        LinearRangeFinder<double, string> finder = new([]);
+        var finder = new LinearRangeFinder<double, string>([]);
 
         // Act
-        List<NumericRange<double, string>> results = [.. finder.QueryRanges(1.0, 2.0)];
+        var results = finder.QueryRanges(1.0, 2.0).ToList();
 
         // Assert
         Assert.Multiple(() =>
@@ -90,13 +87,12 @@ internal class LinearRangeFinderTests
     public void Properties_CorrectValues()
     {
         // Arrange
-        (double, double, string)[] ranges = [
-            (1.0, 3.0, "A"),
-            (2.0, 4.0, "B"),
-            (5.0, 7.0, "C")
+        NumericRange<double, string>[] ranges = [
+            new(1.0, 3.0, "A"),
+            new(2.0, 4.0, "B"),
+            new(5.0, 7.0, "C")
         ];
-        IEnumerable<NumericRange<double, string>> numericRanges = ranges.Select(r => new NumericRange<double, string>(r.Item1, r.Item2, r.Item3));
-        LinearRangeFinder<double, string> finder = new(numericRanges);
+        var finder = new LinearRangeFinder<double, string>(ranges);
 
         // Act & Assert
         Assert.Multiple(() =>
@@ -112,25 +108,24 @@ internal class LinearRangeFinderTests
     public void BackToBackTesting_Example()
     {
         // Arrange - Same test data for both implementations
-        (double, double, string)[] ranges = [
-            (1.0, 3.0, "A"),
-            (2.0, 4.0, "B"),
-            (3.5, 5.0, "C"),
-            (4.5, 6.0, "D")
+        NumericRange<double, string>[] ranges = [
+            new(1.0, 3.0, "A"),
+            new(2.0, 4.0, "B"),
+            new(3.5, 5.0, "C"),
+            new(4.5, 6.0, "D")
         ];
 
-        IEnumerable<NumericRange<double, string>> numericRanges = ranges.Select(r => new NumericRange<double, string>(r.Item1, r.Item2, r.Item3));
-        LinearRangeFinder<double, string> linearFinder = new(numericRanges);
-        RangeFinder<double, string> optimizedFinder = RangeFinderFactory.Create(ranges);
+        var linearFinder = new LinearRangeFinder<double, string>(ranges);
+        var optimizedFinder = new RangeFinder<double, string>(ranges);
 
         // Act - Query both implementations
-        List<string> linearResults = [.. linearFinder.QueryRanges(3.0, 4.0)
+        var linearResults = linearFinder.QueryRanges(3.0, 4.0)
             .Select(r => r.Value)
-            .OrderBy(v => v)];
+            .OrderBy(v => v).ToList();
 
-        List<string> optimizedResults = [.. optimizedFinder.QueryRanges(3.0, 4.0)
+        var optimizedResults = optimizedFinder.QueryRanges(3.0, 4.0)
             .Select(r => r.Value)
-            .OrderBy(v => v)];
+            .OrderBy(v => v).ToList();
 
         // Assert - Results should be identical
         Assert.Multiple(() =>
