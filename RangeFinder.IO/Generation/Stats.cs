@@ -17,7 +17,7 @@ public record Stats(
     public string FormatCharacteristics()
     {
         var spread = MaxValue - MinValue;
-        
+
         return $"Overlap: {OverlapPercentage:F1}%, " +
                $"Avg Length: {AverageLength:F2}, " +
                $"Spread: {spread:F2}, " +

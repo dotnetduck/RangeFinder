@@ -11,7 +11,7 @@ namespace RangeFinder.Benchmarks;
 public class QuickConfig : BenchmarkConfigBase
 {
     public override string ConfigurationMode => "quick";
-    
+
     protected override void ConfigureJob()
     {
         // Ultra-minimal iterations for 2-minute completion
@@ -21,11 +21,11 @@ public class QuickConfig : BenchmarkConfigBase
             .WithUnrollFactor(1)
             .WithLaunchCount(1)
             .WithInvocationCount(1));   // Single invocation per iteration
-        
+
         // Suppress all warnings about low iteration counts
         WithOptions(ConfigOptions.DisableOptimizationsValidator);
     }
-    
+
     protected override void ConfigureValidators()
     {
         // Remove all validators that enforce minimum iteration counts

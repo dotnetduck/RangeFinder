@@ -25,18 +25,18 @@ public abstract class AbstractRangeFinderBenchmark
     /// Each range contains start/end positions and an integer value for identification.
     /// </summary>
     protected List<NumericRange<double, int>> _sourceData = null!;
-    
+
     /// <summary>
     /// Query ranges used for testing range query performance.
     /// Generated independently from source data to avoid bias.
     /// </summary>
     protected List<NumericRange<double, object>> _queryRanges = null!;
-    
+
     /// <summary>
     /// RangeFinder instance constructed from source data for performance testing.
     /// </summary>
     protected RangeFinder<double, int> _rangeFinder = null!;
-    
+
     /// <summary>
     /// IntervalTree instance constructed from source data for comparison testing.
     /// Stores the entire NumericRange as the value for each interval.
@@ -47,24 +47,24 @@ public abstract class AbstractRangeFinderBenchmark
     /// Number of ranges in the source dataset. Configured via BENCHMARK_DATASET_SIZE environment variable.
     /// </summary>
     protected abstract int DatasetSize { get; }
-    
+
     /// <summary>
     /// Number of queries to execute in each benchmark. Configured via BENCHMARK_QUERY_COUNT environment variable.
     /// </summary>
     protected abstract int QueryCount { get; }
-    
+
     /// <summary>
     /// Multiplier for query range length relative to average source range length.
     /// Larger values create queries that span more ranges. Default: 2.0
     /// </summary>
     protected virtual double QueryLengthMultiplier => 2.0;
-    
+
     /// <summary>
     /// Random seed for reproducible data generation across benchmark runs.
     /// Different seeds used for source data vs query data to avoid correlation.
     /// </summary>
     protected virtual int RandomSeed => 42;
-    
+
     /// <summary>
     /// Dataset characteristic determining the distribution pattern of generated ranges.
     /// Configured via BENCHMARK_CHARACTERISTIC environment variable.
@@ -96,7 +96,7 @@ public abstract class AbstractRangeFinderBenchmark
             ValidateResultCorrectness();
         }
     }
-    
+
     /// <summary>
     /// Whether to pre-construct data structures during GlobalSetup.
     /// Set to false for construction benchmarks that measure build time.
@@ -133,12 +133,12 @@ public abstract class AbstractRangeFinderBenchmark
                 GenerateRandomData(random); // Default to truly random
                 break;
         }
-        
+
         // DEBUG: Verify the generated data characteristics
         var stats = Analyzer.Analyze(_sourceData);
         Console.WriteLine($"DEBUG: {Characteristic} - {stats.FormatCharacteristics()}");
     }
-    
+
 
     /// <summary>
     /// Generates uniformly distributed ranges across a large space.
@@ -148,7 +148,7 @@ public abstract class AbstractRangeFinderBenchmark
     {
         // Truly random ranges (not sorted like before!)
         var maxPosition = DatasetSize * 10.0; // Large space to spread ranges
-        
+
         for (var i = 0; i < DatasetSize; i++)
         {
             var start = random.NextDouble() * maxPosition;
@@ -165,7 +165,7 @@ public abstract class AbstractRangeFinderBenchmark
     {
         // Many overlapping ranges - worst case for pruning
         var maxPosition = DatasetSize * 2.0; // Smaller space = more overlap
-        
+
         for (var i = 0; i < DatasetSize; i++)
         {
             var start = random.NextDouble() * maxPosition;
@@ -182,7 +182,7 @@ public abstract class AbstractRangeFinderBenchmark
     {
         // Non-overlapping ranges - best case scenario
         var maxPosition = DatasetSize * 50.0; // Large space = minimal overlap
-        
+
         for (var i = 0; i < DatasetSize; i++)
         {
             var start = random.NextDouble() * maxPosition;
@@ -200,11 +200,11 @@ public abstract class AbstractRangeFinderBenchmark
         // Time-series like data with clustering
         var clusters = Math.Max(10, DatasetSize / 1000); // Create clusters
         var rangesPerCluster = DatasetSize / clusters;
-        
+
         for (var cluster = 0; cluster < clusters; cluster++)
         {
             var clusterCenter = cluster * 100.0 + random.NextDouble() * 20.0;
-            
+
             for (var i = 0; i < rangesPerCluster && _sourceData.Count < DatasetSize; i++)
             {
                 // Ranges clustered around center with some spread
@@ -223,7 +223,7 @@ public abstract class AbstractRangeFinderBenchmark
     {
         // Completely random ranges - most realistic for construction benchmarks
         var maxPosition = DatasetSize * 20.0;
-        
+
         for (var i = 0; i < DatasetSize; i++)
         {
             var start = random.NextDouble() * maxPosition;
@@ -334,47 +334,55 @@ public abstract class AbstractRangeFinderBenchmark
     private void ValidateResultCorrectness()
     {
         Console.WriteLine("🔍 Validating result correctness between RangeFinder and IntervalTree...");
-        
+
         // 1. Validate range query results
         var rangeFinderResults = ExecuteRangeFinderRangeQueries();
         var intervalTreeResults = ExecuteIntervalTreeRangeQueries();
         ValidateResultSetsMatch(rangeFinderResults, intervalTreeResults, "Range queries");
-        
+
         // 2. Validate point query results
         var rangeFinderPointResults = ExecuteRangeFinderPointQueries();
         var intervalTreePointResults = ExecuteIntervalTreePointQueries();
         ValidateResultSetsMatch(rangeFinderPointResults, intervalTreePointResults, "Point queries");
-        
+
         Console.WriteLine($"✅ Validation passed! RangeFinder and IntervalTree return identical results.");
         Console.WriteLine($"   - Range queries: {rangeFinderResults.Count} total results");
         Console.WriteLine($"   - Point queries: {rangeFinderPointResults.Count} total results");
     }
-    
+
     /// <summary>
     /// Validates that two result sets are identical using efficient HashSet comparison.
     /// Throws exception with detailed error information if results differ.
     /// </summary>
-    private static void ValidateResultSetsMatch(List<NumericRange<double, int>> rangeFinderResults, 
+    private static void ValidateResultSetsMatch(List<NumericRange<double, int>> rangeFinderResults,
         List<NumericRange<double, int>> intervalTreeResults, string queryType)
     {
         var rfSet = rangeFinderResults.ToHashSet();
         var itSet = intervalTreeResults.ToHashSet();
-        
-        if (rfSet.SetEquals(itSet)) return; // Fast path - sets are identical
-        
+
+        if (rfSet.SetEquals(itSet))
+        {
+            return; // Fast path - sets are identical
+        }
+
         // Generate detailed error information
         Console.WriteLine($"❌ VALIDATION FAILED! {queryType} results differ between implementations:");
         Console.WriteLine($"   RangeFinder: {rangeFinderResults.Count} results");
         Console.WriteLine($"   IntervalTree: {intervalTreeResults.Count} results");
-        
+
         var missing = itSet.Except(rfSet).Take(5);
         var extra = rfSet.Except(itSet).Take(5);
-        
+
         if (missing.Any())
+        {
             Console.WriteLine($"   Missing from RangeFinder: {string.Join(", ", missing)}");
+        }
+
         if (extra.Any())
+        {
             Console.WriteLine($"   Extra in RangeFinder: {string.Join(", ", extra)}");
-        
+        }
+
         throw new InvalidOperationException($"{queryType} validation failed - implementations return different result sets!");
     }
 }

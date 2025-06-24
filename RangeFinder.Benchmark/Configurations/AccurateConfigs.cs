@@ -9,7 +9,7 @@ namespace RangeFinder.Benchmarks;
 public class AccurateConfig : BenchmarkConfigBase
 {
     public override string ConfigurationMode => "accurate";
-    
+
     protected override void ConfigureJob()
     {
         AddJob(Job.Default
@@ -18,7 +18,7 @@ public class AccurateConfig : BenchmarkConfigBase
             .WithMaxIterationCount(30)
             .WithLaunchCount(3));    // Multiple launches for statistical significance
     }
-    
+
     protected override void ConfigureValidators()
     {
         // Keep all default validators for accurate benchmarks

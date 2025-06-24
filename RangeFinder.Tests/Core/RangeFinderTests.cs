@@ -80,7 +80,10 @@ public class RangeFinderTests
         var rangeFinder = new RangeFinder<double, int>(ranges);
         var intervalTree = new IntervalTree<double, int>();
         foreach (var range in ranges)
+        {
             intervalTree.Add(range.Start, range.End, range.Value);
+        }
+
         var expectedValues = intervalTree.Query(queryStart, queryEnd);
         var actualValues = rangeFinder.QueryRanges(queryStart, queryEnd).Select(r => r.Value).ToArray();
         var difference = actualValues.CompareAsSets(expectedValues);
@@ -96,7 +99,10 @@ public class RangeFinderTests
         var rangeFinder = new RangeFinder<double, int>(ranges);
         var intervalTree = new IntervalTree<double, int>();
         foreach (var range in ranges)
+        {
             intervalTree.Add(range.Start, range.End, range.Value);
+        }
+
         var actual = rangeFinder.QueryRanges(point).Select(r => r.Value).ToArray();
         var expected = intervalTree.Query(point, point);
         var difference = actual.CompareAsSets(expected);
@@ -105,8 +111,16 @@ public class RangeFinderTests
 
     private static string GetRangeSetName(IEnumerable<NumericRange<double, int>> ranges)
     {
-        if (ReferenceEquals(ranges, TestRanges)) return "TestRanges";
-        if (ReferenceEquals(ranges, TestRangesWithNegatives)) return "TestRangesWithNegatives";
+        if (ReferenceEquals(ranges, TestRanges))
+        {
+            return "TestRanges";
+        }
+
+        if (ReferenceEquals(ranges, TestRangesWithNegatives))
+        {
+            return "TestRangesWithNegatives";
+        }
+
         return "CustomRanges";
     }
 }

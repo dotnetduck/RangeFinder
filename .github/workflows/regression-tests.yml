@@ -1,0 +1,42 @@
+name: Regression Tests
+
+on:
+  pull_request:
+    branches: [ main, develop ]
+  push:
+    branches: [ main, develop ]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '8.0.x'
+
+      - name: Restore dependencies
+        run: dotnet restore
+
+      - name: Build solution
+        run: |
+          echo "🔨 Building solution in Release mode..."
+          dotnet build --no-restore --configuration Release
+
+      - name: Run unit tests
+        run: |
+          echo "🧪 Running unit tests..."
+          dotnet test --no-build --configuration Release --verbosity normal
+
+      - name: Test summary
+        if: success()
+        run: |
+          echo "✅ All regression tests passed!"
+          echo ""
+          echo "✅ Solution builds successfully"
+          echo "✅ All unit tests pass"
+          echo "✅ No functional regressions detected"

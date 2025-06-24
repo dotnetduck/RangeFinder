@@ -59,7 +59,10 @@ public class RangeFinderLoaderTests
         }
         finally
         {
-            if (File.Exists(tempFilePath)) File.Delete(tempFilePath);
+            if (File.Exists(tempFilePath))
+            {
+                File.Delete(tempFilePath);
+            }
         }
     }
 
@@ -91,7 +94,10 @@ public class RangeFinderLoaderTests
         }
         finally
         {
-            if (File.Exists(tempFilePath)) File.Delete(tempFilePath);
+            if (File.Exists(tempFilePath))
+            {
+                File.Delete(tempFilePath);
+            }
         }
     }
 
@@ -121,7 +127,10 @@ public class RangeFinderLoaderTests
         }
         finally
         {
-            if (File.Exists(tempFilePath)) File.Delete(tempFilePath);
+            if (File.Exists(tempFilePath))
+            {
+                File.Delete(tempFilePath);
+            }
         }
     }
 
@@ -151,7 +160,10 @@ public class RangeFinderLoaderTests
         }
         finally
         {
-            if (File.Exists(tempFilePath)) File.Delete(tempFilePath);
+            if (File.Exists(tempFilePath))
+            {
+                File.Delete(tempFilePath);
+            }
         }
     }
 
@@ -217,7 +229,10 @@ public class RangeFinderLoaderTests
         }
         finally
         {
-            if (File.Exists(tempFilePath)) File.Delete(tempFilePath);
+            if (File.Exists(tempFilePath))
+            {
+                File.Delete(tempFilePath);
+            }
         }
     }
 
@@ -247,7 +262,10 @@ public class RangeFinderLoaderTests
         }
         finally
         {
-            if (File.Exists(tempFilePath)) File.Delete(tempFilePath);
+            if (File.Exists(tempFilePath))
+            {
+                File.Delete(tempFilePath);
+            }
         }
     }
 
@@ -277,7 +295,10 @@ public class RangeFinderLoaderTests
         }
         finally
         {
-            if (File.Exists(tempFilePath)) File.Delete(tempFilePath);
+            if (File.Exists(tempFilePath))
+            {
+                File.Delete(tempFilePath);
+            }
         }
     }
 
@@ -303,10 +324,10 @@ public class RangeFinderLoaderTests
     [Test]
     public void FromParquetAsync_NullFilePath_ThrowsArgumentNullException()
     {
-        #pragma warning disable CS8600, CS8604 // Intentional null assignment and passing for testing null handling
+#pragma warning disable CS8600, CS8604 // Intentional null assignment and passing for testing null handling
         string filePath = null;
         Assert.ThrowsAsync<ArgumentNullException>(() => RangeFinderLoader.FromParquetAsync(filePath));
-        #pragma warning restore CS8600, CS8604
+#pragma warning restore CS8600, CS8604
 
     }
     #endregion
@@ -330,7 +351,10 @@ public class RangeFinderLoaderTests
         }
         finally
         {
-            if (File.Exists(tempFilePath)) File.Delete(tempFilePath);
+            if (File.Exists(tempFilePath))
+            {
+                File.Delete(tempFilePath);
+            }
         }
     }
 
@@ -351,7 +375,10 @@ public class RangeFinderLoaderTests
         }
         finally
         {
-            if (File.Exists(tempFilePath)) File.Delete(tempFilePath);
+            if (File.Exists(tempFilePath))
+            {
+                File.Delete(tempFilePath);
+            }
         }
     }
 

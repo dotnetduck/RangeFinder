@@ -50,7 +50,7 @@ public class ParameterizedDatasetTests
                 .Select(r => r.Value)
                 .OrderBy(v => v)
                 .ToArray();
-                
+
             var itResults = intervalTree.Query(queryRange.Start, queryRange.End)
                 .OrderBy(v => v)
                 .ToArray();
@@ -67,7 +67,7 @@ public class ParameterizedDatasetTests
                 .Select(r => r.Value)
                 .OrderBy(v => v)
                 .ToArray();
-                
+
             var itResults = intervalTree.Query(point)
                 .OrderBy(v => v)
                 .ToArray();

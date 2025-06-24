@@ -15,23 +15,31 @@ public record SetDifference<T>(HashSet<T> OnlyInExpected, HashSet<T> OnlyInActua
     /// True if both sets are equal (no differences)
     /// </summary>
     public bool AreEqual => OnlyInExpected.Count == 0 && OnlyInActual.Count == 0;
-    
+
     /// <summary>
     /// Creates a human-readable description of the differences
     /// </summary>
     public string GetDescription()
     {
-        if (AreEqual) return "Sets are equal";
+        if (AreEqual)
+        {
+            return "Sets are equal";
+        }
 
         var parts = new List<string>();
         if (OnlyInExpected.Count > 0)
+        {
             parts.Add($"Only in expected: [{string.Join(", ", OnlyInExpected)}]");
+        }
+
         if (OnlyInActual.Count > 0)
+        {
             parts.Add($"Only in actual: [{string.Join(", ", OnlyInActual)}]");
+        }
 
         return string.Join("; ", parts);
     }
-    
+
     /// <summary>
     /// Prints detailed debug information if sets are not equal
     /// </summary>
@@ -43,7 +51,7 @@ public record SetDifference<T>(HashSet<T> OnlyInExpected, HashSet<T> OnlyInActua
             Console.WriteLine($"  {GetDescription()}");
         }
     }
-    
+
     /// <summary>
     /// Prints detailed debug information with additional context data
     /// </summary>
@@ -56,7 +64,7 @@ public record SetDifference<T>(HashSet<T> OnlyInExpected, HashSet<T> OnlyInActua
             Console.WriteLine($"  {GetDescription()}");
         }
     }
-    
+
     /// <summary>
     /// Prints detailed debug information for range comparison failures with data export
     /// </summary>
@@ -70,7 +78,7 @@ public record SetDifference<T>(HashSet<T> OnlyInExpected, HashSet<T> OnlyInActua
             TestContext.WriteLine(debugMsg);
         }
     }
-    
+
     /// <summary>
     /// Formats a comprehensive debug message for range comparison failures
     /// </summary>
@@ -80,7 +88,7 @@ public record SetDifference<T>(HashSet<T> OnlyInExpected, HashSet<T> OnlyInActua
         var sb = new StringBuilder();
         sb.AppendLine($"{context} failed:");
         sb.AppendLine($"  Query: [{query.start}, {query.end}]");
-        
+
         if (rangeData.Length <= 10)
         {
             sb.AppendLine($"  RangeData: [{string.Join(", ", rangeData.Select(r => $"({r.start},{r.end})"))}]");
@@ -90,13 +98,13 @@ public record SetDifference<T>(HashSet<T> OnlyInExpected, HashSet<T> OnlyInActua
             // Export to CSV using existing RangeSerializer
             var fileName = $"debug_ranges_{DateTime.Now:yyyyMMdd_HHmmss_fff}.csv";
             var filePath = Path.Combine(Path.GetTempPath(), fileName);
-            
+
             try
             {
                 // Convert tuples to NumericRange for serialization
                 var ranges = rangeData.Select((r, i) => new NumericRange<TNumber, int>(r.start, r.end, i));
                 ranges.WriteCsv(filePath);
-                
+
                 sb.AppendLine($"  RangeData ({rangeData.Length} ranges): [{string.Join(", ", rangeData.Take(5).Select(r => $"({r.start},{r.end})"))}] ... (full data saved to {filePath})");
             }
             catch (Exception ex)
@@ -104,9 +112,9 @@ public record SetDifference<T>(HashSet<T> OnlyInExpected, HashSet<T> OnlyInActua
                 sb.AppendLine($"  RangeData ({rangeData.Length} ranges): [{string.Join(", ", rangeData.Take(5).Select(r => $"({r.start},{r.end})"))}] ... (failed to save CSV: {ex.Message})");
             }
         }
-        
+
         sb.AppendLine($"  {GetDescription()}");
         return sb.ToString();
     }
-    
+
 }

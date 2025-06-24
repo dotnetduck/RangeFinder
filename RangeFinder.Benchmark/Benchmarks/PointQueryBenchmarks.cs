@@ -6,13 +6,13 @@ namespace RangeFinder.Benchmarks;
 [SimpleJob(RuntimeMoniker.Net80)]
 public class PointQueryBenchmarks : AbstractRangeFinderBenchmark
 {
-    protected override int DatasetSize => 
+    protected override int DatasetSize =>
         int.Parse(Environment.GetEnvironmentVariable("BENCHMARK_DATASET_SIZE") ?? "100000");
-    
-    protected override int QueryCount => 
+
+    protected override int QueryCount =>
         int.Parse(Environment.GetEnvironmentVariable("BENCHMARK_QUERY_COUNT") ?? "25");
-    
-    protected override DatasetCharacteristic Characteristic => 
+
+    protected override DatasetCharacteristic Characteristic =>
         Enum.Parse<DatasetCharacteristic>(Environment.GetEnvironmentVariable("BENCHMARK_CHARACTERISTIC") ?? "Uniform");
 
     [Benchmark(Baseline = true)]

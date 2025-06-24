@@ -11,21 +11,21 @@ namespace RangeFinder.Benchmarks;
 public class BalancedConfig : BenchmarkConfigBase
 {
     public override string ConfigurationMode => "balanced";
-    
+
     protected override void ConfigureJob()
     {
         // Force minimal iterations for fast development feedback
         AddJob(Job.Default
-            .WithWarmupCount(1)         
+            .WithWarmupCount(1)
             .WithIterationCount(1)
             .WithUnrollFactor(1)
             .WithLaunchCount(1)
             .WithInvocationCount(1));   // Single invocation per iteration
-        
+
         // Suppress warnings about low iteration counts
         WithOptions(ConfigOptions.DisableOptimizationsValidator);
     }
-    
+
     protected override void ConfigureValidators()
     {
         // Remove default validators that enforce minimum iteration counts

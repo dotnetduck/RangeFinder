@@ -26,14 +26,14 @@ public class RangeTreeCompatibilityTests
         // Test range queries on empty dataset
         var rangeQueryResults = rangeFinder.Query(1.0, 5.0).ToArray();
         var intervalTreeResults = intervalTree.Query(1.0, 5.0).ToArray();
-        
+
         Assert.That(rangeQueryResults.Length, Is.EqualTo(intervalTreeResults.Length));
         Assert.That(rangeQueryResults, Is.Empty);
 
         // Test point queries on empty dataset
         var pointQueryResults = rangeFinder.Query(2.0).ToArray();
         var intervalPointResults = intervalTree.Query(2.0).ToArray();
-        
+
         Assert.That(pointQueryResults.Length, Is.EqualTo(intervalPointResults.Length));
         Assert.That(pointQueryResults, Is.Empty);
     }
@@ -45,7 +45,7 @@ public class RangeTreeCompatibilityTests
         {
             new(1.0, 2.0, 42)
         };
-        
+
         var rangeFinder = new RangeFinder<double, int>(ranges);
         var intervalTree = new IntervalTree<double, int>();
         intervalTree.Add(1.0, 2.0, 42);
@@ -56,7 +56,7 @@ public class RangeTreeCompatibilityTests
         {
             var rfResults = rangeFinder.Query(point).OrderBy(v => v).ToArray();
             var itResults = intervalTree.Query(point).OrderBy(v => v).ToArray();
-            
+
             Assert.That(rfResults.SequenceEqual(itResults), Is.True,
                 $"Point query at {point} should produce identical results");
         }
@@ -77,7 +77,7 @@ public class RangeTreeCompatibilityTests
         {
             var rfResults = rangeFinder.Query(start, end).OrderBy(v => v).ToArray();
             var itResults = intervalTree.Query(start, end).OrderBy(v => v).ToArray();
-            
+
             Assert.That(rfResults.SequenceEqual(itResults), Is.True,
                 $"Range query [{start}, {end}] should produce identical results");
         }
@@ -113,7 +113,7 @@ public class RangeTreeCompatibilityTests
         {
             var rfResults = rangeFinder.Query(point).OrderBy(v => v).ToArray();
             var itResults = intervalTree.Query(point).OrderBy(v => v).ToArray();
-            
+
             Assert.That(rfResults.SequenceEqual(itResults), Is.True,
                 $"Point query at {point} should produce identical results. RF: [{string.Join(",", rfResults)}], IT: [{string.Join(",", itResults)}]");
         }
@@ -145,7 +145,7 @@ public class RangeTreeCompatibilityTests
         {
             var rfResults = rangeFinder.Query(point).OrderBy(v => v).ToArray();
             var itResults = intervalTree.Query(point).OrderBy(v => v).ToArray();
-            
+
             Assert.That(rfResults.SequenceEqual(itResults), Is.True,
                 $"Boundary point query at {point} should produce identical results");
         }
@@ -163,7 +163,7 @@ public class RangeTreeCompatibilityTests
         {
             var rfResults = rangeFinder.Query(start, end).OrderBy(v => v).ToArray();
             var itResults = intervalTree.Query(start, end).OrderBy(v => v).ToArray();
-            
+
             Assert.That(rfResults.SequenceEqual(itResults), Is.True,
                 $"Touching range query [{start}, {end}] should produce identical results");
         }
@@ -179,7 +179,7 @@ public class RangeTreeCompatibilityTests
         // Use parameterized dataset generation for more systematic testing
         const int datasetSize = 5000;
         const int queryCount = 100;
-        
+
         var parameters = RangeParameterFactory.Uniform(datasetSize);
         var ranges = Gen.GenerateRanges<double>(parameters);
         var queries = Gen.GenerateQueryRanges<double>(parameters, queryCount);
@@ -199,7 +199,7 @@ public class RangeTreeCompatibilityTests
                 .ThenBy(t => t.End)
                 .ThenBy(t => t.Value)
                 .ToArray();
-                
+
             var itResults = intervalTree.Query(query.Start, query.End)
                 .Select(value => ranges.First(r => r.Value == value))
                 .Select(r => (r.Start, r.End, r.Value))
@@ -220,7 +220,7 @@ public class RangeTreeCompatibilityTests
         // Use parameterized dataset generation for systematic point query testing
         const int datasetSize = 5000;
         const int queryCount = 100;
-        
+
         var parameters = RangeParameterFactory.Clustered(datasetSize);
         var ranges = Gen.GenerateRanges<double>(parameters);
         var queryPoints = Gen.GenerateQueryPoints<double>(parameters, queryCount);
@@ -237,7 +237,7 @@ public class RangeTreeCompatibilityTests
             var rfResults = rangeFinder.Query(point)
                 .OrderBy(v => v)
                 .ToArray();
-                
+
             var itResults = intervalTree.Query(point)
                 .OrderBy(v => v)
                 .ToArray();
@@ -284,7 +284,7 @@ public class RangeTreeCompatibilityTests
             var rfResults = rangeFinder.Query(start, end)
                 .OrderBy(v => v)
                 .ToArray();
-                
+
             var itResults = intervalTree.Query(start, end)
                 .OrderBy(v => v)
                 .ToArray();
@@ -329,7 +329,7 @@ public class RangeTreeCompatibilityTests
             var rfResults = rangeFinder.Query(start, end)
                 .OrderBy(v => v)
                 .ToArray();
-                
+
             var itResults = intervalTree.Query(start, end)
                 .OrderBy(v => v)
                 .ToArray();
@@ -345,7 +345,7 @@ public class RangeTreeCompatibilityTests
             var rfResults = rangeFinder.Query(point)
                 .OrderBy(v => v)
                 .ToArray();
-                
+
             var itResults = intervalTree.Query(point)
                 .OrderBy(v => v)
                 .ToArray();
@@ -367,7 +367,7 @@ public class RangeTreeCompatibilityTests
         const int datasetSize = 10000;
         var random = new Random(42);
         var ranges = new List<NumericRange<double, int>>();
-        
+
         for (var i = 0; i < datasetSize; i++)
         {
             var start = i * 1.0 + random.NextDouble() * 0.5;
@@ -398,14 +398,14 @@ public class RangeTreeCompatibilityTests
                 .ThenBy(r => r.End)
                 .ThenBy(r => r.Value)
                 .ToArray();
-                
+
             var itResults = intervalTree.Query(start, end)
                 .OrderBy(r => r.Start)
                 .ThenBy(r => r.End)
                 .ThenBy(r => r.Value)
                 .ToArray();
 
-            Assert.That(rfResults.Length, Is.EqualTo(itResults.Length), 
+            Assert.That(rfResults.Length, Is.EqualTo(itResults.Length),
                 $"Count mismatch for query [{start:F3}, {end:F3}]: RF={rfResults.Length}, IT={itResults.Length}");
 
             for (int i = 0; i < rfResults.Length; i++)
@@ -458,7 +458,7 @@ public class RangeTreeCompatibilityTests
             var rfResults = rangeFinder.Query(start, end)
                 .OrderBy(v => v)
                 .ToArray();
-                
+
             var itResults = intervalTree.Query(start, end)
                 .OrderBy(v => v)
                 .ToArray();

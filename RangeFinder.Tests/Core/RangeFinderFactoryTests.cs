@@ -48,7 +48,7 @@ public class RangeFinderFactoryTests
         var rangeFinder = RangeFinderFactory.Create(ranges);
 
         Assert.That(rangeFinder.Count, Is.EqualTo(3));
-        
+
         var results = rangeFinder.QueryRanges(2.7).ToArray();
         Assert.That(results, Has.Length.EqualTo(1));
         Assert.That(results[0].Value, Is.EqualTo("Third"));
@@ -77,7 +77,7 @@ public class RangeFinderFactoryTests
         var rangeFinder = RangeFinderFactory.Create(ranges);
 
         Assert.That(rangeFinder.Count, Is.EqualTo(3));
-        
+
         var results = rangeFinder.QueryRanges(2.7).ToArray();
         Assert.That(results, Has.Length.EqualTo(1));
         Assert.That(results[0].Value, Is.EqualTo(2)); // Third range has index 2
@@ -103,7 +103,7 @@ public class RangeFinderFactoryTests
         var rangeFinder = RangeFinderFactory.Create(starts, ends, values);
 
         Assert.That(rangeFinder.Count, Is.EqualTo(3));
-        
+
         var results = rangeFinder.QueryRanges(2.7).ToArray();
         Assert.That(results, Has.Length.EqualTo(1));
         Assert.That(results[0].Value, Is.EqualTo("Third"));
@@ -168,7 +168,7 @@ public class RangeFinderFactoryTests
         var rangeFinder = RangeFinderFactory.Create(starts, ends);
 
         Assert.That(rangeFinder.Count, Is.EqualTo(3));
-        
+
         var results = rangeFinder.QueryRanges(2.7).ToArray();
         Assert.That(results, Has.Length.EqualTo(1));
         Assert.That(results[0].Value, Is.EqualTo(2)); // Third range has index 2
@@ -241,7 +241,7 @@ public class RangeFinderFactoryTests
         var rangeFinder = RangeFinderFactory.Create(ranges);
 
         Assert.That(rangeFinder.Count, Is.EqualTo(3));
-        
+
         var results = rangeFinder.QueryRanges(4).ToArray();
         Assert.That(results, Has.Length.EqualTo(2));
         Assert.That(results.Select(r => r.Value), Contains.Item("First"));

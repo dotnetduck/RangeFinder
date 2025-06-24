@@ -19,10 +19,14 @@ public static class RangeFinderLoader
     public static RangeFinder<double, string> FromCsv(string filePath)
     {
         if (filePath == null)
+        {
             throw new ArgumentNullException(nameof(filePath), "File path cannot be null.");
+        }
 
         if (!File.Exists(filePath))
+        {
             throw new FileNotFoundException($"File not found: {filePath}");
+        }
 
         var ranges = RangeSerializer.ReadCsv<double, string>(filePath);
         return RangeFinderFactory.Create(ranges);
@@ -41,10 +45,14 @@ public static class RangeFinderLoader
         where TNumber : INumber<TNumber>
     {
         if (filePath == null)
+        {
             throw new ArgumentNullException(nameof(filePath), "File path cannot be null.");
+        }
 
         if (!File.Exists(filePath))
+        {
             throw new FileNotFoundException($"File not found: {filePath}");
+        }
 
         var ranges = RangeSerializer.ReadCsv<TNumber, TAssociated>(filePath);
         return RangeFinderFactory.Create(ranges);
@@ -60,10 +68,14 @@ public static class RangeFinderLoader
     public static async Task<RangeFinder<double, string>> FromCsvAsync(string filePath)
     {
         if (filePath == null)
+        {
             throw new ArgumentNullException(nameof(filePath), "File path cannot be null.");
+        }
 
         if (!File.Exists(filePath))
+        {
             throw new FileNotFoundException($"File not found: {filePath}");
+        }
 
         var ranges = await RangeSerializer.ReadCsvAsync<double, string>(filePath);
         return RangeFinderFactory.Create(ranges);
@@ -82,10 +94,14 @@ public static class RangeFinderLoader
         where TNumber : INumber<TNumber>
     {
         if (filePath == null)
+        {
             throw new ArgumentNullException(nameof(filePath), "File path cannot be null.");
+        }
 
         if (!File.Exists(filePath))
+        {
             throw new FileNotFoundException($"File not found: {filePath}");
+        }
 
         var ranges = await RangeSerializer.ReadCsvAsync<TNumber, TAssociated>(filePath);
         return RangeFinderFactory.Create(ranges);
@@ -101,10 +117,14 @@ public static class RangeFinderLoader
     public static RangeFinder<double, string> FromParquet(string filePath)
     {
         if (filePath == null)
+        {
             throw new ArgumentNullException(nameof(filePath), "File path cannot be null.");
+        }
 
         if (!File.Exists(filePath))
+        {
             throw new FileNotFoundException($"File not found: {filePath}");
+        }
 
         var ranges = RangeSerializer.ReadParquet<double, string>(filePath);
         return RangeFinderFactory.Create(ranges);
@@ -123,10 +143,14 @@ public static class RangeFinderLoader
         where TNumber : INumber<TNumber>
     {
         if (filePath == null)
+        {
             throw new ArgumentNullException(nameof(filePath), "File path cannot be null.");
+        }
 
         if (!File.Exists(filePath))
+        {
             throw new FileNotFoundException($"File not found: {filePath}");
+        }
 
         var ranges = RangeSerializer.ReadParquet<TNumber, TAssociated>(filePath);
         return RangeFinderFactory.Create(ranges);
@@ -142,10 +166,14 @@ public static class RangeFinderLoader
     public static async Task<RangeFinder<double, string>> FromParquetAsync(string filePath)
     {
         if (filePath == null)
+        {
             throw new ArgumentNullException(nameof(filePath), "File path cannot be null.");
+        }
 
         if (!File.Exists(filePath))
+        {
             throw new FileNotFoundException($"File not found: {filePath}");
+        }
 
         var ranges = await RangeSerializer.ReadParquetAsync<double, string>(filePath);
         return RangeFinderFactory.Create(ranges);
@@ -164,10 +192,14 @@ public static class RangeFinderLoader
         where TNumber : INumber<TNumber>
     {
         if (filePath == null)
+        {
             throw new ArgumentNullException(nameof(filePath), "File path cannot be null.");
+        }
 
         if (!File.Exists(filePath))
+        {
             throw new FileNotFoundException($"File not found: {filePath}");
+        }
 
         var ranges = await RangeSerializer.ReadParquetAsync<TNumber, TAssociated>(filePath);
         return RangeFinderFactory.Create(ranges);

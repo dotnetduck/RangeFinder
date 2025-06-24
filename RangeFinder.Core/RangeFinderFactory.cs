@@ -19,7 +19,9 @@ public static class RangeFinderFactory
         where TNumber : INumber<TNumber>
     {
         if (ranges == null)
+        {
             throw new ArgumentNullException(nameof(ranges), "Ranges collection cannot be null.");
+        }
 
         return new RangeFinder<TNumber, TAssociated>(ranges);
     }
@@ -38,7 +40,9 @@ public static class RangeFinderFactory
         where TNumber : INumber<TNumber>
     {
         if (ranges == null)
+        {
             throw new ArgumentNullException(nameof(ranges), "Ranges collection cannot be null.");
+        }
 
         var numericRanges = ranges.Select(r => new NumericRange<TNumber, TAssociated>(r.Start, r.End, r.Value));
         return new RangeFinder<TNumber, TAssociated>(numericRanges);
@@ -57,7 +61,9 @@ public static class RangeFinderFactory
         where TNumber : INumber<TNumber>
     {
         if (ranges == null)
+        {
             throw new ArgumentNullException(nameof(ranges), "Ranges collection cannot be null.");
+        }
 
         var numericRanges = ranges.Select((r, index) => new NumericRange<TNumber, int>(r.Start, r.End, index));
         return new RangeFinder<TNumber, int>(numericRanges);
@@ -80,14 +86,24 @@ public static class RangeFinderFactory
         where TNumber : INumber<TNumber>
     {
         if (starts == null)
+        {
             throw new ArgumentNullException(nameof(starts), "Starts array cannot be null.");
+        }
+
         if (ends == null)
+        {
             throw new ArgumentNullException(nameof(ends), "Ends array cannot be null.");
+        }
+
         if (values == null)
+        {
             throw new ArgumentNullException(nameof(values), "Values array cannot be null.");
+        }
 
         if (starts.Length != ends.Length || starts.Length != values.Length)
+        {
             throw new ArgumentException("All arrays must have the same length.");
+        }
 
         var ranges = starts.Zip(ends, values)
             .Select(tuple => new NumericRange<TNumber, TAssociated>(tuple.First, tuple.Second, tuple.Third));
@@ -110,12 +126,19 @@ public static class RangeFinderFactory
         where TNumber : INumber<TNumber>
     {
         if (starts == null)
+        {
             throw new ArgumentNullException(nameof(starts), "Starts array cannot be null.");
+        }
+
         if (ends == null)
+        {
             throw new ArgumentNullException(nameof(ends), "Ends array cannot be null.");
+        }
 
         if (starts.Length != ends.Length)
+        {
             throw new ArgumentException("Start and end arrays must have the same length.");
+        }
 
         var ranges = starts.Zip(ends)
             .Select((tuple, index) => new NumericRange<TNumber, int>(tuple.First, tuple.Second, index));

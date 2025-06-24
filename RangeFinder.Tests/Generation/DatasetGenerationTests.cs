@@ -16,7 +16,7 @@ public class DatasetGenerationTests
     public void RangeGenerator_Presets_GenerateExpectedCharacteristics()
     {
         const int testSize = 50_000; // Large dataset for robust characteristics validation
-        
+
         // Test each preset generates data with expected characteristics
         var presets = new[]
         {
@@ -30,15 +30,15 @@ public class DatasetGenerationTests
         {
             var ranges = Generator.GenerateRanges<double>(parameters);
             var analysis = Analyzer.Analyze(ranges);
-            
+
             Assert.That(analysis.Count, Is.EqualTo(testSize), $"{name}: Should generate exactly {testSize} ranges");
-            Assert.That(analysis.MinValue, Is.GreaterThanOrEqualTo(0), 
+            Assert.That(analysis.MinValue, Is.GreaterThanOrEqualTo(0),
                 $"{name}: MinValue should be positive");
-            Assert.That(analysis.MaxValue, Is.LessThanOrEqualTo(parameters.TotalSpace), 
+            Assert.That(analysis.MaxValue, Is.LessThanOrEqualTo(parameters.TotalSpace),
                 $"{name}: MaxValue should respect parameter bounds");
-            Assert.That(analysis.AverageLength, Is.GreaterThan(0), 
+            Assert.That(analysis.AverageLength, Is.GreaterThan(0),
                 $"{name}: Should have positive average length");
-            
+
             Console.WriteLine($"{name} Dataset Analysis:");
             Console.WriteLine($"  Count: {analysis.Count}");
             Console.WriteLine($"  Range: [{analysis.MinValue:F2}, {analysis.MaxValue:F2}]");
@@ -78,12 +78,12 @@ public class DatasetGenerationTests
     public void RangeGenerator_RepeatableResults_WithSameSeed()
     {
         var parameters = RangeParameterFactory.Uniform(100);
-        
+
         var ranges1 = Generator.GenerateRanges<double>(parameters);
         var ranges2 = Generator.GenerateRanges<double>(parameters);
 
         Assert.That(ranges1.Count, Is.EqualTo(ranges2.Count));
-        
+
         for (int i = 0; i < ranges1.Count; i++)
         {
             Assert.That(ranges1[i].Start, Is.EqualTo(ranges2[i].Start).Within(1e-10));
@@ -101,7 +101,8 @@ public class DatasetGenerationTests
             lengthRatio: 1.0,
             overlapFactor: 2.5,
             lengthVariability: 0.2,
-            clusteringFactor: 0.25) with { RandomSeed = 42 };
+            clusteringFactor: 0.25) with
+        { RandomSeed = 42 };
 
         var params2 = RangeParameterFactory.Custom(
             count: 100,
@@ -109,8 +110,9 @@ public class DatasetGenerationTests
             lengthRatio: 1.0,
             overlapFactor: 2.5,
             lengthVariability: 0.2,
-            clusteringFactor: 0.25) with { RandomSeed = 123 };
-        
+            clusteringFactor: 0.25) with
+        { RandomSeed = 123 };
+
         var ranges1 = Generator.GenerateRanges<double>(params1);
         var ranges2 = Generator.GenerateRanges<double>(params2);
 
@@ -124,37 +126,37 @@ public class DatasetGenerationTests
                 foundDifference = true;
             }
         }
-        
+
         Assert.That(foundDifference, Is.True, "Different seeds should produce different datasets");
     }
-    
+
     [Test]
     public void RangeGenerator_PerformanceRegression_CompletesWithinReasonableTime()
     {
         var parameters = RangeParameterFactory.Uniform(100_000); // Large dataset
-        
+
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
         var ranges = Generator.GenerateRanges<double>(parameters);
         stopwatch.Stop();
-        
+
         Assert.That(ranges, Has.Count.EqualTo(parameters.Count), "Performance test should generate correct count");
-        
+
         var maxExpectedTime = TimeSpan.FromMilliseconds(Math.Max(1000, 100_000 / 100.0));
-        Assert.That(stopwatch.Elapsed, Is.LessThan(maxExpectedTime), 
+        Assert.That(stopwatch.Elapsed, Is.LessThan(maxExpectedTime),
             $"Large dataset generation took {stopwatch.Elapsed.TotalMilliseconds:F1}ms, expected < {maxExpectedTime.TotalMilliseconds:F1}ms");
     }
-    
+
     [Test]
     public void RangeGenerator_EmptyDataset_HandlesCorrectly()
     {
         // Edge case: count = 0 should be handled gracefully
-        Assert.Throws<ArgumentException>(() => 
+        Assert.Throws<ArgumentException>(() =>
         {
             var parameters = RangeParameterFactory.Uniform(0);
             Generator.GenerateRanges<double>(parameters);
         }, "Zero count should be rejected during validation");
     }
-    
+
     [Test]
     public void RangeGenerator_ExtremeParameters_HandleGracefully()
     {
@@ -166,14 +168,14 @@ public class DatasetGenerationTests
             overlapFactor: 1.0,
             lengthVariability: 0.0,
             clusteringFactor: 0.0);
-            
+
         var ranges = Generator.GenerateRanges<double>(tinyParams);
         Assert.That(ranges, Has.Count.EqualTo(tinyParams.Count), "Tiny space allocation should generate correct count");
         foreach (var range in ranges)
         {
             Assert.That(range.Start, Is.LessThanOrEqualTo(range.End), "Generated ranges should be valid");
         }
-        
+
         // Test with very high overlap requirement
         var overlapParams = RangeParameterFactory.Custom(
             count: 10,
@@ -182,7 +184,7 @@ public class DatasetGenerationTests
             overlapFactor: 5.0, // High overlap requirement
             lengthVariability: 0.1,
             clusteringFactor: 0.1);
-            
+
         var overlapRanges = Generator.GenerateRanges<double>(overlapParams);
         Assert.That(overlapRanges, Has.Count.EqualTo(overlapParams.Count), "High overlap requirement should generate correct count");
         foreach (var range in overlapRanges)

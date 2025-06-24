@@ -12,10 +12,10 @@ public static class CustomComparator
     {
         var expectedSet = expected.ToHashSet();
         var actualSet = actual.ToHashSet();
-        
+
         var onlyInExpected = expectedSet.Except(actualSet).ToHashSet();
         var onlyInActual = actualSet.Except(expectedSet).ToHashSet();
-        
+
         return new SetDifference<T>(onlyInExpected, onlyInActual, actualSet.Count, expectedSet.Count);
     }
 }

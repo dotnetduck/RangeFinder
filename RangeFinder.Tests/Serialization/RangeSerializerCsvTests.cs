@@ -30,7 +30,9 @@ public class RangeSerializerCsvTests
         finally
         {
             if (File.Exists(tempFilePath))
+            {
                 File.Delete(tempFilePath);
+            }
         }
     }
 
@@ -62,7 +64,9 @@ public class RangeSerializerCsvTests
         finally
         {
             if (File.Exists(tempFilePath))
+            {
                 File.Delete(tempFilePath);
+            }
         }
     }
 
@@ -87,7 +91,9 @@ public class RangeSerializerCsvTests
         finally
         {
             if (File.Exists(tempFilePath))
+            {
                 File.Delete(tempFilePath);
+            }
         }
     }
 
@@ -112,7 +118,9 @@ public class RangeSerializerCsvTests
         finally
         {
             if (File.Exists(tempFilePath))
+            {
                 File.Delete(tempFilePath);
+            }
         }
     }
 
@@ -132,7 +140,9 @@ public class RangeSerializerCsvTests
         finally
         {
             if (File.Exists(tempFilePath))
+            {
                 File.Delete(tempFilePath);
+            }
         }
     }
 
@@ -164,7 +174,9 @@ public class RangeSerializerCsvTests
         finally
         {
             if (File.Exists(tempFilePath))
+            {
                 File.Delete(tempFilePath);
+            }
         }
     }
 }

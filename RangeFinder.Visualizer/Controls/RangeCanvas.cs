@@ -69,7 +69,7 @@ public class RangeCanvas : Control
     private Point _lastPointerPosition;
     private ToolTip? _currentToolTip;
     private List<List<NumericRange<double, string>>> _cachedLayers = new();
-    
+
     static RangeCanvas()
     {
         AffectsRender<RangeCanvas>(StringRangesProperty, ViewportStartProperty, ViewportEndProperty);
@@ -86,7 +86,7 @@ public class RangeCanvas : Control
         base.Render(context);
 
         var hasStringRanges = StringRanges != null && StringRanges.Count > 0;
-        
+
         if (!hasStringRanges)
         {
             RenderEmptyState(context);
@@ -119,11 +119,11 @@ public class RangeCanvas : Control
     private void RenderBackground(DrawingContext context)
     {
         context.FillRectangle(Brushes.White, new Rect(0, 0, Bounds.Width, Bounds.Height));
-        
+
         // Draw simple grid lines
         var gridPen = new Pen(Brushes.LightGray, 0.5);
         var gridCount = 10;
-        
+
         for (int i = 1; i < gridCount; i++)
         {
             var x = (Bounds.Width / gridCount) * i;
@@ -141,7 +141,7 @@ public class RangeCanvas : Control
             for (int layer = 0; layer < _cachedLayers.Count; layer++)
             {
                 var y = 50 + layer * 30; // Start ranges below axis
-                
+
                 foreach (var range in _cachedLayers[layer])
                 {
                     RenderStringRange(context, range, y);
@@ -154,22 +154,25 @@ public class RangeCanvas : Control
     {
         var startX = ValueToScreenX(range.Start);
         var endX = ValueToScreenX(range.End);
-        
+
         // Clamp to visible area
         startX = Math.Max(0, startX);
         endX = Math.Min(Bounds.Width, endX);
-        
-        if (endX <= startX) return; // Range not visible
-        
+
+        if (endX <= startX)
+        {
+            return; // Range not visible
+        }
+
         var width = endX - startX;
         var rect = new Rect(startX, y, width, 20);
-        
+
         // Color scheme based on range value hashcode for better distribution
         var brush = GetBrushFromHashCode(range.Value.GetHashCode());
-        
+
         context.FillRectangle(brush, rect);
         context.DrawRectangle(new Pen(Brushes.Black, 1), rect);
-        
+
         // Draw range value if there's space
         if (width > 30)
         {
@@ -183,13 +186,13 @@ public class RangeCanvas : Control
                     new Typeface("Arial"),
                     10,
                     Brushes.White);
-                
+
                 // Center the text in the rectangle
                 var textWidth = textGeometry.Width;
                 var textHeight = textGeometry.Height;
                 var labelX = startX + (width - textWidth) / 2;
                 var labelY = y + (20 - textHeight) / 2;
-                
+
                 var labelPos = new Point(Math.Max(startX + 2, labelX), labelY);
                 context.DrawText(textGeometry, labelPos);
             }
@@ -200,24 +203,24 @@ public class RangeCanvas : Control
     {
         var axisPen = new Pen(Brushes.Black, 2);
         var axisY = 40;
-        
+
         // Draw main axis line
         context.DrawLine(axisPen, new Point(0, axisY), new Point(Bounds.Width, axisY));
-        
+
         // Draw tick marks and labels above the axis
         var tickCount = 8;
         var step = (ViewportEnd - ViewportStart) / tickCount;
-        
+
         for (int i = 0; i <= tickCount; i++)
         {
             var value = ViewportStart + (step * i);
             var x = ValueToScreenX(value);
-            
+
             if (x >= 0 && x <= Bounds.Width)
             {
                 // Tick mark
                 context.DrawLine(axisPen, new Point(x, axisY - 5), new Point(x, axisY + 5));
-                
+
                 // Label - positioned above the axis
                 var labelText = value.ToString("F1");
                 var textGeometry = new FormattedText(
@@ -227,7 +230,7 @@ public class RangeCanvas : Control
                     new Typeface("Arial"),
                     10,
                     Brushes.Black);
-                
+
                 var labelPos = new Point(x - textGeometry.WidthIncludingTrailingWhitespace / 2, axisY - textGeometry.Height - 8);
                 context.DrawText(textGeometry, labelPos);
             }
@@ -237,8 +240,11 @@ public class RangeCanvas : Control
     private double ValueToScreenX(double value)
     {
         var viewportSpan = ViewportEnd - ViewportStart;
-        if (viewportSpan == 0) return 0;
-        
+        if (viewportSpan == 0)
+        {
+            return 0;
+        }
+
         return (value - ViewportStart) / viewportSpan * Bounds.Width;
     }
 
@@ -251,17 +257,17 @@ public class RangeCanvas : Control
     {
         var layers = new List<List<NumericRange<double, string>>>();
         var sortedRanges = ranges.OrderBy(r => r.Start).ToList();
-        
+
         foreach (var range in sortedRanges)
         {
             bool placed = false;
-            
+
             // Try to place in existing layer
             for (int i = 0; i < layers.Count; i++)
             {
                 var layer = layers[i];
                 var canPlace = !layer.Any(r => r.Overlaps(range));
-                
+
                 if (canPlace)
                 {
                     layer.Add(range);
@@ -269,24 +275,24 @@ public class RangeCanvas : Control
                     break;
                 }
             }
-            
+
             // Create new layer if needed
             if (!placed)
             {
                 layers.Add(new List<NumericRange<double, string>> { range });
             }
         }
-        
+
         return layers;
     }
 
     protected override void OnPointerPressed(PointerPressedEventArgs e)
     {
         base.OnPointerPressed(e);
-        
+
         // Give focus to enable keyboard shortcuts
         Focus();
-        
+
         _isDragging = true;
         _lastPointerPosition = e.GetPosition(this);
         e.Pointer.Capture(this);
@@ -301,17 +307,17 @@ public class RangeCanvas : Control
     protected override void OnPointerMoved(PointerEventArgs e)
     {
         base.OnPointerMoved(e);
-        
+
         if (_isDragging)
         {
             var currentPosition = e.GetPosition(this);
             var deltaX = currentPosition.X - _lastPointerPosition.X;
-            
+
             // Scale pan delta relative to displayed range span for gentler panning
             var displayedSpan = ViewportEnd - ViewportStart;
             var scaledDelta = (deltaX / Bounds.Width) * displayedSpan * 0.5;
             PanRequested?.Invoke(this, -scaledDelta);
-            
+
             _lastPointerPosition = currentPosition;
         }
         else
@@ -324,23 +330,23 @@ public class RangeCanvas : Control
     protected override void OnPointerWheelChanged(PointerWheelEventArgs e)
     {
         base.OnPointerWheelChanged(e);
-        
+
         var position = e.GetPosition(this);
         var mouseXRatio = position.X / Bounds.Width;
         var isZoomModifier = e.KeyModifiers.HasFlag(KeyModifiers.Control) || e.KeyModifiers.HasFlag(KeyModifiers.Meta);
-        
+
         ScrollRequested?.Invoke(this, (e.Delta.Y, isZoomModifier, mouseXRatio));
-        
+
         e.Handled = true;
     }
 
     protected override void OnKeyDown(KeyEventArgs e)
     {
         base.OnKeyDown(e);
-        
+
         var span = ViewportEnd - ViewportStart;
         var centerX = 0.5; // Center for zoom operations
-        
+
         switch (e.Key)
         {
             // Arrow keys for slow scroll
@@ -350,14 +356,14 @@ public class RangeCanvas : Control
                 PanRequested?.Invoke(this, -slowLeftDelta);
                 e.Handled = true;
                 break;
-                
+
             case Key.Right:
                 // Right = forward/later = positive pan
                 var slowRightDelta = span * 0.05;
                 PanRequested?.Invoke(this, slowRightDelta);
                 e.Handled = true;
                 break;
-                
+
             // Page Up/Down for fast scroll
             case Key.PageUp:
                 // Page Up = backward/earlier = negative pan
@@ -365,14 +371,14 @@ public class RangeCanvas : Control
                 PanRequested?.Invoke(this, -fastLeftDelta);
                 e.Handled = true;
                 break;
-                
+
             case Key.PageDown:
                 // Page Down = forward/later = positive pan
                 var fastRightDelta = span * 0.5;
                 PanRequested?.Invoke(this, fastRightDelta);
                 e.Handled = true;
                 break;
-                
+
             // Home/End to jump to boundaries
             case Key.Home:
                 if (!double.IsNaN(DataMin))
@@ -385,7 +391,7 @@ public class RangeCanvas : Control
                 }
                 e.Handled = true;
                 break;
-                
+
             case Key.End:
                 if (!double.IsNaN(DataMax))
                 {
@@ -397,7 +403,7 @@ public class RangeCanvas : Control
                 }
                 e.Handled = true;
                 break;
-                
+
             // +/- for zoom
             case Key.Add:
             case Key.OemPlus:
@@ -405,7 +411,7 @@ public class RangeCanvas : Control
                 ScrollRequested?.Invoke(this, (100, true, centerX));
                 e.Handled = true;
                 break;
-                
+
             case Key.Subtract:
             case Key.OemMinus:
                 // Zoom out
@@ -419,24 +425,24 @@ public class RangeCanvas : Control
     {
         // Generate colors based on hashcode for better distribution
         var hash = Math.Abs(hashCode);
-        
+
         // Extract RGB components from hash
         var r = (byte)((hash >> 16) & 0xFF);
         var g = (byte)((hash >> 8) & 0xFF);
         var b = (byte)(hash & 0xFF);
-        
+
         // Ensure colors are vibrant and visible by adjusting brightness
         r = (byte)Math.Max(80, Math.Min(220, (int)r));
         g = (byte)Math.Max(80, Math.Min(220, (int)g));
         b = (byte)Math.Max(80, Math.Min(220, (int)b));
-        
+
         return new SolidColorBrush(Color.FromRgb(r, g, b));
     }
 
     private void HandleTooltipOnHover(Point mousePosition)
     {
         var hoveredRange = GetRangeAtPosition(mousePosition);
-        
+
         if (hoveredRange != null)
         {
             ShowTooltip(hoveredRange, mousePosition);
@@ -449,26 +455,32 @@ public class RangeCanvas : Control
 
     private NumericRange<double, string>? GetRangeAtPosition(Point position)
     {
-        if (_cachedLayers.Count == 0) return null;
+        if (_cachedLayers.Count == 0)
+        {
+            return null;
+        }
 
         for (int layer = 0; layer < _cachedLayers.Count; layer++)
         {
             var layerY = 50 + layer * 30;
             var layerRect = new Rect(0, layerY, Bounds.Width, 20);
-            
+
             if (layerRect.Contains(position))
             {
                 foreach (var range in _cachedLayers[layer])
                 {
                     var startX = ValueToScreenX(range.Start);
                     var endX = ValueToScreenX(range.End);
-                    
+
                     // Clamp to visible area
                     startX = Math.Max(0, startX);
                     endX = Math.Min(Bounds.Width, endX);
-                    
-                    if (endX <= startX) continue;
-                    
+
+                    if (endX <= startX)
+                    {
+                        continue;
+                    }
+
                     var rangeRect = new Rect(startX, layerY, endX - startX, 20);
                     if (rangeRect.Contains(position))
                     {
@@ -477,7 +489,7 @@ public class RangeCanvas : Control
                 }
             }
         }
-        
+
         return null;
     }
 
@@ -490,7 +502,7 @@ public class RangeCanvas : Control
 
         var tooltipText = $"{range.Value}\nStart: {range.Start:F2}\nEnd: {range.End:F2}\nSpan: {range.Span:F2}";
         _currentToolTip.Content = tooltipText;
-        
+
         ToolTip.SetTip(this, _currentToolTip);
         ToolTip.SetIsOpen(this, true);
     }
@@ -500,5 +512,5 @@ public class RangeCanvas : Control
         ToolTip.SetIsOpen(this, false);
         ToolTip.SetTip(this, null);
     }
-    
+
 }

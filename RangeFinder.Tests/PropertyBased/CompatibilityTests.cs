@@ -21,9 +21,9 @@ public class CompatibilityTests
 
     [OneTimeSetUp]
     public void SetUp()
-    {   
+    {
         Arb.Register(typeof(RangeDataGenerators));
-        
+
         if (VerboseMode)
         {
             TestContext.WriteLine("Verbose mode enabled: will print results for all property tests");
