@@ -17,42 +17,42 @@ public class ParameterValidationTests : TestBase
     {
         var minimalParams = TestParameterFactory.MinimalValidParameters();
         var maximalParams = TestParameterFactory.MaximalValidParameters();
-        
+
         Assert.DoesNotThrow(() => minimalParams.Validate(), "Minimal valid parameters should pass validation");
         Assert.DoesNotThrow(() => maximalParams.Validate(), "Maximal valid parameters should pass validation");
-        
+
         // Test successful generation with boundary parameters
         var minimalRanges = Generator.GenerateRanges<double>(minimalParams);
         var maximalRanges = Generator.GenerateRanges<double>(maximalParams);
-        
+
         Validators.ValidateRangeCollection(minimalRanges, minimalParams, "Minimal parameters");
-        
+
         // For maximal parameters, validate most constraints but allow small floating point tolerance
         Assert.That(maximalRanges, Is.Not.Null, "Maximal parameters: Range collection should not be null");
-        Assert.That(maximalRanges.Count, Is.EqualTo(maximalParams.Count), 
+        Assert.That(maximalRanges.Count, Is.EqualTo(maximalParams.Count),
             "Maximal parameters: Should generate correct count");
-            
+
         foreach (var range in maximalRanges)
         {
-            Assert.That(range.Start, Is.LessThanOrEqualTo(range.End), 
+            Assert.That(range.Start, Is.LessThanOrEqualTo(range.End),
                 "Maximal parameters: Range start should be <= end");
-            Assert.That(Convert.ToDouble(range.Start), Is.GreaterThanOrEqualTo(0), 
+            Assert.That(Convert.ToDouble(range.Start), Is.GreaterThanOrEqualTo(0),
                 "Maximal parameters: Range start should be non-negative");
             // Maximal parameters with extreme settings may generate ranges that extend beyond strict bounds
             // This is expected behavior when testing boundary conditions with high LengthRatio values
-            Assert.That(Convert.ToDouble(range.End), Is.GreaterThan(0), 
+            Assert.That(Convert.ToDouble(range.End), Is.GreaterThan(0),
                 "Maximal parameters: Range end should be positive");
         }
     }
-    
+
     [Test]
     public void Parameter_InvalidCombinations_ThrowsExpectedExceptions()
     {
         foreach (var (invalidParams, expectedError) in TestParameterFactory.InvalidParameterCases())
         {
-            var exception = Assert.Throws<ArgumentException>(() => invalidParams.Validate(), 
+            var exception = Assert.Throws<ArgumentException>(() => invalidParams.Validate(),
                 $"Should throw ArgumentException for: {expectedError}");
-            Assert.That(exception.Message, Does.Contain(expectedError), 
+            Assert.That(exception.Message, Does.Contain(expectedError),
                 "Exception message should contain expected error text");
         }
     }
@@ -72,9 +72,9 @@ public class ParameterValidationTests : TestBase
             StartOffset = 0.0,
             RandomSeed = 42
         };
-        
+
         // Should either validate successfully or throw a clear overflow-related exception
-        Assert.DoesNotThrow(() => overflowParams.Validate(), 
+        Assert.DoesNotThrow(() => overflowParams.Validate(),
             "Large parameter values should be handled gracefully by validation");
     }
 
@@ -93,9 +93,9 @@ public class ParameterValidationTests : TestBase
             StartOffset = 0.0,
             RandomSeed = 42
         };
-        
+
         var exception = Assert.Throws<InvalidOperationException>(() => infeasibleParams.Validate());
-        Assert.That(exception.Message, Does.Contain("requires more space"), 
+        Assert.That(exception.Message, Does.Contain("requires more space"),
             "Should explain space requirements in error message");
     }
 
@@ -114,36 +114,36 @@ public class ParameterValidationTests : TestBase
             StartOffset = 0.0,
             RandomSeed = 42
         };
-        
+
         var method = typeof(Generator).GetMethod(nameof(Generator.GenerateRanges))!.MakeGenericMethod(numericType);
-        
+
         if (IsSmallNumericType(numericType))
         {
             // Very small types (byte, sbyte, short, ushort) should throw overflow exceptions
-            if (numericType == typeof(byte) || numericType == typeof(sbyte) || 
+            if (numericType == typeof(byte) || numericType == typeof(sbyte) ||
                 numericType == typeof(short) || numericType == typeof(ushort))
             {
                 var exception = Assert.Throws<TargetInvocationException>(() => method.Invoke(null, new object[] { largeParams }));
-                Assert.That(exception.InnerException, Is.InstanceOf<InvalidOperationException>(), 
+                Assert.That(exception.InnerException, Is.InstanceOf<InvalidOperationException>(),
                     $"{numericType.Name} should throw InvalidOperationException for overflow");
             }
             else
             {
                 // Other small types should handle gracefully
-                Assert.DoesNotThrow(() => method.Invoke(null, new object[] { largeParams }), 
+                Assert.DoesNotThrow(() => method.Invoke(null, new object[] { largeParams }),
                     $"{numericType.Name} should handle overflow scenarios gracefully");
             }
         }
         else
         {
             // Large types should handle without overflow
-            Assert.DoesNotThrow(() => method.Invoke(null, new object[] { largeParams }), 
+            Assert.DoesNotThrow(() => method.Invoke(null, new object[] { largeParams }),
                 $"{numericType.Name} should handle large values without overflow");
         }
     }
-    
+
     private static bool IsSmallNumericType(Type type) =>
-        type == typeof(byte) || type == typeof(sbyte) || 
+        type == typeof(byte) || type == typeof(sbyte) ||
         type == typeof(short) || type == typeof(ushort) ||
         type == typeof(float); // float has limited precision
 
@@ -161,14 +161,14 @@ public class ParameterValidationTests : TestBase
             StartOffset = 0.25,
             RandomSeed = 42
         };
-        
+
         Assert.That(testParams.TotalSpace, Is.EqualTo(500.0), "TotalSpace calculation should be Count * SpacePerRange");
         Assert.That(testParams.AverageLength, Is.EqualTo(4.0), "AverageLength calculation should be SpacePerRange * LengthRatio");
-        
+
         // Properties should be consistent
         Assert.That(testParams.TotalSpace, Is.GreaterThan(0), "TotalSpace should be positive");
         Assert.That(testParams.AverageLength, Is.GreaterThan(0), "AverageLength should be positive");
-        Assert.That(testParams.AverageLength, Is.LessThanOrEqualTo(testParams.SpacePerRange * testParams.LengthRatio), 
+        Assert.That(testParams.AverageLength, Is.LessThanOrEqualTo(testParams.SpacePerRange * testParams.LengthRatio),
             "AverageLength should not exceed expected value");
     }
 
@@ -177,10 +177,10 @@ public class ParameterValidationTests : TestBase
     {
         var originalParams = RangeParameterFactory.Uniform(TestSizes.Small);
         var modifiedParams = originalParams with { Count = TestSizes.Medium };
-        
+
         Assert.That(originalParams.Count, Is.EqualTo(TestSizes.Small), "Original parameters should be unchanged");
         Assert.That(modifiedParams.Count, Is.EqualTo(TestSizes.Medium), "Modified parameters should have new value");
-        Assert.That(modifiedParams.SpacePerRange, Is.EqualTo(originalParams.SpacePerRange), 
+        Assert.That(modifiedParams.SpacePerRange, Is.EqualTo(originalParams.SpacePerRange),
             "Non-modified properties should remain the same");
     }
 
@@ -190,16 +190,16 @@ public class ParameterValidationTests : TestBase
         // Test that Custom factory creates parameters that fail validation when invalid inputs are provided
         var invalidCountParams = RangeParameterFactory.Custom(-1, 1.0, 1.0, 1.0);
         Assert.Throws<ArgumentException>(() => invalidCountParams.Validate(), "Should reject negative count during validation");
-            
+
         var invalidSpaceParams = RangeParameterFactory.Custom(100, 0, 1.0, 1.0);
         Assert.Throws<ArgumentException>(() => invalidSpaceParams.Validate(), "Should reject zero spacePerRange during validation");
-            
+
         var invalidLengthParams = RangeParameterFactory.Custom(100, 1.0, 0, 1.0);
         Assert.Throws<ArgumentException>(() => invalidLengthParams.Validate(), "Should reject zero lengthRatio during validation");
-            
+
         var invalidOverlapParams = RangeParameterFactory.Custom(100, 1.0, 1.0, 0);
         Assert.Throws<ArgumentException>(() => invalidOverlapParams.Validate(), "Should reject zero overlapFactor during validation");
-            
+
         // Test that valid parameters work
         var validParams = RangeParameterFactory.Custom(100, 5.0, 0.8, 1.5, 0.3, 0.2);
         Assert.DoesNotThrow(() => validParams.Validate(), "Valid custom parameters should pass validation");
@@ -220,9 +220,9 @@ public class ParameterValidationTests : TestBase
             StartOffset = 0.0,
             RandomSeed = 42
         };
-        
+
         Assert.Throws<ArgumentException>(() => nanParams.Validate(), "Should reject NaN values");
-        
+
         // Test infinite values
         var infiniteParams = new Parameter
         {
@@ -235,7 +235,7 @@ public class ParameterValidationTests : TestBase
             StartOffset = 0.0,
             RandomSeed = 42
         };
-        
+
         Assert.Throws<ArgumentException>(() => infiniteParams.Validate(), "Should reject infinite values");
     }
 
@@ -245,11 +245,11 @@ public class ParameterValidationTests : TestBase
         var params1 = RangeParameterFactory.Uniform(100);
         var params2 = RangeParameterFactory.Uniform(100);
         var params3 = RangeParameterFactory.DenseOverlapping(100);
-        
+
         // Record equality
         Assert.That(params1, Is.EqualTo(params2), "Identical parameters should be equal");
         Assert.That(params1, Is.Not.EqualTo(params3), "Different parameters should not be equal");
-        
+
         // ToString should not throw and should contain meaningful information
         var stringRep = params1.ToString();
         Assert.That(stringRep, Is.Not.Null.And.Not.Empty, "ToString should produce non-empty string");

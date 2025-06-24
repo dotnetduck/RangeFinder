@@ -30,7 +30,9 @@ public class RangeSerializerParquetTests
         finally
         {
             if (File.Exists(tempFilePath))
+            {
                 File.Delete(tempFilePath);
+            }
         }
     }
 
@@ -55,7 +57,9 @@ public class RangeSerializerParquetTests
         finally
         {
             if (File.Exists(tempFilePath))
+            {
                 File.Delete(tempFilePath);
+            }
         }
     }
 
@@ -80,7 +84,9 @@ public class RangeSerializerParquetTests
         finally
         {
             if (File.Exists(tempFilePath))
+            {
                 File.Delete(tempFilePath);
+            }
         }
     }
 
@@ -105,7 +111,9 @@ public class RangeSerializerParquetTests
         finally
         {
             if (File.Exists(tempFilePath))
+            {
                 File.Delete(tempFilePath);
+            }
         }
     }
 
@@ -125,7 +133,9 @@ public class RangeSerializerParquetTests
         finally
         {
             if (File.Exists(tempFilePath))
+            {
                 File.Delete(tempFilePath);
+            }
         }
     }
 
@@ -150,7 +160,9 @@ public class RangeSerializerParquetTests
         finally
         {
             if (File.Exists(tempFilePath))
+            {
                 File.Delete(tempFilePath);
+            }
         }
     }
 }

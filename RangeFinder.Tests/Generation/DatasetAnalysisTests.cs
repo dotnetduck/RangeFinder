@@ -90,13 +90,13 @@ public class DatasetAnalysisTests
         Assert.That(analysis.Count, Is.EqualTo(5));
         Assert.That(analysis.MinValue, Is.EqualTo(0.0));
         Assert.That(analysis.MaxValue, Is.EqualTo(12.0));
-        
+
         // Average length: (2 + 3 + 2 + 4 + 4) / 5 = 3.0
         Assert.That(analysis.AverageLength, Is.EqualTo(3.0));
-        
+
         // Should have some overlap (ranges 0-1-2 and ranges 3-4)
         Assert.That(analysis.OverlapPercentage, Is.GreaterThan(0));
-        
+
         // Standard deviation should be positive for varied lengths
         Assert.That(analysis.LengthStdDev, Is.GreaterThan(0));
     }
@@ -140,7 +140,7 @@ public class DatasetAnalysisTests
     public void Generator_DatasetAnalysis_GeneratedDatasets_ProduceReasonableStatistics()
     {
         const int testSize = 100;
-        
+
         var presets = new[]
         {
             ("Dense", RangeParameterFactory.DenseOverlapping(testSize)),
@@ -153,36 +153,36 @@ public class DatasetAnalysisTests
         {
             var ranges = Generator.GenerateRanges<double>(parameters);
             var analysis = Generator.AnalyzeDataset(ranges);
-            
+
             // Basic sanity checks for all datasets
-            Assert.That(analysis.Count, Is.EqualTo(testSize), 
+            Assert.That(analysis.Count, Is.EqualTo(testSize),
                 $"{name}: Should analyze exactly {testSize} ranges");
-            Assert.That(analysis.MinValue, Is.GreaterThanOrEqualTo(0), 
+            Assert.That(analysis.MinValue, Is.GreaterThanOrEqualTo(0),
                 $"{name}: MinValue should be non-negative");
-            Assert.That(analysis.MaxValue, Is.LessThanOrEqualTo(parameters.TotalSpace), 
+            Assert.That(analysis.MaxValue, Is.LessThanOrEqualTo(parameters.TotalSpace),
                 $"{name}: MaxValue should be within total space");
-            Assert.That(analysis.AverageLength, Is.GreaterThan(0), 
+            Assert.That(analysis.AverageLength, Is.GreaterThan(0),
                 $"{name}: Should have positive average length");
-            Assert.That(analysis.LengthStdDev, Is.GreaterThanOrEqualTo(0), 
+            Assert.That(analysis.LengthStdDev, Is.GreaterThanOrEqualTo(0),
                 $"{name}: Standard deviation should be non-negative");
-            Assert.That(analysis.OverlapPercentage, Is.GreaterThanOrEqualTo(0), 
+            Assert.That(analysis.OverlapPercentage, Is.GreaterThanOrEqualTo(0),
                 $"{name}: Overlap percentage should be non-negative");
-            
+
             // Specific checks based on dataset characteristics
             switch (name)
             {
                 case "Dense":
-                    Assert.That(analysis.OverlapPercentage, Is.GreaterThan(100), 
+                    Assert.That(analysis.OverlapPercentage, Is.GreaterThan(100),
                         "Dense dataset should have high overlap (>100%)");
                     break;
                 case "Sparse":
-                    Assert.That(analysis.OverlapPercentage, Is.LessThan(50), 
+                    Assert.That(analysis.OverlapPercentage, Is.LessThan(50),
                         "Sparse dataset should have lower overlap than dense");
                     break;
             }
         }
     }
-    
+
     [Test]
     public void Analyzer_ComplexOverlapScenarios_CalculatesCorrectly()
     {
@@ -194,12 +194,12 @@ public class DatasetAnalysisTests
             new(0.0, 10.0, 2)
         };
         var fullOverlapAnalysis = Generator.AnalyzeDataset(fullyOverlapping);
-        
+
         Assert.That(fullOverlapAnalysis.Count, Is.EqualTo(3), "Should count all ranges");
         Assert.That(fullOverlapAnalysis.AverageLength, Is.EqualTo(10.0), "Average length should be correct");
         Assert.That(fullOverlapAnalysis.LengthStdDev, Is.EqualTo(0.0).Within(1e-10), "Identical lengths should have zero std dev");
         Assert.That(fullOverlapAnalysis.OverlapPercentage, Is.GreaterThanOrEqualTo(200), "Fully overlapping should have very high overlap percentage (>=200%)");
-        
+
         // Test partially overlapping ranges
         var partiallyOverlapping = new List<NumericRange<double, int>>
         {
@@ -208,13 +208,13 @@ public class DatasetAnalysisTests
             new(10.0, 15.0, 2)  // Length: 5, no overlap
         };
         var partialOverlapAnalysis = Generator.AnalyzeDataset(partiallyOverlapping);
-        
+
         Assert.That(partialOverlapAnalysis.Count, Is.EqualTo(3), "Should count all ranges");
         Assert.That(partialOverlapAnalysis.AverageLength, Is.EqualTo(5.0), "Average length should be correct");
-        Assert.That(partialOverlapAnalysis.OverlapPercentage, Is.GreaterThan(0).And.LessThan(100), 
+        Assert.That(partialOverlapAnalysis.OverlapPercentage, Is.GreaterThan(0).And.LessThan(100),
             "Partial overlap should be between 0 and 100%");
     }
-    
+
     [Test]
     public void Analyzer_EdgeCaseRanges_HandleCorrectly()
     {
@@ -225,11 +225,11 @@ public class DatasetAnalysisTests
             new(10.0, 10.0, 1) // Zero length
         };
         var zeroLengthAnalysis = Generator.AnalyzeDataset(zeroLengthRanges);
-        
+
         Assert.That(zeroLengthAnalysis.Count, Is.EqualTo(2), "Should count zero-length ranges");
         Assert.That(zeroLengthAnalysis.AverageLength, Is.EqualTo(0.0), "Zero-length ranges should have zero average");
         Assert.That(zeroLengthAnalysis.OverlapPercentage, Is.EqualTo(0), "Zero-length ranges should have no overlap");
-        
+
         // Test touching ranges (adjacent, not overlapping)
         var touchingRanges = new List<NumericRange<double, int>>
         {
@@ -238,7 +238,7 @@ public class DatasetAnalysisTests
             new(10.0, 15.0, 2)
         };
         var touchingAnalysis = Generator.AnalyzeDataset(touchingRanges);
-        
+
         Assert.That(touchingAnalysis.Count, Is.EqualTo(3), "Should count touching ranges");
         Assert.That(touchingAnalysis.AverageLength, Is.EqualTo(5.0), "Average length should be correct");
         // Note: depending on overlap calculation method, touching might or might not count as overlap

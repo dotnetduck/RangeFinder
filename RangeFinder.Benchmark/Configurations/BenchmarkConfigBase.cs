@@ -17,32 +17,32 @@ public abstract class BenchmarkConfigBase : ManualConfig
     {
         // Configure job with derived class settings
         ConfigureJob();
-        
+
         // Configure validators with derived class settings
         ConfigureValidators();
-        
+
         // Common configuration for all benchmark configs
         AddLogger(ConsoleLogger.Default);
         AddColumnProvider(DefaultColumnProviders.Instance);
         WithOrderer(new DefaultOrderer(SummaryOrderPolicy.FastestToSlowest));
-        
+
         // Export results in standard formats
         AddExporter(MarkdownExporter.GitHub);
         AddExporter(CsvExporter.Default);
     }
-    
+
     /// <summary>
     /// Configure the benchmark job (iterations, warmup, etc.)
     /// Must be implemented by derived classes
     /// </summary>
     protected abstract void ConfigureJob();
-    
+
     /// <summary>
     /// Configure validators for the benchmark
     /// Must be implemented by derived classes
     /// </summary>
     protected abstract void ConfigureValidators();
-    
+
     /// <summary>
     /// Get the configuration mode name for parameter selection
     /// Must be implemented by derived classes

@@ -11,7 +11,7 @@ public partial class MainWindow : Window
     public MainWindow()
     {
         InitializeComponent();
-        
+
         // Connect events
         if (this.FindControl<RangeViewer>("RangeCanvas") is RangeViewer canvas &&
             DataContext is MainWindowViewModel viewModel)
@@ -20,7 +20,7 @@ public partial class MainWindow : Window
             canvas.ScrollRequested += (_, args) => viewModel.OnScrollRequested(args.delta, args.isZoomModifier, args.mouseX);
             canvas.ResetViewportRequested += (_, _) => viewModel.ResetViewport();
         }
-        
+
         // Connect load file button
         if (this.FindControl<Button>("LoadFileButton") is Button loadButton)
         {
@@ -31,10 +31,15 @@ public partial class MainWindow : Window
     private async void OnLoadFileClicked(object? sender, Avalonia.Interactivity.RoutedEventArgs e)
     {
         if (DataContext is not MainWindowViewModel viewModel)
+        {
             return;
+        }
 
         var topLevel = GetTopLevel(this);
-        if (topLevel == null) return;
+        if (topLevel == null)
+        {
+            return;
+        }
 
         var files = await topLevel.StorageProvider.OpenFilePickerAsync(new FilePickerOpenOptions
         {

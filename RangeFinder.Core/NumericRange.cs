@@ -4,8 +4,8 @@ using System.Numerics;
 namespace RangeFinder.Core;
 
 public record NumericRange<TRangeNumber, TAssociated>(
-    TRangeNumber Start, 
-    TRangeNumber End, 
+    TRangeNumber Start,
+    TRangeNumber End,
     TAssociated Value = default!)
     : IComparable<NumericRange<TRangeNumber, TAssociated>>
     where TRangeNumber : INumber<TRangeNumber>
@@ -15,7 +15,7 @@ public record NumericRange<TRangeNumber, TAssociated>(
     /// </summary>
     [EditorBrowsable(EditorBrowsableState.Never)]
     public NumericRange() : this(default!, default!, default!) { }
-    
+
     public TRangeNumber Span => End - Start;
 
     /// <summary>
@@ -30,7 +30,7 @@ public record NumericRange<TRangeNumber, TAssociated>(
     public bool Overlaps(TRangeNumber queryStart, TRangeNumber queryEnd) =>
         queryStart <= End && Start <= queryEnd;
 
-#region For backwards compatibility
+    #region For backwards compatibility
     [Obsolete("This method will be removed in future versions. Use Overlaps() instead")]
     public bool OverlapsIncludeTouching(NumericRange<TRangeNumber, TAssociated> queryNumericRange) =>
         Overlaps(queryNumericRange);
@@ -38,11 +38,15 @@ public record NumericRange<TRangeNumber, TAssociated>(
     [Obsolete("This method will be removed in future versions as RangeFinder always includes touching boundaries")]
     public bool OverlapsExceptTouching(NumericRange<TRangeNumber, TAssociated> queryNumericRange) =>
         queryNumericRange.Start < End && Start < queryNumericRange.End;
-#endregion
+    #endregion
 
     public int CompareTo(NumericRange<TRangeNumber, TAssociated>? other)
     {
-        if (other is null) return 1;
+        if (other is null)
+        {
+            return 1;
+        }
+
         var startComparison = Start.CompareTo(other.Start);
         return startComparison != 0
             ? startComparison

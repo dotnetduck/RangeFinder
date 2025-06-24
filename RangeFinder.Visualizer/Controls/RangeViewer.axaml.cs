@@ -94,13 +94,19 @@ public partial class RangeViewer : UserControl
         }
 
         if (zoomInButton != null)
+        {
             zoomInButton.Click += OnZoomInClicked;
+        }
 
         if (zoomOutButton != null)
+        {
             zoomOutButton.Click += OnZoomOutClicked;
+        }
 
         if (resetButton != null)
+        {
             resetButton.Click += OnResetClicked;
+        }
 
         UpdateCanvasProperties();
         SetSmartInitialViewport();
@@ -116,7 +122,7 @@ public partial class RangeViewer : UserControl
             }
         }
 
-        if (e.Property == StringRangesProperty || e.Property == ViewportStartProperty || 
+        if (e.Property == StringRangesProperty || e.Property == ViewportStartProperty ||
             e.Property == ViewportEndProperty || e.Property == DataMinProperty || e.Property == DataMaxProperty)
         {
             UpdateCanvasProperties();
@@ -126,20 +132,22 @@ public partial class RangeViewer : UserControl
     private void SetSmartInitialViewport()
     {
         if (StringRanges == null || StringRanges.Count == 0 || double.IsNaN(DataMin) || double.IsNaN(DataMax))
+        {
             return;
+        }
 
         var dataSpan = DataMax - DataMin;
         var rangeCount = StringRanges.Count;
-        
+
         // Calculate optimal initial viewport - show roughly 20-30 ranges
         var optimalRangeCount = Math.Min(rangeCount, Math.Max(20, rangeCount / 4));
         var unitsPerRange = dataSpan / rangeCount;
         var idealViewportSpan = unitsPerRange * optimalRangeCount;
-        
+
         // Ensure minimum viewport size
         var minViewportSpan = dataSpan * 0.1; // At least 10% of data
         var viewportSpan = Math.Max(idealViewportSpan, minViewportSpan);
-        
+
         // Center on data or start from beginning if viewport covers most data
         double newStart, newEnd;
         if (viewportSpan >= dataSpan * 0.8)
@@ -163,7 +171,10 @@ public partial class RangeViewer : UserControl
 
     private void UpdateCanvasProperties()
     {
-        if (_canvas == null) return;
+        if (_canvas == null)
+        {
+            return;
+        }
 
         _canvas.StringRanges = StringRanges;
         _canvas.ViewportStart = ViewportStart;
@@ -204,19 +215,19 @@ public partial class RangeViewer : UserControl
     {
         var currentSpan = ViewportEnd - ViewportStart;
         var zoomFactor = 1.0 + (zoomDelta * 0.001);
-        
+
         // Limit zoom levels
         zoomFactor = Math.Max(0.1, Math.Min(10.0, zoomFactor));
-        
+
         var newSpan = currentSpan / zoomFactor;
-        
+
         // Limit minimum and maximum zoom
         var dataSpan = double.IsNaN(DataMax) || double.IsNaN(DataMin) ? double.PositiveInfinity : DataMax - DataMin;
         var minSpan = dataSpan * 0.001; // Can zoom in to 0.1% of data
         var maxSpan = dataSpan * 5.0;   // Can zoom out to 5x data span
-        
+
         newSpan = Math.Max(minSpan, Math.Min(maxSpan, newSpan));
-        
+
         // Calculate new viewport bounds centered on mouse position
         var mouseValue = ViewportStart + mouseXRatio * currentSpan;
         var newStart = mouseValue - (newSpan * mouseXRatio);
@@ -231,7 +242,9 @@ public partial class RangeViewer : UserControl
     private double ConstrainPanToDataBounds(double delta)
     {
         if (double.IsNaN(DataMin) || double.IsNaN(DataMax))
+        {
             return delta;
+        }
 
         var newStart = ViewportStart + delta;
         var newEnd = ViewportEnd + delta;
@@ -253,7 +266,9 @@ public partial class RangeViewer : UserControl
     private (double start, double end) ConstrainViewportToDataBounds(double start, double end)
     {
         if (double.IsNaN(DataMin) || double.IsNaN(DataMax))
+        {
             return (start, end);
+        }
 
         var span = end - start;
         var dataSpan = DataMax - DataMin;
@@ -305,8 +320,11 @@ public partial class RangeViewer : UserControl
     public void ZoomOut() => OnZoomOutClicked(null, default!);
     public void ZoomToFit()
     {
-        if (double.IsNaN(DataMin) || double.IsNaN(DataMax)) return;
-        
+        if (double.IsNaN(DataMin) || double.IsNaN(DataMax))
+        {
+            return;
+        }
+
         var padding = (DataMax - DataMin) * 0.05;
         ViewportStart = DataMin - padding;
         ViewportEnd = DataMax + padding;

@@ -20,13 +20,13 @@ public class MainWindowViewModel : ViewModelBase
     private double _dataMin = double.NaN;
     private double _dataMax = double.NaN;
 
-    public string[] AvailableDatasets { get; } = 
+    public string[] AvailableDatasets { get; } =
     {
         "sparse",
-        "medium", 
+        "medium",
         "dense",
         "timeseries_sample.csv",
-        "overlapping_sample.csv", 
+        "overlapping_sample.csv",
         "large_dataset_sample.csv"
     };
 
@@ -91,7 +91,7 @@ public class MainWindowViewModel : ViewModelBase
                 // Generate sample data
                 var sampleRanges = GenerateSampleData(datasetName);
                 Ranges = new ObservableCollection<NumericRange<double, string>>(sampleRanges);
-                
+
                 if (Ranges.Any())
                 {
                     DataMin = Ranges.Min(r => r.Start);
@@ -106,7 +106,7 @@ public class MainWindowViewModel : ViewModelBase
             // Fall back to sparse data on error
             var fallbackRanges = GenerateSampleData("sparse");
             Ranges = new ObservableCollection<NumericRange<double, string>>(fallbackRanges);
-            
+
             if (Ranges.Any())
             {
                 DataMin = Ranges.Min(r => r.Start);
@@ -124,12 +124,12 @@ public class MainWindowViewModel : ViewModelBase
             // Get the directory where the executable is located
             var exeDirectory = Path.GetDirectoryName(System.Reflection.Assembly.GetExecutingAssembly().Location);
             var filePath = Path.Combine(exeDirectory!, "SampleData", fileName);
-            
+
             if (File.Exists(filePath))
             {
                 var loadedRanges = RangeSerializer.ReadCsv<double, string>(filePath).ToList();
                 Ranges = new ObservableCollection<NumericRange<double, string>>(loadedRanges);
-                
+
                 if (Ranges.Any())
                 {
                     DataMin = Ranges.Min(r => r.Start);
@@ -148,7 +148,7 @@ public class MainWindowViewModel : ViewModelBase
             // Fall back to generated data if file loading fails
             var fallbackRanges = GenerateSampleData("sparse");
             Ranges = new ObservableCollection<NumericRange<double, string>>(fallbackRanges);
-            
+
             if (Ranges.Any())
             {
                 DataMin = Ranges.Min(r => r.Start);
@@ -219,7 +219,7 @@ public class MainWindowViewModel : ViewModelBase
         try
         {
             IEnumerable<NumericRange<double, string>> loadedRanges;
-            
+
             var extension = Path.GetExtension(filePath).ToLowerInvariant();
             loadedRanges = extension switch
             {
@@ -235,7 +235,7 @@ public class MainWindowViewModel : ViewModelBase
             }
 
             Ranges = new ObservableCollection<NumericRange<double, string>>(rangesList);
-            
+
             DataMin = Ranges.Min(r => r.Start);
             DataMax = Ranges.Max(r => r.End);
             ViewportStart = DataMin;
@@ -284,7 +284,7 @@ public class MainWindowViewModel : ViewModelBase
             var zoomSensitivity = Math.Max(0.01, span * 0.0001);
             var zoomFactor = 1.0 + (delta * zoomSensitivity);
             var newSpan = span / zoomFactor;
-            
+
             var mouseValue = ViewportStart + mouseX * span;
             var newStart = mouseValue - (newSpan * mouseX);
             var newEnd = newStart + newSpan;
@@ -304,16 +304,16 @@ public class MainWindowViewModel : ViewModelBase
         {
             var dataSpan = DataMax - DataMin;
             var rangeCount = Ranges.Count;
-            
+
             // Calculate optimal initial viewport - show roughly 20-30 ranges
             var optimalRangeCount = Math.Min(rangeCount, Math.Max(20, rangeCount / 4));
             var unitsPerRange = dataSpan / rangeCount;
             var idealViewportSpan = unitsPerRange * optimalRangeCount;
-            
+
             // Ensure minimum viewport size
             var minViewportSpan = dataSpan * 0.1;
             var viewportSpan = Math.Max(idealViewportSpan, minViewportSpan);
-            
+
             // Center on data or show all if viewport covers most data
             if (viewportSpan >= dataSpan * 0.8)
             {

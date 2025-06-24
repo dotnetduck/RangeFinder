@@ -10,7 +10,7 @@ public record Parameter
     /// Number of ranges to generate
     /// </summary>
     public int Count { get; init; }
-    
+
     /// <summary>
     /// Average space size per range when the total space is evenly divided by element count.
     /// This determines the total space: TotalSpace = Count × SpacePerRange
@@ -18,7 +18,7 @@ public record Parameter
     /// Example: 10.0 means each range can use 10 units when space is evenly divided
     /// </summary>
     public double SpacePerRange { get; init; }
-    
+
     /// <summary>
     /// Average ratio of range length to SpacePerRange
     /// 0.5 = ranges are 50% the length of allocated space
@@ -26,30 +26,30 @@ public record Parameter
     /// 2.0 = ranges are twice the length of allocated space (overlap required)
     /// </summary>
     public double LengthRatio { get; init; }
-    
+
     /// <summary>
     /// Range length variability coefficient (standard deviation/average)
     /// 0.0 = all same length, 1.0 = high variability
     /// </summary>
     public double LengthVariability { get; init; }
-    
+
     /// <summary>
     /// Target overlap depth: expected number of overlapping ranges at any point in space
     /// 1.0 = only one range (no overlap), 2.0 = average of two ranges overlap
     /// Actual overlap count varies probabilistically
     /// </summary>
     public double OverlapFactor { get; init; }
-    
+
     /// <summary>
     /// Clustering tendency: 0.0 = uniform distribution, 1.0 = highly clustered
     /// </summary>
     public double ClusteringFactor { get; init; }
-    
+
     /// <summary>
     /// Start offset within the total space (0.0 to 1.0)
     /// </summary>
     public double StartOffset { get; init; } = 0.0;
-    
+
     /// <summary>
     /// Seed value for reproducible results
     /// </summary>
@@ -66,34 +66,74 @@ public record Parameter
     {
         // Check for NaN and Infinity values first
         if (double.IsNaN(SpacePerRange) || double.IsInfinity(SpacePerRange))
+        {
             throw new ArgumentException("SpacePerRange cannot be NaN or Infinity");
+        }
+
         if (double.IsNaN(LengthRatio) || double.IsInfinity(LengthRatio))
+        {
             throw new ArgumentException("LengthRatio cannot be NaN or Infinity");
+        }
+
         if (double.IsNaN(LengthVariability) || double.IsInfinity(LengthVariability))
+        {
             throw new ArgumentException("LengthVariability cannot be NaN or Infinity");
+        }
+
         if (double.IsNaN(OverlapFactor) || double.IsInfinity(OverlapFactor))
+        {
             throw new ArgumentException("OverlapFactor cannot be NaN or Infinity");
+        }
+
         if (double.IsNaN(ClusteringFactor) || double.IsInfinity(ClusteringFactor))
+        {
             throw new ArgumentException("ClusteringFactor cannot be NaN or Infinity");
+        }
+
         if (double.IsNaN(StartOffset) || double.IsInfinity(StartOffset))
+        {
             throw new ArgumentException("StartOffset cannot be NaN or Infinity");
-            
+        }
+
         if (TotalSpace <= 0)
+        {
             throw new ArgumentException("Calculated TotalSpace must be a positive value");
+        }
+
         if (Count <= 0)
+        {
             throw new ArgumentException("Count must be a positive value");
+        }
+
         if (SpacePerRange <= 0)
+        {
             throw new ArgumentException("SpacePerRange must be a positive value");
+        }
+
         if (LengthRatio <= 0 || LengthRatio > 5.0)
+        {
             throw new ArgumentException("LengthRatio must be between 0 and 5.0");
+        }
+
         if (LengthVariability < 0 || LengthVariability > 2.0)
+        {
             throw new ArgumentException("LengthVariability must be between 0 and 2.0");
+        }
+
         if (OverlapFactor <= 0 || OverlapFactor > 100.0)
+        {
             throw new ArgumentException("OverlapFactor must be between 0 and 100.0");
+        }
+
         if (ClusteringFactor < 0 || ClusteringFactor > 2.0)
+        {
             throw new ArgumentException("ClusteringFactor must be between 0 and 2.0");
+        }
+
         if (StartOffset < 0 || StartOffset > 1.0)
+        {
             throw new ArgumentException("StartOffset must be between 0 and 1.0");
+        }
 
         // Check if configuration is physically feasible
         var minSpaceNeeded = Count * AverageLength * (1.0 / Math.Max(OverlapFactor, 1.0));
@@ -175,12 +215,12 @@ public static class RangeParameterFactory
         double overlapFactor,
         double lengthVariability = 0.4,
         double clusteringFactor = 0.3) => new()
-    {
-        Count = count,
-        SpacePerRange = spacePerRange,
-        LengthRatio = lengthRatio,
-        LengthVariability = lengthVariability,
-        OverlapFactor = overlapFactor,
-        ClusteringFactor = clusteringFactor
-    };
+        {
+            Count = count,
+            SpacePerRange = spacePerRange,
+            LengthRatio = lengthRatio,
+            LengthVariability = lengthVariability,
+            OverlapFactor = overlapFactor,
+            ClusteringFactor = clusteringFactor
+        };
 }

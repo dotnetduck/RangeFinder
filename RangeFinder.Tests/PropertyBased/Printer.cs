@@ -5,7 +5,7 @@ using RangeFinder.Tests.Helper;
 namespace RangeFinder.Tests.PropertyBased;
 
 public class Printer
-{    
+{
     /// <summary>
     /// Logs failure with context and comparison details for property-based tests
     /// Always prints detailed information when comparisons fail
@@ -26,14 +26,14 @@ public class Printer
         }
         else if (verbose)
         {
-            if(rangeData.Length < comparison.ActualCount)
+            if (rangeData.Length < comparison.ActualCount)
             {
                 var warningMsg = $"⚠️ WARNING: ResultCount ({comparison.ActualCount}) exceeds RangeCount ({rangeData.Length}) for query [{query.start}, {query.end}]";
                 Console.WriteLine(warningMsg);
                 TestContext.WriteLine(warningMsg);
             }
 
-            var successMsg = $"{testName} passed: Query=[{query.start}, {query.end}],"+
+            var successMsg = $"{testName} passed: Query=[{query.start}, {query.end}]," +
             $"RangeCount={rangeData.Length}, ResultCount={comparison.ActualCount}";
             TestContext.WriteLine(successMsg);
         }
