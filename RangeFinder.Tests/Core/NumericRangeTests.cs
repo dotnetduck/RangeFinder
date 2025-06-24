@@ -70,7 +70,7 @@ public class NumericRangeTests
     {
         var range = new NumericRange<double, string>(rangeStart, rangeEnd, "A");
 
-        Assert.That(range.Overlaps(queryStart, queryEnd), Is.EqualTo(expected), 
+        Assert.That(range.Overlaps(queryStart, queryEnd), Is.EqualTo(expected),
             $"[{intention}] Range[{rangeStart}, {rangeEnd}] overlaps query[{queryStart}, {queryEnd}]");
     }
 
@@ -79,7 +79,7 @@ public class NumericRangeTests
     {
         var range = new NumericRange<double, string>(rangeStart, rangeEnd, "A");
 
-        Assert.That(range.Contains(point), Is.EqualTo(expected), 
+        Assert.That(range.Contains(point), Is.EqualTo(expected),
             $"[{intention}] Range[{rangeStart}, {rangeEnd}] contains point {point}");
     }
 
@@ -93,7 +93,7 @@ public class NumericRangeTests
         bool containsPoint = range.Contains(testPoint);
         bool overlapsPoint = range.Overlaps(testPoint, testPoint);
 
-        Assert.That(containsPoint, Is.EqualTo(overlapsPoint), 
+        Assert.That(containsPoint, Is.EqualTo(overlapsPoint),
             "Contains and Overlaps should be consistent for point queries");
     }
 
