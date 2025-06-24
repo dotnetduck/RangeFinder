@@ -9,7 +9,7 @@ public class BenchmarkCommands
     /// Run a single RangeFinder benchmark
     /// </summary>
     /// <param name="test">Type of benchmark: Construction, RangeQuery, PointQuery, Allocation</param>
-    /// <param name="size">Dataset size: Size10K, Size100K, Size1M, Size5M (default: Size100K)</param>
+    /// <param name="size">Dataset size: Size10K, Size100K, Size1M, Size5M, Size10M, Size50M (default: Size100K)</param>
     /// <param name="characteristics">Dataset characteristic: Uniform, Dense, Sparse, Temporal (default: Uniform)</param>
     /// <param name="accuracy">Accuracy level: Quick (~30s), Balanced (~2min), Accurate (~5-15min) (default: Balanced)</param>
     /// <param name="queries">Number of queries to execute per benchmark (default: 25)</param>
@@ -43,11 +43,11 @@ public class BenchmarkCommands
         try
         {
             RunSingleBenchmark(test, size, characteristics, accuracy, queries);
-            
+
             // Organize results
             var timestampStr = timestamp ? DateTime.Now.ToString("yyyyMMdd_HHmmss") : "";
             OrganizeResultsBySize(output, timestampStr, test, size, characteristics);
-            
+
             Console.WriteLine("✅ Single benchmark completed successfully");
         }
         catch (Exception ex)
@@ -61,8 +61,8 @@ public class BenchmarkCommands
     /// Run a comprehensive suite of RangeFinder benchmarks
     /// </summary>
     /// <param name="accuracy">Accuracy level: Quick (~5min total), Balanced (~15min total), Accurate (~45min total) (default: Balanced)</param>
-    /// <param name="sizes">Comma-separated dataset sizes: Size10K,Size100K,Size1M,Size5M (default: Size100K,Size1M)</param>
-    /// <param name="tests">Comma-separated test types: Construction,RangeQuery,PointQuery,Allocation (default: all types)</param>
+    /// <param name="sizes">Comma-separated dataset sizes: Size10K,Size100K,Size1M,Size5M,Size10M,Size50M (default: Size100K,Size1M)</param>
+    /// <param name="tests">Comma-separated test types: Construction,RangeQuery,PointQuery,Allocation (default: Construction,RangeQuery,PointQuery)</param>
     /// <param name="characteristics">Comma-separated dataset characteristics: Uniform,Dense,Sparse,Temporal (default: Uniform,Dense,Sparse)</param>
     /// <param name="output">Output directory for organized results (default: results/)</param>
     /// <param name="delay">Delay between benchmarks in seconds for system stabilization (default: 5)</param>
@@ -72,8 +72,8 @@ public class BenchmarkCommands
     [Command("run-suite")]
     public static void RunSuite(
         AccuracyLevel accuracy = AccuracyLevel.Balanced,
-        string sizes = "Size100K,Size1M",
-        string tests = "Construction,RangeQuery,PointQuery,Allocation",
+        string sizes = "Size100K,Size1M", // Default sizes for reasonable execution time (Size50M takes 19+ hours)
+        string tests = "Construction,RangeQuery,PointQuery", // TODO: Re-enable Allocation after fixing memory measurement accuracy issues
         string characteristics = "Uniform,Dense,Sparse",
         string output = "results/",
         int delay = 5,
@@ -127,7 +127,7 @@ public class BenchmarkCommands
             Console.WriteLine("Valid tests: Construction, RangeQuery, PointQuery, Allocation");
             return;
         }
-        
+
         if (characteristicList.Count == 0)
         {
             Console.WriteLine("❌ Error: No valid characteristics specified");
@@ -166,15 +166,15 @@ public class BenchmarkCommands
         {
             var (test, size, characteristic) = benchmarks[i];
             var current = i + 1;
-            
+
             Console.WriteLine($"📈 Progress: {current}/{total} - {test.ToDisplayString()} ({size.ToDisplayString()}) [{characteristic.ToDisplayString()}]");
-            
+
             try
             {
                 RunSingleBenchmark(test, size, characteristic, accuracy, queries);
                 results.Add((test, size, characteristic, true, ""));
                 Console.WriteLine($"✅ Completed {test.ToDisplayString()} ({size.ToDisplayString()}) [{characteristic.ToDisplayString()}]");
-                
+
                 // Immediately organize results after each benchmark to prevent overwrites
                 OrganizeResultsBySize(output, timestampStr, test, size, characteristic);
             }
@@ -215,7 +215,7 @@ public class BenchmarkCommands
         Console.WriteLine($"📊 Total configurations: {total}");
         Console.WriteLine($"✅ Successful: {successful}");
         Console.WriteLine($"❌ Failed: {failed}");
-        
+
         if (failed == 0)
         {
             Console.WriteLine("🎉 All benchmarks completed successfully!");
@@ -228,7 +228,7 @@ public class BenchmarkCommands
                 Console.WriteLine($"   • {test.ToDisplayString()} ({size.ToDisplayString()}) [{characteristic.ToDisplayString()}]: {error}");
             }
         }
-        
+
         Console.WriteLine($"📂 Results available in: {Path.GetFullPath(output)}");
         Console.WriteLine("═══════════════════════════════════════════════════════");
     }
@@ -248,14 +248,14 @@ public class BenchmarkCommands
         foreach (var characteristic in characteristics)
         {
             Console.WriteLine($"Testing {characteristic}:");
-            
+
             // Set environment variables for the test
             Environment.SetEnvironmentVariable("BENCHMARK_DATASET_SIZE", datasetSize.ToString());
             Environment.SetEnvironmentVariable("BENCHMARK_CHARACTERISTIC", characteristic.ToString());
-            
+
             var benchmark = new ConstructionBenchmarks();
             benchmark.Setup(); // This should call GenerateSourceData with the characteristic
-            
+
             Console.WriteLine($"  Environment characteristic: {Environment.GetEnvironmentVariable("BENCHMARK_CHARACTERISTIC")}");
             Console.WriteLine();
         }
@@ -351,9 +351,9 @@ public class BenchmarkCommands
     {
         var artifactsDir = Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts", "results");
         var resultsDir = Path.Combine(Directory.GetCurrentDirectory(), outputDir);
-        
+
         Directory.CreateDirectory(resultsDir);
-        
+
         if (!Directory.Exists(artifactsDir))
         {
             Console.WriteLine($"⚠️  Warning: Artifacts directory not found at {artifactsDir}");
@@ -362,25 +362,25 @@ public class BenchmarkCommands
 
         var prefix = !string.IsNullOrEmpty(timestampStr) ? $"{timestampStr}_" : "";
         var filesCopied = 0;
-        
+
         foreach (var file in Directory.GetFiles(artifactsDir, "*.csv").Concat(Directory.GetFiles(artifactsDir, "*.md")))
         {
             var fileName = Path.GetFileName(file);
             var fileTimestamp = File.GetLastWriteTime(file).ToString("HHmmss");
             var newFileName = $"{prefix}{fileTimestamp}_{fileName}";
             var destPath = Path.Combine(resultsDir, newFileName);
-            
+
             File.Copy(file, destPath, true);
             filesCopied++;
         }
-        
+
         Console.WriteLine($"📁 Copied {filesCopied} result files to: {resultsDir}");
     }
 
     private static void CleanArtifactsDirectory()
     {
         var artifactsDir = Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts", "results");
-        
+
         if (Directory.Exists(artifactsDir))
         {
             foreach (var file in Directory.GetFiles(artifactsDir, "*.csv").Concat(Directory.GetFiles(artifactsDir, "*.md")))
@@ -401,49 +401,49 @@ public class BenchmarkCommands
     {
         var artifactsDir = Path.Combine(Directory.GetCurrentDirectory(), "BenchmarkDotNet.Artifacts", "results");
         var resultsDir = Path.Combine(Directory.GetCurrentDirectory(), outputDir);
-        
+
         // Create timestamp-based directory structure: results/{yymmddhhmmss}/{size}/{characteristic}/
         var timestampDirName = !string.IsNullOrEmpty(timestampStr) ? timestampStr : DateTime.Now.ToString("yyyyMMdd_HHmmss");
         var timestampDir = Path.Combine(resultsDir, timestampDirName);
         var sizeDir = Path.Combine(timestampDir, size.ToDisplayString());
         var characteristicDir = Path.Combine(sizeDir, characteristic.ToDisplayString());
         Directory.CreateDirectory(characteristicDir);
-        
+
         if (!Directory.Exists(artifactsDir))
         {
             return;
         }
 
         var benchmarkTimestamp = DateTime.Now.ToString("HHmmss");
-        
+
         // Only copy files that match the current test type (now should be clean artifacts)
         var testClassPattern = GetBenchmarkClassPattern(test);
         var filesCopied = 0;
-        
+
         foreach (var file in Directory.GetFiles(artifactsDir, "*.csv").Concat(Directory.GetFiles(artifactsDir, "*.md")))
         {
             var fileName = Path.GetFileName(file);
-            
+
             // Only copy files that exactly match the test class pattern
             if (fileName.Contains(testClassPattern))
             {
                 var newFileName = $"{test.ToDisplayString()}_{characteristic.ToDisplayString()}_{benchmarkTimestamp}_{fileName}";
                 var destPath = Path.Combine(characteristicDir, newFileName);
-                
+
                 File.Copy(file, destPath, true);
                 filesCopied++;
             }
         }
-        
+
         Console.WriteLine($"📁 Organized {filesCopied} {test.ToDisplayString()} result files in: {timestampDirName}/{size.ToDisplayString()}/{characteristic.ToDisplayString()}/");
     }
-    
+
     private static string GetBenchmarkClassPattern(TestType test)
     {
         return test switch
         {
             TestType.Construction => "ConstructionBenchmarks",
-            TestType.RangeQuery => "RangeQueryBenchmarks", 
+            TestType.RangeQuery => "RangeQueryBenchmarks",
             TestType.PointQuery => "PointQueryBenchmarks",
             TestType.Allocation => "QueryAllocationBenchmarks",
             _ => ""
@@ -451,24 +451,24 @@ public class BenchmarkCommands
     }
 
     private static void GenerateSuiteSummary(
-        string outputDir, 
-        string timestampStr, 
-        AccuracyLevel accuracy, 
+        string outputDir,
+        string timestampStr,
+        AccuracyLevel accuracy,
         List<(TestType test, DatasetSize size, DatasetCharacteristic characteristic, bool success, string error)> results,
         TimeSpan totalTime)
     {
         var resultsDir = Path.Combine(Directory.GetCurrentDirectory(), outputDir);
-        
+
         // Create timestamp-based directory structure: results/{yymmddhhmmss}/
         var timestampDirName = !string.IsNullOrEmpty(timestampStr) ? timestampStr : DateTime.Now.ToString("yyyyMMdd_HHmmss");
         var timestampDir = Path.Combine(resultsDir, timestampDirName);
         Directory.CreateDirectory(timestampDir);
-        
+
         var summaryFile = Path.Combine(timestampDir, "SUITE_SUMMARY.txt");
-        
+
         var successful = results.Count(r => r.success);
         var failed = results.Count(r => !r.success);
-        
+
         var content = $@"RangeFinder Benchmark Suite Summary
 Generated: {DateTime.Now:yyyy-MM-dd HH:mm:ss}
 Working Directory: {Directory.GetCurrentDirectory()}
@@ -499,7 +499,7 @@ Notes:
 - Memory measurements may require additional investigation (see issue #14)
 - For detailed analysis, see SUMMARY.md and individual result files
 ";
-        
+
         File.WriteAllText(summaryFile, content);
         Console.WriteLine($"📝 Suite summary generated: {Path.GetFileName(summaryFile)}");
     }
@@ -507,22 +507,24 @@ Notes:
     private static IEnumerable<string> GetAllGeneratedFiles(string timestampDir)
     {
         if (!Directory.Exists(timestampDir))
+        {
             return Enumerable.Empty<string>();
-            
+        }
+
         var files = new List<string>();
-        
+
         // Get all CSV and MD files in subdirectories
         foreach (var subDir in Directory.GetDirectories(timestampDir))
         {
             files.AddRange(Directory.GetFiles(subDir, "*.csv"));
             files.AddRange(Directory.GetFiles(subDir, "*.md"));
         }
-        
+
         // Get any files directly in the timestamp directory (like SUITE_SUMMARY.txt)
         files.AddRange(Directory.GetFiles(timestampDir, "*.txt"));
         files.AddRange(Directory.GetFiles(timestampDir, "*.csv"));
         files.AddRange(Directory.GetFiles(timestampDir, "*.md"));
-        
+
         return files.OrderBy(f => f);
     }
 }

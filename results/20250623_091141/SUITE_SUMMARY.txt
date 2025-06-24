@@ -1,0 +1,63 @@
+RangeFinder Benchmark Suite Summary
+Generated: 2025-06-24 04:30:14
+Total Execution Time: 19:18:33
+
+Configuration:
+- Accuracy Level: balanced
+- Total Configurations: 36
+- Successful: 36
+- Failed: 0
+- Execution: Sequential (required for accurate benchmarking)
+
+Benchmark Results:
+- construction (5M) [uniform]: ✅ SUCCESS
+- construction (5M) [dense]: ✅ SUCCESS
+- construction (5M) [sparse]: ✅ SUCCESS
+- construction (10M) [uniform]: ✅ SUCCESS
+- construction (10M) [dense]: ✅ SUCCESS
+- construction (10M) [sparse]: ✅ SUCCESS
+- construction (50M) [uniform]: ✅ SUCCESS
+- construction (50M) [dense]: ✅ SUCCESS
+- construction (50M) [sparse]: ✅ SUCCESS
+- range-query (5M) [uniform]: ✅ SUCCESS
+- range-query (5M) [dense]: ✅ SUCCESS
+- range-query (5M) [sparse]: ✅ SUCCESS
+- range-query (10M) [uniform]: ✅ SUCCESS
+- range-query (10M) [dense]: ✅ SUCCESS
+- range-query (10M) [sparse]: ✅ SUCCESS
+- range-query (50M) [uniform]: ✅ SUCCESS
+- range-query (50M) [dense]: ✅ SUCCESS
+- range-query (50M) [sparse]: ✅ SUCCESS
+- point-query (5M) [uniform]: ✅ SUCCESS
+- point-query (5M) [dense]: ✅ SUCCESS
+- point-query (5M) [sparse]: ✅ SUCCESS
+- point-query (10M) [uniform]: ✅ SUCCESS
+- point-query (10M) [dense]: ✅ SUCCESS
+- point-query (10M) [sparse]: ✅ SUCCESS
+- point-query (50M) [uniform]: ✅ SUCCESS
+- point-query (50M) [dense]: ✅ SUCCESS
+- point-query (50M) [sparse]: ✅ SUCCESS
+- allocation (5M) [uniform]: ✅ SUCCESS
+- allocation (5M) [dense]: ✅ SUCCESS
+- allocation (5M) [sparse]: ✅ SUCCESS
+- allocation (10M) [uniform]: ✅ SUCCESS
+- allocation (10M) [dense]: ✅ SUCCESS
+- allocation (10M) [sparse]: ✅ SUCCESS
+- allocation (50M) [uniform]: ✅ SUCCESS
+- allocation (50M) [dense]: ✅ SUCCESS
+- allocation (50M) [sparse]: ✅ SUCCESS
+
+Platform Information:
+- OS: Unix 15.5.0
+- .NET Version: 8.0.5
+- Processor Count: 10
+- Working Set: 12183 MB
+
+Generated Files:
+
+
+Notes:
+- All benchmarks run in Release mode with sequential execution
+- Results include both CSV data and markdown reports  
+- Memory measurements may require additional investigation (see issue #14)
+- For detailed analysis, see SUMMARY.md and individual result files
