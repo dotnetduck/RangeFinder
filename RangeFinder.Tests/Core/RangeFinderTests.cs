@@ -1,4 +1,3 @@
-using IntervalTree;
 using RangeFinder.Core;
 using RangeFinder.Tests.Helper;
 
@@ -72,55 +71,33 @@ public class RangeFinderTests
     }
 
     /// <summary>
-    /// Compares RangeFinder and IntervalTree for a variety of range queries, including positive, negative, and edge cases.
+    /// Compares RangeFinder and LinearRangeFinder for a variety of range queries, including positive, negative, and edge cases.
     /// </summary>
     [Test, TestCaseSource(nameof(RangeQueryCases))]
     public void Query_RangeQuery(double queryStart, double queryEnd, string intention, IEnumerable<NumericRange<double, int>> ranges)
     {
-        var rangeFinder = new RangeFinder<double, int>(ranges);
-        var intervalTree = new IntervalTree<double, int>();
-        foreach (var range in ranges)
-        {
-            intervalTree.Add(range.Start, range.End, range.Value);
-        }
+        RangeFinder<double, int> rangeFinder = new(ranges);
+        LinearRangeFinder<double, int> linearRangeFinder = new(ranges);
 
-        var expectedValues = intervalTree.Query(queryStart, queryEnd);
-        var actualValues = rangeFinder.QueryRanges(queryStart, queryEnd).Select(r => r.Value).ToArray();
-        var difference = actualValues.CompareAsSets(expectedValues);
-        Assert.IsTrue(difference.AreEqual, $"[{intention}] Query [{queryStart}, {queryEnd}] failed. {difference.GetDescription()}");
+        int[] expectedValues = [.. linearRangeFinder.QueryRanges(queryStart, queryEnd).Select(r => r.Value)];
+        int[] actualValues = [.. rangeFinder.QueryRanges(queryStart, queryEnd).Select(r => r.Value)];
+        SetDifference<int> difference = actualValues.CompareAsSets(expectedValues);
+        Assert.That(difference.AreEqual, Is.True, $"[{intention}] Query [{queryStart}, {queryEnd}] failed. {difference.GetDescription()}");
     }
 
     /// <summary>
-    /// Compares RangeFinder and IntervalTree for a variety of point queries, including positive, negative, and edge cases.
+    /// Compares RangeFinder and LinearRangeFinder for a variety of point queries, including positive, negative, and edge cases.
     /// </summary>
     [Test, TestCaseSource(nameof(PointQueryCases))]
     public void Query_PointQuery(double point, string intention, IEnumerable<NumericRange<double, int>> ranges)
     {
-        var rangeFinder = new RangeFinder<double, int>(ranges);
-        var intervalTree = new IntervalTree<double, int>();
-        foreach (var range in ranges)
-        {
-            intervalTree.Add(range.Start, range.End, range.Value);
-        }
+        RangeFinder<double, int> rangeFinder = new(ranges);
+        LinearRangeFinder<double, int> linearRangeFinder = new(ranges);
 
-        var actual = rangeFinder.QueryRanges(point).Select(r => r.Value).ToArray();
-        var expected = intervalTree.Query(point, point);
-        var difference = actual.CompareAsSets(expected);
-        Assert.IsTrue(difference.AreEqual, $"[{intention}] Point query at {point} failed. {difference.GetDescription()}");
+        int[] actual = [.. rangeFinder.QueryRanges(point).Select(r => r.Value)];
+        int[] expected = [.. linearRangeFinder.QueryRanges(point).Select(r => r.Value)];
+        SetDifference<int> difference = actual.CompareAsSets(expected);
+        Assert.That(difference.AreEqual, Is.True, $"[{intention}] Point query at {point} failed. {difference.GetDescription()}");
     }
 
-    private static string GetRangeSetName(IEnumerable<NumericRange<double, int>> ranges)
-    {
-        if (ReferenceEquals(ranges, TestRanges))
-        {
-            return "TestRanges";
-        }
-
-        if (ReferenceEquals(ranges, TestRangesWithNegatives))
-        {
-            return "TestRangesWithNegatives";
-        }
-
-        return "CustomRanges";
-    }
 }
