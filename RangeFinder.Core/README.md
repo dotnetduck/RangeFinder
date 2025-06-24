@@ -1,15 +1,11 @@
 # RangeFinder.Core
 
+> **Note**: This documentation was created with AI support and has not been fully reviewed by the author (dotnetduck).  
+> It will be reviewed by v1.0.0. Types and documentation comments in the source code are more reliable at this moment.
+
 High-performance range query library using binary search optimization.
 
 For project overview and ecosystem information, see the [main README](../README.md).
-
-## Features
-
-- **O(log N + K) queries** - Fast overlap detection
-- **RangeTree compatibility** - Drop-in replacement for existing code
-- **Generic types** - Any `INumber<T>` (int, double, decimal, etc.)
-- **Static optimization** - All ranges known upfront for maximum performance
 
 ## Quick Start
 
@@ -22,34 +18,38 @@ var finder = RangeFinderFactory.Create([
     (2.0, 3.2, "Range2")
 ]);
 
-// Query overlapping ranges
+// Query overlapping values (using extension method)
 var values = finder.Query(2.0, 2.9);         // Returns: "Range1", "Range2"
+
+// Query overlapping ranges (native method)
 var ranges = finder.QueryRanges(2.0, 3.0);   // Returns full range objects
 ```
 
-## Custom Range Types
+## API Overview
+
+RangeFinder provides two query methods:
+
+### `Query()` - Extension Method
+
+Returns associated values directly (IntervalTree compatible):
 
 ```csharp
-public record TimeSlot(DateTime Start, DateTime End, string Activity) 
-    : INumericRange<DateTime>;
-
-var scheduler = new RangeFinder<DateTime, TimeSlot>(timeSlots);
+IEnumerable<TAssociated> Query(TNumber from, TNumber to)
+IEnumerable<TAssociated> Query(TNumber point)
 ```
 
-## Advanced API
+### `QueryRanges()` - Native Method
 
-### Generic Constraints
+Returns full `NumericRange<TNumber, TAssociated>` objects:
 
-- All numeric types implementing `INumber<T>` are supported
-- Custom range types via `INumericRange<T>` interface
+```csharp
+IEnumerable<NumericRange<TNumber, TAssociated>> QueryRanges(TNumber from, TNumber to)
+IEnumerable<NumericRange<TNumber, TAssociated>> QueryRanges(TNumber point)
+```
 
-### Performance Characteristics  
+## RangeTree Migration
 
-- **Construction**: O(N log N) sorting + O(N) array setup
-- **Query**: O(log N + K) where K = overlapping ranges  
-- **Memory**: Efficient sorted array storage with cache locality
-
-### RangeTree Migration
+RangeFinder provides a drop-in replacement for IntervalTree/RangeTree:
 
 ```csharp
 // Before (RangeTree)
@@ -60,4 +60,30 @@ var results = tree.Query(2.0, 4.0);
 // After (RangeFinder) - same API
 var finder = RangeFinderFactory.Create([(1.0, 5.0, 42)]);
 var results = finder.Query(2.0, 4.0);
+```
+
+## Performance Characteristics
+
+- **Algorithm**: Binary search with intelligent pruning
+- **Query Time**: O(log N + K) where K is result count
+- **Construction**: Optimized for fast initialization
+- **Memory**: Sorted arrays for optimal cache locality
+
+## Factory Methods
+
+```csharp
+// From tuples
+RangeFinderFactory.Create([(1.0, 2.0, "A"), (2.0, 3.0, "B")])
+
+// From NumericRange objects
+RangeFinderFactory.Create(numericRanges)
+
+// From arrays
+RangeFinderFactory.Create(starts, ends, values)
+
+// Without values (uses indices)
+RangeFinderFactory.Create([(1.0, 2.0), (2.0, 3.0)])
+
+// Empty instance
+RangeFinderFactory.CreateEmpty<double, string>()
 ```
