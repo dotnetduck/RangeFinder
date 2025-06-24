@@ -30,6 +30,12 @@ public record NumericRange<TRangeNumber, TAssociated>(
     public bool Overlaps(TRangeNumber queryStart, TRangeNumber queryEnd) =>
         queryStart <= End && Start <= queryEnd;
 
+    /// <summary>
+    /// Determines if this range contains the specified point value (inclusive of boundaries)
+    /// </summary>
+    public bool Contains(TRangeNumber value) =>
+        Start.CompareTo(value) <= 0 && value.CompareTo(End) <= 0;
+
     #region For backwards compatibility
     [Obsolete("This method will be removed in future versions. Use Overlaps() instead")]
     public bool OverlapsIncludeTouching(NumericRange<TRangeNumber, TAssociated> queryNumericRange) =>
