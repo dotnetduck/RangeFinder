@@ -2,26 +2,14 @@ using System.Numerics;
 
 namespace RangeFinder.Core;
 
-/// <summary>
-/// Provides an in-memory implementation that efficiently finds overlapping ranges and ranges between 
-/// specified boundaries in a collection of NumericRange with optimized performance.
-/// </summary>
-/// <typeparam name="TNumber">The type of number used in the ranges.</typeparam>
-/// <typeparam name="TAssociated">The type of value associated with each range.</typeparam>
-public class RangeFinder<TNumber, TAssociated>
+public class RangeFinder<TNumber, TAssociated> : IRangeFinder<TNumber, TAssociated>
     where TNumber : INumber<TNumber>
 {
     public int Count => _sortedRanges.Length;
     public IEnumerable<NumericRange<TNumber, TAssociated>> Values => _sortedRanges;
 
-    /// <summary>
-    /// The minimum start value across all ranges
-    /// </summary>
     public TNumber LowerBound { get; init; }
 
-    /// <summary>
-    /// The maximum end value across all ranges
-    /// </summary>
     public TNumber UpperBound { get; init; }
 
     private readonly NumericRange<TNumber, TAssociated>[] _sortedRanges;
@@ -89,13 +77,6 @@ public class RangeFinder<TNumber, TAssociated>
         return (lowerBound, maxEndSoFar);
     }
 
-    /// <summary>
-    /// Finds all ranges that overlap with the specified range.
-    /// Returns the complete NumericRange objects for detailed analysis.
-    /// </summary>
-    /// <param name="from">The start of the query range</param>
-    /// <param name="to">The end of the query range</param>
-    /// <returns>All ranges that overlap with the specified range</returns>
     public IEnumerable<NumericRange<TNumber, TAssociated>> QueryRanges(TNumber from, TNumber to)
     {
         var queryRange = new NumericRange<TNumber, TAssociated>(from, to);
@@ -130,12 +111,6 @@ public class RangeFinder<TNumber, TAssociated>
         return results;
     }
 
-    /// <summary>
-    /// Finds all ranges that contain the specified point value.
-    /// Returns the complete NumericRange objects for detailed analysis.
-    /// </summary>
-    /// <param name="value">The point value to search for</param>
-    /// <returns>All ranges that contain the specified value</returns>
     public IEnumerable<NumericRange<TNumber, TAssociated>> QueryRanges(TNumber value)
     {
         // Use bulk collection instead of yield return for better performance

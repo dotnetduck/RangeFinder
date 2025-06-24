@@ -3,7 +3,7 @@ using System.Numerics;
 namespace RangeFinder.Core;
 
 /// <summary>
-/// Extension methods providing IntervalTree-compatible API for RangeFinder.
+/// Extension methods providing IntervalTree-compatible API for IRangeFinder.
 /// These methods provide drop-in compatibility with IntervalTree library for easy migration.
 /// </summary>
 public static class IntervalTreeExtensions
@@ -14,12 +14,12 @@ public static class IntervalTreeExtensions
     /// Finds all values associated with ranges that overlap with the specified range.
     /// For accessing full range objects, use QueryRanges() instead.
     /// </summary>
-    /// <param name="rangeFinder">The RangeFinder instance</param>
+    /// <param name="rangeFinder">The IRangeFinder instance</param>
     /// <param name="from">The start of the query range</param>
     /// <param name="to">The end of the query range</param>
     /// <returns>All values associated with overlapping ranges (compatible with IntervalTree.Query)</returns>
     public static IEnumerable<TAssociated> Query<TNumber, TAssociated>(
-        this RangeFinder<TNumber, TAssociated> rangeFinder,
+        this IRangeFinder<TNumber, TAssociated> rangeFinder,
         TNumber from,
         TNumber to)
         where TNumber : INumber<TNumber>
@@ -33,11 +33,11 @@ public static class IntervalTreeExtensions
     /// Finds all values associated with ranges that contain the specified point value.
     /// For accessing full range objects, use QueryRanges() instead.
     /// </summary>
-    /// <param name="rangeFinder">The RangeFinder instance</param>
+    /// <param name="rangeFinder">The IRangeFinder instance</param>
     /// <param name="value">The point value to search for</param>
     /// <returns>All values associated with ranges that contain the specified value (compatible with IntervalTree.Query)</returns>
     public static IEnumerable<TAssociated> Query<TNumber, TAssociated>(
-        this RangeFinder<TNumber, TAssociated> rangeFinder,
+        this IRangeFinder<TNumber, TAssociated> rangeFinder,
         TNumber value)
         where TNumber : INumber<TNumber>
     {
