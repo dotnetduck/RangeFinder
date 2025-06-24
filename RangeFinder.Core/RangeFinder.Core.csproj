@@ -4,10 +4,10 @@
         <TargetFramework>net8.0</TargetFramework>
         <ImplicitUsings>enable</ImplicitUsings>
         <Nullable>enable</Nullable>
-        
+
         <!-- Package Information -->
         <PackageId>RangeFinder</PackageId>
-        <Version>0.2.0</Version>
+        <Version>0.3.0-preview</Version>
         <Authors>dotnetduck</Authors>
         <Copyright>Copyright (c) 2025- dotnetduck@gmail.com</Copyright>
         <Description>A high-performance .NET range query library for general numeric ranges.</Description>
@@ -19,7 +19,7 @@
         <PackageTags>range-query;interval-tree;performance;numeric;binary-search</PackageTags>
         <GeneratePackageOnBuild>false</GeneratePackageOnBuild>
     </PropertyGroup>
-    
+
     <ItemGroup>
         <None Include="NUGET_README.md" Pack="true" PackagePath="\" />
     </ItemGroup>

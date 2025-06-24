@@ -7,7 +7,7 @@
     
     <!-- Package Information -->
     <PackageId>RangeFinder.IO</PackageId>
-    <Version>0.2.0-preview</Version>
+    <Version>0.3.0-preview</Version>
     <Authors>dotnetduck</Authors>
     <Copyright>Copyright (c) 2025- dotnetduck@gmail.com</Copyright>
     <Description>Experimental file I/O and data generation utilities for RangeFinder library. Pre-release package with basic CSV and Parquet support.</Description>

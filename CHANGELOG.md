@@ -2,6 +2,26 @@
 
 All notable changes to RangeFinder will be documented in this file.
 
+## [Unreleased] - v0.3.0
+
+### Added
+
+#### RangeFinder.Core
+
+- **IRangeFinder Interface** - Extracted interface from `RangeFinder` class for better abstraction and future extensibility
+- **Interface-based Extension Methods** - Updated `IntervalTreeExtensions` to operate on interface types for improved flexibility
+
+### Changed
+
+#### RangeFinder.Core
+
+- **RangeFinder Class** - Now implements `IRangeFinder<TNumber, TAssociated>` interface
+- **Documentation Structure** - Moved XML documentation to interface definition as the authoritative contract location
+
+#### RangeFinder.IO
+
+- **Version Alignment** - Updated to 0.3.0-preview for consistency with v0.3.x development branch
+
 ## [0.2.0] - 2025-06-24
 
 ### Added

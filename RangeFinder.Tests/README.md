@@ -19,7 +19,7 @@ The test suite is organized into focused modules, each testing specific aspects 
 | `RangeFinderFactoryTests.cs` | 22 tests | Factory method validation and error handling |
 | `RangeFinderGenericTypeTests.cs` | 5 tests | Generic type system validation |
 
-**Total Core Tests: 54**
+#### Total Core Tests: 54
 
 ### Generation Tests (6 files)
 
@@ -32,7 +32,7 @@ The test suite is organized into focused modules, each testing specific aspects 
 | `QueryGenerationTests.cs` | 6 tests | Query generation utilities |
 | `DatasetAnalysisTests.cs` | 11 tests | Statistical analysis of datasets |
 
-**Total Generation Tests: 45**
+#### Total Generation Tests: 45
 
 ### Serialization Tests (3 files)
 
@@ -42,7 +42,7 @@ The test suite is organized into focused modules, each testing specific aspects 
 | `RangeSerializerParquetTests.cs` | 6 tests | Parquet serialization validation |
 | `RangeFinderLoaderTests.cs` | 16 tests | File loading and factory integration |
 
-**Total Serialization Tests: 28**
+#### Total Serialization Tests: 28
 
 ### Property-Based Tests (1 file)
 
