@@ -1,6 +1,7 @@
 # RangeFinder
 
-A high-performance .NET range query library for general numeric ranges.
+A high-performance .NET range query library for general numeric ranges. Designed as a lightweight alternative to
+RangeTree, optimized for scenarios where all ranges are known upfront.
 
 [![.NET](https://img.shields.io/badge/.NET-8.0%20or%20later-blue)](https://dotnet.microsoft.com/download)
 [![License](https://img.shields.io/badge/License-MIT-blue)](LICENSE)
@@ -9,80 +10,77 @@ A high-performance .NET range query library for general numeric ranges.
 ## Features
 
 - **High Performance**: Fast construction, fast query
-- **Generic Support**: Works with any numeric type using [`INumber<TSelf>`](https://learn.microsoft.com/en-us/dotnet/api/system.numerics.inumber-1) interface
-- **Memory Efficient**: Designed to predictable allocation patterns with low GC pressure
-- **Compatibility**: RangeTree-compatible [Query APIs](#migration-from-rangetree) for easy migration
-- **Visualization**: Interactive range visualization with RangeFinder.Visualizer
-- **Serialization**: CSV and Parquet data import/export support
+- **Generic Support**: Works with any numeric type using
+  [`INumber<TSelf>`](https://learn.microsoft.com/en-us/dotnet/api/system.numerics.inumber-1) interface
+- **Compatibility**: RangeTree-compatible [Query APIs](#rangetree-compatible-query-apis) for easy migration
+- **Visualization**: Interactive range visualization with RangeFinder.Visualizer (Experimental)
+- **Serialization**: CSV and Parquet data import/export support (Experimental)
 
 ## Quick Start
-
-### Construct a RangeFinder
 
 ```csharp
 using RangeFinder.Core;
 
-// Simple tuple-based creation
-var finder = RangeFinderFactory.Create(
-[
-    (1.0, 2.2, 100),
-    (2.0, 3.2, 200),
-    (3.0, 4.0, 300)
-]);
+// Create from tuples  
+var finder = RangeFinderFactory.Create([(1.0, 2.2, 100), (2.0, 3.2, 200)]);
 
-// Or create from NumericRange objects
-var ranges = new[]
-{
-    new NumericRange<double, int>(1.0, 2.2, 100),
-    new NumericRange<double, int>(2.0, 3.2, 200)
-};
-var finder2 = RangeFinderFactory.Create(ranges);
-```
-
-### Issue queries
-
-```csharp
 // Query overlapping ranges
 var values = finder.Query(2.0, 2.9);         // Returns: 100, 200
-var overlaps = finder.QueryRanges(2.0, 3.0); // Returns: [1.0,2.2]=100, [2.0,3.2]=200
-
-// Point queries
-var pointValues = finder.Query(1.9);        // Returns: 100
-var pointRanges = finder.QueryRanges(1.9);  // Returns: [1.0,2.2]=100
+var ranges = finder.QueryRanges(2.0, 3.0);   // Returns full range objects
 ```
 
-## Performance
+For detailed API documentation and advanced usage examples, see [RangeFinder.Core](RangeFinder.Core/#quick-start).
 
-RangeFinder is designed for high-performance range queries with optimized construction and query algorithms. 
+## Performance Characteristics (Preliminary)
 
-Please refer a detailed performance analysis at
-📊 **[Benchmark](RangeFinder.Benchmark)**
+The following results are preliminary measurements from our test environment and may not reflect typical
+real-world performance differences. These should be validated with your specific use cases.
 
-## API Reference
+**Test Environment:**
 
-### Core Types
+- RangeFinder v0.2.0
+- RangeTree (IntervalTree) v3.0.1 (for comparison)
 
-```csharp
-// Basic range with associated value
-var range = new NumericRange<double, int>(1.0, 5.0, 42);
+### Range Query Performance
 
-// Range finder for efficient queries
-var finder = RangeFinderFactory.Create(ranges);
-```
+| Dataset | Pattern | RangeFinder | IntervalTree | Performance Ratio |
+|---------|---------|------------:|-------------:|-------------------|
+| 10M | Uniform | 2.16 us | 17.89 us | **~8x improvement** |
+| 10M | Dense | 6.66 us | 33.43 us | **~5x improvement** |
+| 10M | Sparse | 1.27 us | 12.15 us | **~10x improvement** |
+| 50M | Uniform | 2.42 us | 20.31 us | **~8x improvement** |
 
-### Query Methods
+### Point Query Performance
 
-```csharp
-// RangeTree-compatible API (returns values only)
-IEnumerable<TValue> Query(TNumber point)
-IEnumerable<TValue> Query(TNumber from, TNumber to)
+| Dataset | Pattern | RangeFinder | IntervalTree | Performance Ratio |
+|---------|---------|------------:|-------------:|-------------------|
+| 10M | Uniform | 993 ns | 9,272 ns | **~9x improvement** |
 
-// Native API (returns full range objects)
-IEnumerable<NumericRange<TNumber, TValue>> QueryRanges(TNumber point)
-IEnumerable<NumericRange<TNumber, TValue>> QueryRanges(TNumber from, TNumber to)
-```
+### Construction Performance
 
-## Migration from RangeTree
+| Dataset | Pattern | RangeFinder | IntervalTree | Performance Ratio |
+|---------|---------|------------:|-------------:|-------------------|
+| 5M | Uniform | 834 ms | 10,375 ms | **~12x improvement** |
+| 10M | Uniform | 1,888 ms | 26,999 ms | **~14x improvement** |
+| 50M | Uniform | 11.30 s | 207.41 s | **~18x improvement** |
+
+## Methodology Notes
+
+All benchmarks executed using BenchmarkDotNet with:
+
+- Release mode compilation
+- Sequential execution for measurement accuracy
+- Multiple iterations for statistical reliability
+- Platform: ARM64 macOS with .NET 8.0
+
+_These are preliminary benchmark results from our specific test environment. Performance differences may not
+reflect real-world usage and can vary significantly on different platforms, with different data patterns, or under
+different usage conditions. We strongly encourage users to conduct their own benchmarks with their specific data
+and requirements before making performance-based decisions._
+
+_For detailed methodology, benchmarking tools, and to provide feedback on our approach, see [RangeFinder.Benchmark/README.md](RangeFinder.Benchmark/README.md)._
+
+## RangeTree-compatible query APIs
 
 RangeFinder provides query API compatibility for easy migration:
 
@@ -98,6 +96,7 @@ var results = finder.Query(2.0, 4.0); // Same API!
 ```
 
 **Key Differences:**
+
 - **Dynamic insertion**: Not supported - requires all ranges during construction
 - **Query API**: Compatible method signatures and behavior
 - **Performance focus**: Optimized for fast construction and queries
@@ -106,17 +105,14 @@ var results = finder.Query(2.0, 4.0); // Same API!
 
 ### Core Projects
 
-- **RangeFinder.Core** - Main library with range finding algorithms
-- **RangeFinder.IO** - File I/O and data generation utilities
-- **RangeFinder.Visualizer** - Avalonia-based range visualization tool
-- **RangeFinder.Benchmark** - Performance testing and validation
+- **[RangeFinder.Core](RangeFinder.Core/)** - Main library with range finding algorithms
+- **[RangeFinder.IO](RangeFinder.IO/)** - File I/O and data generation utilities
+- **[RangeFinder.Visualizer](RangeFinder.Visualizer/)** - Avalonia-based range visualization tool
+- **[RangeFinder.Benchmark](RangeFinder.Benchmark/)** - Performance testing and validation
 
-### What's New in v0.2.0
+## What's New
 
-- **RangeFinder.Visualizer** - Interactive range visualization tool
-- **RangeFinderFactory** - Simplified creation from various data sources
-- **CSV/Parquet Support** - Import and export range data
-- **Enhanced Testing** - Property-based testing and improved coverage
+See [CHANGELOG.md](CHANGELOG.md) for detailed version history and changes across all projects.
 
 ## Requirements
 

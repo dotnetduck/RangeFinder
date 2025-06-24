@@ -1,22 +1,29 @@
 # Contributing to RangeFinder
 
-> **⚠️ DRAFT**: These contributing guidelines are a work in progress. CI/CD automation and NuGet publishing workflows are not yet implemented.
+> **⚠️ DRAFT**: These contributing guidelines are a work in progress. CI/CD automation and NuGet publishing workflows
+> are not yet implemented.
 
-Thank you for your interest in contributing to RangeFinder! This document provides guidelines for contributing to this high-performance range query library.
+Thank you for your interest in contributing to RangeFinder! This document provides guidelines for contributing to
+this high-performance range query library.
 
 ## Project Status
 
-> **⚠️ Pre-1.0 Development**: RangeFinder is currently in active development toward v1.0.0. While the public API is stable, breaking changes may occasionally occur before v1.0. For significant contributions, consider waiting until v1.0.0 release for better API stability.
+> **⚠️ Pre-1.0 Development**: RangeFinder is currently in active development toward v1.0.0. While the public API
+> is stable, breaking changes may occasionally occur before v1.0. For significant contributions, consider waiting
+> until v1.0.0 release for better API stability.
 
 ## Getting Started
 
 1. **Fork the repository** on GitHub
 2. **Clone your fork** locally:
+
    ```bash
    git clone https://github.com/your-username/RangeFinder.git
    cd RangeFinder
    ```
+
 3. **Build and test** to ensure everything works:
+
    ```bash
    dotnet build
    dotnet test
@@ -27,9 +34,11 @@ Thank you for your interest in contributing to RangeFinder! This document provid
 ### Before Making Changes
 
 1. **Create a feature branch** from the main branch:
+
    ```bash
    git checkout -b feature/your-feature-name
    ```
+
 2. **Understand the performance requirements** - RangeFinder is a performance-first library
 3. **Review existing tests** to understand expected behavior
 
@@ -56,6 +65,7 @@ dotnet test RangeFinder.Tests/
 ```
 
 **Test Categories:**
+
 - **Unit tests**: Core functionality and edge cases
 - **Compatibility tests**: Ensure RangeTree API compatibility
 - **Performance validation**: Verify no performance regressions
@@ -65,13 +75,17 @@ dotnet test RangeFinder.Tests/
 RangeFinder prioritizes performance above convenience. When contributing:
 
 1. **Benchmark significant changes**:
+
    ```bash
    dotnet run --project RangeFinder.Benchmark -c Release
    ```
+
 2. **Run performance benchmarks** to detect regressions:
+
    ```bash
    dotnet run --project RangeFinder.Benchmark -c Release
    ```
+
 3. **Avoid allocations** in hot paths
 4. **Prefer arrays over lists** for performance-critical code
 5. **Consider cache locality** in data structure design
@@ -81,19 +95,24 @@ RangeFinder prioritizes performance above convenience. When contributing:
 #### Before Submitting
 
 1. **Ensure all tests pass**:
+
    ```bash
    dotnet test --verbosity normal
    ```
+
 2. **Build in Release mode**:
+
    ```bash
    dotnet build -c Release
    ```
+
 3. **Run benchmarks** if you modified core algorithms
 4. **Update documentation** for new features or API changes
 
 #### Pull Request Guidelines
 
 **PR Title Format:**
+
 - `feat: Add new feature description`
 - `fix: Fix specific issue description`
 - `perf: Performance improvement description`
@@ -101,6 +120,7 @@ RangeFinder prioritizes performance above convenience. When contributing:
 - `test: Test improvement description`
 
 **PR Description Should Include:**
+
 - Clear description of changes made
 - Reason for the change
 - Any performance impact (positive or negative)
@@ -108,6 +128,7 @@ RangeFinder prioritizes performance above convenience. When contributing:
 - Breaking changes (if any)
 
 **Example PR Description:**
+
 ```markdown
 ## Summary
 Add support for custom comparison operators in NumericRange.
@@ -130,29 +151,34 @@ Add support for custom comparison operators in NumericRange.
 ## Types of Contributions
 
 ### 🐛 Bug Fixes
+
 - **Include test cases** that reproduce the bug
 - **Verify the fix** doesn't break existing functionality
 - **Document any edge cases** discovered
 
 ### ✨ New Features
+
 - **Discuss large features** in an issue first
 - **Maintain API compatibility** with RangeTree where possible
 - **Include comprehensive tests** and documentation
 - **Benchmark performance impact**
 
 ### 📊 Performance Improvements
+
 - **Provide benchmark evidence** of improvement
 - **Ensure no regression** in other scenarios
 - **Document algorithmic complexity** if changed
 - **Test across different dataset characteristics** (Dense, Sparse, Uniform)
 
 ### 📝 Documentation
+
 - **Update relevant markdown files**
 - **Include code examples** for new features
 - **Verify examples compile and run**
 - **Update benchmark tables** if performance changed
 
 ### 🧪 Tests
+
 - **Follow existing test patterns**
 - **Include edge cases and boundary conditions**
 - **Use descriptive test names**
@@ -163,6 +189,7 @@ Add support for custom comparison operators in NumericRange.
 > **Note**: Automated CI/CD workflows are in development. Currently manual verification is required.
 
 **Planned automation:**
+
 1. **CI Pipeline**: Automated build, test, and performance guardian checks on PRs
 2. **Performance validation**: Automated benchmarks on significant changes  
 3. **NuGet publishing**: Automatic package publishing on version tags
@@ -170,6 +197,7 @@ Add support for custom comparison operators in NumericRange.
 5. **Documentation review** for public API changes
 
 **Current manual process:**
+
 1. Verify all tests pass locally: `dotnet test`
 2. Run performance benchmarks: `dotnet run --project RangeFinder.Benchmark -c Release`
 3. Manual code review by maintainers
@@ -193,7 +221,7 @@ RangeFinder maintains strict performance requirements:
 
 ## Project Structure
 
-```
+```text
 RangeFinder/
 ├── RangeFinder.Core/      # Core library
 ├── RangeFinder.IO/        # File I/O and data generation utilities
@@ -207,6 +235,7 @@ RangeFinder/
 ## Recognition
 
 Contributors will be recognized in:
+
 - **Git commit history** with proper attribution
 - **Release notes** for significant contributions
 - **Documentation** for major features

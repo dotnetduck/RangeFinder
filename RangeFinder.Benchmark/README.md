@@ -11,7 +11,8 @@ Performance benchmarks for RangeFinder using BenchmarkDotNet.
 dotnet build -c Release
 
 # Run single benchmark with parameters
-dotnet run -c Release -- run-single --test <TestType> --characteristics <DatasetCharacteristic> --accuracy <AccuracyLevel> [options]
+dotnet run -c Release -- run-single --test <TestType> --characteristics <DatasetCharacteristic> \
+  --accuracy <AccuracyLevel> [options]
 
 # Run comprehensive suite with multiple characteristics
 dotnet run -c Release -- run-suite --accuracy <AccuracyLevel> [options]
@@ -20,14 +21,18 @@ dotnet run -c Release -- run-suite --accuracy <AccuracyLevel> [options]
 ## Available Commands
 
 ### run-single
+
 Run a single benchmark configuration:
+
 - **Construction**: Data structure construction time measurement
 - **RangeQuery**: Range query performance measurement
 - **PointQuery**: Point query performance measurement
 - **Allocation (Not yet implemented)**: Memory allocation pattern analysis during queries
 
 ### run-suite
+
 Run comprehensive benchmark suite across multiple:
+
 - Dataset sizes (default: 100K, 1M)
 - Dataset characteristics (default: Uniform, Dense, Sparse)
 - Test types (default: all types)
@@ -41,20 +46,23 @@ Run comprehensive benchmark suite across multiple:
 ## Parameters
 
 ### Common Parameters
+
 - **--accuracy**: Benchmark precision level (Quick, Balanced, Accurate) (default: Balanced)
 - **--queries**: Number of queries to execute (default: 25)
 - **--output**: Output directory for results (default: results/)
 - **--timestamp**: Add timestamp to result files (default: true)
 
 ### run-single Parameters
+
 - **--test**: Test type (Construction, RangeQuery, PointQuery, Allocation)
 - **--size**: Dataset size (Size10K, Size100K, Size1M, Size5M) (default: Size100K)
 - **--characteristics**: Dataset characteristic (Uniform, Dense, Sparse) (default: Uniform)
-   - **Uniform**: Balanced distribution of ranges across the dataset space (baseline)
-   - **Dense**: Many overlapping ranges in smaller space (worst-case for pruning algorithms)
-   - **Sparse**: Minimal overlap with ranges spread across large space (best-case scenario)
+  - **Uniform**: Balanced distribution of ranges across the dataset space (baseline)
+  - **Dense**: Many overlapping ranges in smaller space (worst-case for pruning algorithms)
+  - **Sparse**: Minimal overlap with ranges spread across large space (best-case scenario)
 
 ### run-suite Parameters
+
 - **--sizes**: Comma-separated sizes (default: "Size100K,Size1M")
 - **--tests**: Comma-separated test types (default: all types)
 - **--characteristics**: Dataset characteristics (default: "Uniform,Dense,Sparse")
@@ -82,41 +90,11 @@ dotnet run -c Release -- run-suite --characteristics "Uniform,Dense" --sizes "Si
 dotnet run -c Release -- run-suite --characteristics "Uniform,Dense,Sparse" --accuracy Accurate
 ```
 
-## Preliminary Results
-
-Performed on: Apple Mac mini M4 w/ 24GiB RAM, .NET 8.0.5, June 14, 2025
-
-### Construction Performance (Sample measurements)
-| Operation  | Dataset Size  | Dataset Characteristic | RangeFinder[ms] |
-|------------|--------------:|:----------------------:|----------------:|
-|Construction| 100K          | Uniform                | **8.62**        |
-|^           | ^             | Dense                  | **8.64**        |
-|^           | ^             | Sparse                 | **8.63**        |
-|^           | 1M            | Uniform                | **135.00**      |
-
-*^ : same as the above*
-
-### Query Performance (Sample measurements)
-| Operation   | Dataset Size | Dataset Characteristic | RangeFinder[us] |
-|:-----------:|-------------:|:----------------------:|----------------:|
-| Range Query | 100K         | Uniform                | **1.97**        |
-| ^           | ^            | Dense                  | **5.81**        |
-| ^           | ^            | Sparse                 | **0.95**        |
-| Point Query | 100K         | Uniform                | **0.81**        |
-| ^           | ^            | Dense                  | **2.13**        |
-
-*^ : same as the above*
-
-**Key Insights:**
-- **Fast construction** across all dataset characteristics
-- **Consistent query performance** depending on data density and operation type
-- **Scalable performance** across Uniform, Dense, and Sparse datasets
-
 ## Output Organization
 
 Results are automatically organized in structured directories:
 
-```
+```text
 results/
 └── {timestamp}/        # Benchmark session timestamp
     ├── 10K/            # Dataset size
@@ -129,6 +107,7 @@ results/
 ```
 
 **File Types:**
+
 - **CSV files**: Raw benchmark data for analysis
 - **Markdown files**: Formatted BenchmarkDotNet reports
 - **SUITE_SUMMARY.txt**: Overview of suite execution results
