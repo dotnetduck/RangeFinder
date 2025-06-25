@@ -1,17 +1,17 @@
 using FsCheck;
 using FsC = FsCheck.NUnit;
-using IntervalTree;
 using RangeFinder.Core;
 using RangeFinder.Tests.Helper;
 
 namespace RangeFinder.Tests.PropertyBased;
 
 /// <summary>
-/// Property-based compatibility tests using FsCheck that verify RangeFinder behavior
-/// against IntervalTree using custom generators and factory methods.
+/// Property-based tests using FsCheck that verify RangeFinder behavior with random data.
+/// Uses LinearRangeFinder as reference implementation to validate core properties
+/// without external dependencies.
 /// </summary>
 [TestFixture]
-public class CompatibilityTests
+public class RandomPropertyBasedTests
 {
     /// <summary>
     /// Enable verbose mode to print results for all property tests (success and failure)
@@ -32,31 +32,29 @@ public class CompatibilityTests
 
 
     /// <summary>
-    /// PROPERTY: RangeFinder and IntervalTree must always produce identical results
-    /// ∀ ranges, query. RangeFinder.Query(query) = IntervalTree.Query(query)
+    /// PROPERTY: RangeFinder and LinearRangeFinder must always produce identical results
+    /// ∀ ranges, query. RangeFinder.Query(query) = LinearRangeFinder.Query(query)
     /// </summary>
     [FsC.Property]
-    public void RangeFinderEquivalentToIntervalTree_RangeQueries()
+    public void RangeFinderEquivalentToLinearRangeFinder_RangeQueries()
     {
         Prop.ForAll<(double start, double end)[]>(rangeData =>
             {
                 // Build both data structures using factory method
                 var rangeFinder = RangeFinderFactory.Create(rangeData);
-                var intervalTree = new IntervalTree<double, int>();
-                for (int i = 0; i < rangeData.Length; i++)
-                {
-                    intervalTree.Add(rangeData[i].start, rangeData[i].end, i);
-                }
+                var linearRangeFinder = new LinearRangeFinder<double, int>(
+                    rangeData.Select((tuple, index) => new NumericRange<double, int>(tuple.start, tuple.end, index))
+                );
 
                 var queryPoint = RangeDataGenerators.ExtractQueryPoint(rangeData);
 
                 // ASSERTION: Results must be identical (same elements, order doesn't matter)
                 var rfResults = rangeFinder.Query(queryPoint);
-                var itResults = intervalTree.Query(queryPoint);
+                var lrfResults = linearRangeFinder.QueryRanges(queryPoint).Select(r => r.Value);
 
-                var comparison = rfResults.CompareAsSets(itResults);
+                var comparison = rfResults.CompareAsSets(lrfResults);
                 return Printer.LogAndReturn(
-                    comparison, "RangeFinder vs IntervalTree equivalence", (queryPoint, queryPoint), rangeData, VerboseMode);
+                    comparison, "RangeFinder vs LinearRangeFinder equivalence", (queryPoint, queryPoint), rangeData, VerboseMode);
             })
             .QuickCheckThrowOnFailure();
     }

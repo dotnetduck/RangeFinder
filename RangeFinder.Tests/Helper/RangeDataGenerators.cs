@@ -1,6 +1,6 @@
 using FsCheck;
 
-namespace RangeFinder.Tests.PropertyBased;
+namespace RangeFinder.Tests.Helper;
 
 /// <summary>
 /// Custom generators for FsCheck property-based tests
