@@ -10,6 +10,14 @@ All notable changes to RangeFinder will be documented in this file.
 
 - **IRangeFinder Interface** - Extracted interface from `RangeFinder` class for better abstraction and future extensibility
 - **Interface-based Extension Methods** - Updated `IntervalTreeExtensions` to operate on interface types for improved flexibility
+- **NumericRange.Contains Method** - Added point containment method to encapsulate point-in-range logic
+
+#### RangeFinder.Tests
+
+- **LinearRangeFinder** - Added naive O(n) reference implementation for back-to-back testing
+- **Comprehensive NumericRange Testing** - Added 36 parameterized test cases covering Overlaps and Contains methods
+- **Test Code Quality Improvements** - Enhanced test assertions using struct value equality and simplified comparisons
+- **Back-to-Back Testing** - Replaced IntervalTree dependency with self-contained LinearRangeFinder for expected results
 
 ### Changed
 
@@ -17,6 +25,7 @@ All notable changes to RangeFinder will be documented in this file.
 
 - **RangeFinder Class** - Now implements `IRangeFinder<TNumber, TAssociated>` interface
 - **Documentation Structure** - Moved XML documentation to interface definition as the authoritative contract location
+- **Point Query Logic** - Refactored to use NumericRange.Contains() method for better encapsulation
 
 #### RangeFinder.IO
 

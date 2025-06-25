@@ -134,7 +134,7 @@ public class RangeFinder<TNumber, TAssociated> : IRangeFinder<TNumber, TAssociat
             }
 
             // Check if the point is within the range (inclusive of boundaries)
-            if (range.Start.CompareTo(value) <= 0 && value.CompareTo(range.End) <= 0)
+            if (range.Contains(value))
             {
                 results.Add(range);
             }
