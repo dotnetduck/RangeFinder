@@ -21,7 +21,7 @@ public class LinearRangeFinder<TNumber, TAssociated> : IRangeFinder<TNumber, TAs
     public LinearRangeFinder(IEnumerable<NumericRange<TNumber, TAssociated>> ranges)
     {
         _ranges = ranges?.ToList() ?? throw new ArgumentNullException(nameof(ranges));
-        
+
         // Calculate bounds
         if (_ranges.Count > 0)
         {
