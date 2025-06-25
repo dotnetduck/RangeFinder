@@ -40,8 +40,11 @@ jobs:
       - name: Apply .NET formatting
         run: dotnet format --verbosity diagnostic
 
-      - name: Ensure final newlines
-        run: find . -name "*.cs" -o -name "*.md" -o -name "*.json" -o -name "*.yml" -o -name "*.yaml" | xargs -I {} sh -c 'if [ "$(tail -c1 "{}" 2>/dev/null)" != "" ]; then echo >> "{}"; fi'
+      - name: Install eclint
+        run: npm install -g eclint
+
+      - name: Apply EditorConfig rules
+        run: eclint fix .
 
       - name: Apply markdown formatting
         run: |
