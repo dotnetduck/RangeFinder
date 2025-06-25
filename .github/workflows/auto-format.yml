@@ -41,7 +41,7 @@ jobs:
         run: npm install -g eclint
 
       - name: Apply EditorConfig rules
-        run: eclint fix .
+        run: eclint fix . --exclude ".github/workflows/**"
 
       - name: Apply markdown formatting
         run: |
