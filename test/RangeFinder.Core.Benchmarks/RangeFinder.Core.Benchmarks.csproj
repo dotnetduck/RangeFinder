@@ -15,7 +15,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\RangeFinder.Core\RangeFinder.Core.csproj" />
-      <ProjectReference Include="..\..\src\RangeFinder.Serialization\RangeFinder.Serialization.csproj" />
+      <ProjectReference Include="..\RangeFinder.TestUtilities\RangeFinder.TestUtilities.csproj" />
     </ItemGroup>
 
     <!-- Clean BenchmarkDotNet artifacts with dotnet clean -->

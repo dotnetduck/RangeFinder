@@ -1,7 +1,7 @@
 using IntervalTree;
 using RangeFinder.Core;
-using RangeFinder.Serialization.Generation;
-using Gen = RangeFinder.Serialization.Generation.Generator;
+using RangeFinder.TestUtilities.Generation;
+using Gen = RangeFinder.TestUtilities.Generation.Generator;
 
 namespace RangeFinder.Core.RangeTreeCompatTests;
 

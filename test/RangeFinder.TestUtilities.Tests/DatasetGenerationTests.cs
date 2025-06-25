@@ -1,5 +1,5 @@
 using RangeFinder.Core;
-using RangeFinder.Serialization.Generation;
+using RangeFinder.TestUtilities.Generation;
 using System.Reflection;
 
 namespace RangeFinder.TestUtilities.Tests;

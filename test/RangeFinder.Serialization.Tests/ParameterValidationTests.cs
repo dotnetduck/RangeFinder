@@ -1,4 +1,4 @@
-using RangeFinder.Serialization.Generation;
+using RangeFinder.TestUtilities.Generation;
 using RangeFinder.Serialization.Tests;
 using System.Reflection;
 
