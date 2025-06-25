@@ -9,7 +9,7 @@ namespace RangeFinder.Core.Tests;
 /// Validates correctness according to RangeFinder's own specifications.
 /// </summary>
 [TestFixture]
-public class RangeFinderTests
+public class RangeFinderQueryTests
 {
     private static readonly List<NumericRange<double, int>> TestRanges = new()
     {
