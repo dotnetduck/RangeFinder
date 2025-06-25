@@ -13,13 +13,11 @@ public class RangeFinder<TNumber, TAssociated> : IRangeFinder<TNumber, TAssociat
     public TNumber UpperBound { get; init; }
 
     private readonly NumericRange<TNumber, TAssociated>[] _sortedRanges;
-    private readonly bool[] _canTerminateHere; // Marks positions where no later range can overlap
     private readonly TNumber _maxSpanOfTheRangesForPruning;
 
     public RangeFinder(IEnumerable<NumericRange<TNumber, TAssociated>> ranges)
     {
         _sortedRanges = ranges.OrderBy(r => r.Start).ToArray();
-        _canTerminateHere = new bool[_sortedRanges.Length];
 
         // Calculate max span for pruning
         if (_sortedRanges.Length > 0)
@@ -31,50 +29,16 @@ public class RangeFinder<TNumber, TAssociated> : IRangeFinder<TNumber, TAssociat
             _maxSpanOfTheRangesForPruning = TNumber.Zero;
         }
 
-        // Pre-compute early termination markers and get bounds
-        (LowerBound, UpperBound) = ComputeEarlyTerminationMarkers();
-    }
-
-    /// <summary>
-    /// Pre-computes markers to identify positions where search can terminate early.
-    /// For each position i, _canTerminateHere[i] is true if no range at position j > i
-    /// can have an end time later than the start time of range at position i.
-    /// Also computes and returns LowerBound and UpperBound during the same pass.
-    /// </summary>
-    private (TNumber LowerBound, TNumber UpperBound) ComputeEarlyTerminationMarkers()
-    {
-        if (_sortedRanges.Length == 0)
+        if (_sortedRanges.Length > 0)
         {
-            return (TNumber.Zero, TNumber.Zero);
+            LowerBound = _sortedRanges[0].Start;
+            UpperBound = _sortedRanges[^1].End;
         }
-
-        // LowerBound is always the first element's start (array is sorted)
-        var lowerBound = _sortedRanges[0].Start;
-
-        // Work backwards to compute the maximum end time seen so far
-        var maxEndSoFar = _sortedRanges[^1].End;
-        _canTerminateHere[^1] = true; // Last element can always terminate
-
-        for (var i = _sortedRanges.Length - 2; i >= 0; i--)
+        else
         {
-            var currentRange = _sortedRanges[i];
-
-            // If current range's start >= max end of all subsequent ranges,
-            // we can terminate here when searching for overlaps
-            if (currentRange.Start.CompareTo(maxEndSoFar) >= 0)
-            {
-                _canTerminateHere[i] = true;
-            }
-
-            // Update max end seen so far
-            if (currentRange.End.CompareTo(maxEndSoFar) > 0)
-            {
-                maxEndSoFar = currentRange.End;
-            }
+            LowerBound = TNumber.Zero;
+            UpperBound = TNumber.Zero;
         }
-
-        // maxEndSoFar now contains the global maximum end value
-        return (lowerBound, maxEndSoFar);
     }
 
     public IEnumerable<NumericRange<TNumber, TAssociated>> QueryRanges(TNumber from, TNumber to)
@@ -142,8 +106,6 @@ public class RangeFinder<TNumber, TAssociated> : IRangeFinder<TNumber, TAssociat
 
         return results;
     }
-
-
 
     /// <summary>
     /// Binary search to find the first range that could potentially overlap with the query.
