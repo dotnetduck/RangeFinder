@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <OutputType>Exe</OutputType>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+    </PropertyGroup>
+
+    <ItemGroup>
+      <PackageReference Include="BenchmarkDotNet" Version="0.15.0" />
+      <PackageReference Include="RangeTree" Version="3.0.1" />
+      <PackageReference Include="ConsoleAppFramework" Version="5.2.4" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\RangeFinder.Core\RangeFinder.Core.csproj" />
+      <ProjectReference Include="..\..\src\RangeFinder.IO\RangeFinder.IO.csproj" />
+    </ItemGroup>
+
+    <!-- Clean BenchmarkDotNet artifacts with dotnet clean -->
+    <Target Name="CleanBenchmarkArtifacts" AfterTargets="Clean">
+        <RemoveDir Directories="$(MSBuildProjectDirectory)/BenchmarkDotNet.Artifacts" Condition="Exists('$(MSBuildProjectDirectory)/BenchmarkDotNet.Artifacts')" />
+        <Message Text="Cleaned BenchmarkDotNet.Artifacts directory" Importance="normal" Condition="Exists('$(MSBuildProjectDirectory)/BenchmarkDotNet.Artifacts')" />
+    </Target>
+
+</Project>

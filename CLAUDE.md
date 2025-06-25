@@ -9,13 +9,20 @@ The library is designed for performance-critical scenarios with optimized algori
 
 ## Solution Structure
 
+**Source Projects (`src/`):**
 - **RangeFinder.Core/** - Main library with Core interfaces, Finders implementations, and Utilities
 - **RangeFinder.IO/** - File I/O and data generation utilities
   - **Generation/** - Test data generation utilities and parameterized dataset creation
   - **Serialization/** - CSV and Parquet serialization for range data
-- **RangeFinder.Tests/** - NUnit test suite with comprehensive unit and integration tests
-- **RangeFinder.Benchmark/** - BenchmarkDotNet performance tests and regression validation
 - **RangeFinder.Visualizer/** - Avalonia-based range visualization tool
+
+**Test Projects (`test/`):**
+- **RangeFinder.Core.Tests/** - Unit tests for core library functionality
+- **RangeFinder.IO.Tests/** - Tests for I/O and data generation utilities
+- **RangeFinder.Compatibility.Tests/** - IntervalTree compatibility validation (with RangeTree dependency)
+- **RangeFinder.PropertyBased.Tests/** - Property-based tests using FsCheck
+- **RangeFinder.TestUtilities/** - Shared test utilities and helpers (LinearRangeFinder, SetDifference, etc.)
+- **RangeFinder.Benchmark/** - BenchmarkDotNet performance tests and regression validation
 
 ## Development Commands
 
@@ -27,10 +34,11 @@ dotnet build
 dotnet test
 
 # Run specific test project
-dotnet test RangeFinder.Tests/
+dotnet test test/RangeFinder.Core.Tests/
+dotnet test test/RangeFinder.PropertyBased.Tests/
 
 # Run performance benchmarks
-dotnet run --project RangeFinder.Benchmark -c Release
+dotnet run --project test/RangeFinder.Benchmark -c Release
 
 # Build in release mode for accurate performance testing
 dotnet build -c Release

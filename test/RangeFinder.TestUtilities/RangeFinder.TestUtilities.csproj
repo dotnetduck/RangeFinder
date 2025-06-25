@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+    <PropertyGroup>
+        <TargetFramework>net8.0</TargetFramework>
+        <ImplicitUsings>enable</ImplicitUsings>
+        <Nullable>enable</Nullable>
+
+        <IsPackable>false</IsPackable>
+        <IsTestProject>false</IsTestProject>
+    </PropertyGroup>
+
+    <ItemGroup>
+        <PackageReference Include="FsCheck" Version="2.16.5" />
+        <PackageReference Include="FsCheck.NUnit" Version="2.16.5" />
+        <PackageReference Include="NUnit" Version="3.14.0" />
+    </ItemGroup>
+
+    <ItemGroup>
+        <Using Include="NUnit.Framework" />
+    </ItemGroup>
+
+    <ItemGroup>
+      <ProjectReference Include="..\..\src\RangeFinder.Core\RangeFinder.Core.csproj" />
+      <ProjectReference Include="..\..\src\RangeFinder.IO\RangeFinder.IO.csproj" />
+    </ItemGroup>
+
+</Project>

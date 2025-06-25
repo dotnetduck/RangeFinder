@@ -29,7 +29,7 @@ var values = finder.Query(2.0, 2.9);         // Returns: 100, 200
 var ranges = finder.QueryRanges(2.0, 3.0);   // Returns full range objects
 ```
 
-For detailed API documentation and advanced usage examples, see [RangeFinder.Core](RangeFinder.Core/#quick-start).
+For detailed API documentation and advanced usage examples, see [RangeFinder.Core](src/RangeFinder.Core/#quick-start).
 
 ## Performance Characteristics (Preliminary)
 
@@ -78,7 +78,7 @@ reflect real-world usage and can vary significantly on different platforms, with
 different usage conditions. We strongly encourage users to conduct their own benchmarks with their specific data
 and requirements before making performance-based decisions._
 
-_For detailed methodology, benchmarking tools, and to provide feedback on our approach, see [RangeFinder.Benchmark/README.md](RangeFinder.Benchmark/README.md)._
+_For detailed methodology, benchmarking tools, and to provide feedback on our approach, see [RangeFinder.Benchmark/README.md](test/RangeFinder.Benchmark/README.md)._
 
 ## RangeTree-compatible query APIs
 
@@ -105,10 +105,10 @@ var results = finder.Query(2.0, 4.0); // Same API!
 
 ### Core Projects
 
-- **[RangeFinder.Core](RangeFinder.Core/)** - Main library with range finding algorithms
-- **[RangeFinder.IO](RangeFinder.IO/)** - File I/O and data generation utilities
-- **[RangeFinder.Visualizer](RangeFinder.Visualizer/)** - Avalonia-based range visualization tool
-- **[RangeFinder.Benchmark](RangeFinder.Benchmark/)** - Performance testing and validation
+- **[RangeFinder.Core](src/RangeFinder.Core/)** - Main library with range finding algorithms
+- **[RangeFinder.IO](src/RangeFinder.IO/)** - File I/O and data generation utilities
+- **[RangeFinder.Visualizer](src/RangeFinder.Visualizer/)** - Avalonia-based range visualization tool
+- **[RangeFinder.Benchmark](test/RangeFinder.Benchmark/)** - Performance testing and validation
 
 ## What's New
 
