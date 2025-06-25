@@ -95,5 +95,5 @@ jobs:
               issue_number: context.issue.number,
               owner: context.repo.owner,
               repo: context.repo.repo,
-              body: '🤖 **Auto-formatting applied**\n\nCode and documentation have been automatically formatted to maintain consistency:\n\n- ✅ .NET code formatting (dotnet format)\n- ✅ Markdown documentation formatting (markdownlint)\n\nAll quality checks now pass. The changes help maintain code quality and consistency across the project.'
+              body: '🤖 **Auto-formatting applied**\n\nCode and documentation have been automatically formatted to maintain consistency:\n\n- ✅ .NET code formatting (dotnet format)\n- ✅ EditorConfig rules applied (eclint)\n- ✅ Markdown documentation formatting (markdownlint)\n\nAll quality checks now pass. The changes help maintain code quality and consistency across the project.'
             });
