@@ -2,7 +2,7 @@ using RangeFinder.Core;
 using RangeFinder.Serialization.Generation;
 using System.Reflection;
 
-namespace RangeFinder.Serialization.Tests;
+namespace RangeFinder.TestUtilities.Tests;
 
 /// <summary>
 /// Tests for core dataset generation functionality.

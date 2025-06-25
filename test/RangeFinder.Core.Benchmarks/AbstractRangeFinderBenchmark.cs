@@ -3,7 +3,7 @@ using IntervalTree;
 using RangeFinder.Core;
 using RangeFinder.Serialization.Generation;
 
-namespace RangeFinder.Benchmark;
+namespace RangeFinder.Core.Benchmarks;
 
 /// <summary>
 /// Abstract base class for RangeFinder performance benchmarks.

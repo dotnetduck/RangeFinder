@@ -3,7 +3,7 @@ using BenchmarkDotNet.Jobs;
 using IntervalTree;
 using RangeFinder.Core;
 
-namespace RangeFinder.Benchmark;
+namespace RangeFinder.Core.Benchmarks;
 
 [SimpleJob(RuntimeMoniker.Net80)]
 public class ConstructionBenchmarks : AbstractRangeFinderBenchmark

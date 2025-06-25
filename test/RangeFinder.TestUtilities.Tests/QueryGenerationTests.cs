@@ -1,9 +1,9 @@
 using RangeFinder.Core;
 using RangeFinder.Serialization.Generation;
-using RangeFinder.Serialization.Tests;
+using RangeFinder.TestUtilities.Tests;
 using System.Reflection;
 
-namespace RangeFinder.Serialization.Tests;
+namespace RangeFinder.TestUtilities.Tests;
 
 /// <summary>
 /// Tests for query generation functionality.

@@ -1,6 +1,6 @@
 using BenchmarkDotNet.Jobs;
 
-namespace RangeFinder.Benchmark;
+namespace RangeFinder.Core.Benchmarks;
 
 /// <summary>
 /// Accurate execution config - for comprehensive performance analysis

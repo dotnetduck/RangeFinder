@@ -17,13 +17,13 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RangeFinder.Core.RangeTreeC
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RangeFinder.Serialization.Tests", "test\RangeFinder.Serialization.Tests\RangeFinder.Serialization.Tests.csproj", "{7CCA5C50-59E9-45F2-8A66-C2AC4725BD12}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RangeFinder.PropertyBased.Tests", "test\RangeFinder.PropertyBased.Tests\RangeFinder.PropertyBased.Tests.csproj", "{2E588F2C-96CD-07A3-C81C-D40CFEBD3361}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RangeFinder.Core.PropTests", "test\RangeFinder.Core.PropTests\RangeFinder.Core.PropTests.csproj", "{2E588F2C-96CD-07A3-C81C-D40CFEBD3361}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RangeFinder.TestUtilities", "test\RangeFinder.TestUtilities\RangeFinder.TestUtilities.csproj", "{1D4A47CD-A680-2895-17D7-CD9F536262D4}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RangeFinder.TestUtilities.Tests", "test\RangeFinder.TestUtilities.Tests\RangeFinder.TestUtilities.Tests.csproj", "{BA5C9048-7839-B193-A2DD-BB4A64FBF4A7}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RangeFinder.Benchmark", "test\RangeFinder.Benchmark\RangeFinder.Benchmark.csproj", "{002A1559-1590-459A-BCA0-E491C92DBF7F}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RangeFinder.Core.Benchmarks", "test\RangeFinder.Core.Benchmarks\RangeFinder.Core.Benchmarks.csproj", "{002A1559-1590-459A-BCA0-E491C92DBF7F}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

@@ -3,7 +3,7 @@ using FsC = FsCheck.NUnit;
 using RangeFinder.Core;
 using RangeFinder.TestUtilities;
 
-namespace RangeFinder.PropertyBased.Tests;
+namespace RangeFinder.Core.PropTests;
 
 /// <summary>
 /// Property-based tests using FsCheck that verify RangeFinder behavior with random data.
