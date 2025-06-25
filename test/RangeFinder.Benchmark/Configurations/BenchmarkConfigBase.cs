@@ -5,7 +5,7 @@ using BenchmarkDotNet.Exporters;
 using BenchmarkDotNet.Exporters.Csv;
 using BenchmarkDotNet.Loggers;
 
-namespace RangeFinder.Benchmarks;
+namespace RangeFinder.Benchmark;
 
 /// <summary>
 /// Abstract base class for benchmark configurations

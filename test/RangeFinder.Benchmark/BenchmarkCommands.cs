@@ -1,7 +1,7 @@
 using BenchmarkDotNet.Running;
 using BenchmarkDotNet.Configs;
 using ConsoleAppFramework;
-using RangeFinder.Benchmarks;
+using RangeFinder.Benchmark;
 
 public class BenchmarkCommands
 {

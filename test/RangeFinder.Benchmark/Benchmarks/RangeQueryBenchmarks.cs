@@ -1,7 +1,7 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 
-namespace RangeFinder.Benchmarks;
+namespace RangeFinder.Benchmark;
 
 [SimpleJob(RuntimeMoniker.Net80)]
 public class RangeQueryBenchmarks : AbstractRangeFinderBenchmark

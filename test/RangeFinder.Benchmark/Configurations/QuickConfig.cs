@@ -2,7 +2,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Validators;
 using BenchmarkDotNet.Configs;
 
-namespace RangeFinder.Benchmarks;
+namespace RangeFinder.Benchmark;
 
 /// <summary>
 /// Quick execution config - ultra-fast execution for quick overview within 30 seconds

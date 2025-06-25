@@ -1,7 +1,7 @@
 using BenchmarkDotNet.Attributes;
 using BenchmarkDotNet.Jobs;
 
-namespace RangeFinder.Benchmarks;
+namespace RangeFinder.Benchmark;
 
 /// <summary>
 /// Measures memory allocations during query execution by collecting results.

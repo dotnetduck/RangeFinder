@@ -1,4 +1,4 @@
-namespace RangeFinder.Benchmarks;
+namespace RangeFinder.Benchmark;
 
 /// <summary>
 /// Type of benchmark to execute

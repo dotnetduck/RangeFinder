@@ -2,7 +2,7 @@ using BenchmarkDotNet.Jobs;
 using BenchmarkDotNet.Validators;
 using BenchmarkDotNet.Configs;
 
-namespace RangeFinder.Benchmarks;
+namespace RangeFinder.Benchmark;
 
 /// <summary>
 /// Balanced execution config - balanced precision and speed for reasonable feedback
