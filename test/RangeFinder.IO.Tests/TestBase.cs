@@ -1,6 +1,7 @@
 using RangeFinder.Core;
 using RangeFinder.IO.Generation;
 using System.Numerics;
+using NUnit.Framework;
 
 namespace RangeFinder.IO.Tests;
 
@@ -68,6 +69,16 @@ public static class Validators
         Assert.That(queryList, Is.All.Not.Null, $"{context}: All queries should be non-null");
     }
 
+    public static void ValidateQueryRanges<TNumber>(
+        IEnumerable<NumericRange<TNumber, object>> queries,
+        Parameter parameters,
+        Characteristic characteristic,
+        string context)
+        where TNumber : INumber<TNumber>
+    {
+        ValidateQueryRanges(queries, parameters, context);
+    }
+
     public static void ValidateQueryPoints<TNumber>(
         IEnumerable<TNumber> points,
         Parameter parameters,
@@ -77,6 +88,26 @@ public static class Validators
         Assert.That(points, Is.Not.Null, $"{context}: Points should not be null");
         var pointList = points.ToList();
         Assert.That(pointList, Is.All.Not.Null, $"{context}: All points should be non-null");
+    }
+
+    public static void ValidateQueryPoints<TNumber>(
+        IEnumerable<TNumber> points,
+        Parameter parameters,
+        Characteristic characteristic,
+        string context)
+        where TNumber : INumber<TNumber>
+    {
+        ValidateQueryPoints(points, parameters, context);
+    }
+
+    public static void ValidateStats(Stats analysis, Parameter parameters, string context)
+    {
+        Assert.That(analysis, Is.Not.Null, $"{context}: Stats analysis should not be null");
+    }
+
+    public static void ValidateCharacteristicSpecificBehavior(Characteristic type, Stats analysis, string context)
+    {
+        Assert.That(analysis, Is.Not.Null, $"{context}: Analysis should not be null for {type}");
     }
 }
 
@@ -99,5 +130,69 @@ public static class PerformanceHelpers
     {
         Assert.That(elapsed.TotalSeconds, Is.LessThan(30), 
             $"{context}: Operation took {elapsed.TotalSeconds}s, which exceeds acceptable performance threshold");
+    }
+
+    public static TimeSpan MeasureExecutionTime(Action action)
+    {
+        var stopwatch = System.Diagnostics.Stopwatch.StartNew();
+        action();
+        stopwatch.Stop();
+        return stopwatch.Elapsed;
+    }
+
+    public static void ValidatePerformance(TimeSpan executionTime, TestBase.TestSizes size, string context)
+    {
+        var maxTime = size switch
+        {
+            TestBase.TestSizes.Small => TimeSpan.FromMilliseconds(100),
+            TestBase.TestSizes.Medium => TimeSpan.FromMilliseconds(500),
+            TestBase.TestSizes.Large => TimeSpan.FromSeconds(2),
+            _ => TimeSpan.FromSeconds(5)
+        };
+        
+        Assert.That(executionTime, Is.LessThan(maxTime), 
+            $"{context}: Execution time {executionTime.TotalMilliseconds}ms exceeded limit for {size} dataset");
+    }
+}
+
+/// <summary>
+/// Factory for creating test parameters with various configurations
+/// </summary>
+public static class TestParameterFactory
+{
+    public static Parameter MinimalValidParameters()
+    {
+        return new Parameter
+        {
+            Count = 10,
+            SpacePerRange = 4.0,
+            LengthRatio = 0.4,
+            LengthVariability = 0.4,
+            OverlapFactor = 1.5,
+            ClusteringFactor = 0.2
+        };
+    }
+
+    public static Parameter MaximalValidParameters()
+    {
+        return new Parameter
+        {
+            Count = 100000,
+            SpacePerRange = 2.0,
+            LengthRatio = 1.5,
+            LengthVariability = 0.5,
+            OverlapFactor = 3.0,
+            ClusteringFactor = 0.3
+        };
+    }
+
+    public static IEnumerable<(Parameter invalidParams, string expectedError)> InvalidParameterCases()
+    {
+        yield return (new Parameter { Count = 0, SpacePerRange = 4.0, LengthRatio = 0.4, LengthVariability = 0.4, OverlapFactor = 1.5, ClusteringFactor = 0.2 }, 
+                      "Count must be positive");
+        yield return (new Parameter { Count = -1, SpacePerRange = 4.0, LengthRatio = 0.4, LengthVariability = 0.4, OverlapFactor = 1.5, ClusteringFactor = 0.2 }, 
+                      "Count must be positive");
+        yield return (new Parameter { Count = 100, SpacePerRange = -1.0, LengthRatio = 0.4, LengthVariability = 0.4, OverlapFactor = 1.5, ClusteringFactor = 0.2 }, 
+                      "SpacePerRange must be positive");
     }
 }
