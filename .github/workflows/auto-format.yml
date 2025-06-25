@@ -41,7 +41,7 @@ jobs:
         run: dotnet format --verbosity diagnostic
 
       - name: Apply EditorConfig rules
-        uses: zbeekman/EditorConfig-Action@v1.3.0
+        uses: zbeekman/EditorConfig-Action@v1.1.1
         with:
           config_file: .editorconfig
           check_only: false
