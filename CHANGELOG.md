@@ -31,6 +31,14 @@ All notable changes to RangeFinder will be documented in this file.
 
 - **Version Alignment** - Updated to 0.3.0-preview for consistency with v0.3.x development branch
 
+### Fixed
+
+#### Development Tools
+
+- **EditorConfig Line Endings** - Changed `end_of_line` from `crlf` to `lf` for mac/linux development environment compatibility
+- **GitHub Actions Formatting** - Fixed final newline removal issue by adding EditorConfig-Action to properly enforce `.editorconfig` rules
+- **CI Workflow Conflicts** - Removed `dotnet format --verify-no-changes` step that conflicted with EditorConfig post-processing
+
 ## [0.2.0] - 2025-06-24
 
 ### Added
