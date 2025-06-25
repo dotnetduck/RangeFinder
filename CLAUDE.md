@@ -10,6 +10,7 @@ The library is designed for performance-critical scenarios with optimized algori
 ## Solution Structure
 
 **Source Projects (`src/`):**
+
 - **RangeFinder.Core/** - Main library with Core interfaces, Finders implementations, and Utilities
 - **RangeFinder.IO/** - File I/O and data generation utilities
   - **Generation/** - Test data generation utilities and parameterized dataset creation
@@ -17,6 +18,7 @@ The library is designed for performance-critical scenarios with optimized algori
 - **RangeFinder.Visualizer/** - Avalonia-based range visualization tool
 
 **Test Projects (`test/`):**
+
 - **RangeFinder.Core.Tests/** - Unit tests for core library functionality
 - **RangeFinder.IO.Tests/** - Tests for I/O and data generation utilities
 - **RangeFinder.Compatibility.Tests/** - IntervalTree compatibility validation (with RangeTree dependency)

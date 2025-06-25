@@ -58,8 +58,8 @@ public abstract class TestBase
 public static class Validators
 {
     public static void ValidateRangeCollection<TNumber>(
-        IEnumerable<NumericRange<TNumber, int>> ranges, 
-        Parameter parameters, 
+        IEnumerable<NumericRange<TNumber, int>> ranges,
+        Parameter parameters,
         string context)
         where TNumber : INumber<TNumber>
     {
@@ -158,14 +158,14 @@ public static class PerformanceHelpers
         var stopwatch = System.Diagnostics.Stopwatch.StartNew();
         var result = action();
         stopwatch.Stop();
-        
-        Assert.That(stopwatch.Elapsed, Is.LessThan(maxDuration), 
+
+        Assert.That(stopwatch.Elapsed, Is.LessThan(maxDuration),
             $"{context}: Operation took {stopwatch.Elapsed.TotalMilliseconds}ms, expected < {maxDuration.TotalMilliseconds}ms");
     }
 
     public static void AssertAcceptablePerformance(TimeSpan elapsed, string context)
     {
-        Assert.That(elapsed.TotalSeconds, Is.LessThan(30), 
+        Assert.That(elapsed.TotalSeconds, Is.LessThan(30),
             $"{context}: Operation took {elapsed.TotalSeconds}s, which exceeds acceptable performance threshold");
     }
 
@@ -186,8 +186,8 @@ public static class PerformanceHelpers
             TestBase.TestSizes.Large => TimeSpan.FromSeconds(2),
             _ => TimeSpan.FromSeconds(5)
         };
-        
-        Assert.That(executionTime, Is.LessThan(maxTime), 
+
+        Assert.That(executionTime, Is.LessThan(maxTime),
             $"{context}: Execution time {executionTime.TotalMilliseconds}ms exceeded limit for {size} dataset");
     }
 }
@@ -225,11 +225,11 @@ public static class TestParameterFactory
 
     public static IEnumerable<(Parameter invalidParams, string expectedError)> InvalidParameterCases()
     {
-        yield return (new Parameter { Count = 0, SpacePerRange = 4.0, LengthRatio = 0.4, LengthVariability = 0.4, OverlapFactor = 1.5, ClusteringFactor = 0.2 }, 
-                      "Calculated TotalSpace must be a positive value");
-        yield return (new Parameter { Count = -1, SpacePerRange = 4.0, LengthRatio = 0.4, LengthVariability = 0.4, OverlapFactor = 1.5, ClusteringFactor = 0.2 }, 
-                      "Calculated TotalSpace must be a positive value");
-        yield return (new Parameter { Count = 100, SpacePerRange = -1.0, LengthRatio = 0.4, LengthVariability = 0.4, OverlapFactor = 1.5, ClusteringFactor = 0.2 }, 
-                      "Calculated TotalSpace must be a positive value");
+        yield return (new Parameter { Count = 0, SpacePerRange = 4.0, LengthRatio = 0.4, LengthVariability = 0.4, OverlapFactor = 1.5, ClusteringFactor = 0.2 },
+                    "Calculated TotalSpace must be a positive value");
+        yield return (new Parameter { Count = -1, SpacePerRange = 4.0, LengthRatio = 0.4, LengthVariability = 0.4, OverlapFactor = 1.5, ClusteringFactor = 0.2 },
+                    "Calculated TotalSpace must be a positive value");
+        yield return (new Parameter { Count = 100, SpacePerRange = -1.0, LengthRatio = 0.4, LengthVariability = 0.4, OverlapFactor = 1.5, ClusteringFactor = 0.2 },
+                    "Calculated TotalSpace must be a positive value");
     }
 }
