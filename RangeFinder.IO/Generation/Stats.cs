@@ -19,8 +19,8 @@ public record Stats(
         var spread = MaxValue - MinValue;
 
         return $"Overlap: {OverlapPercentage:F1}%, " +
-               $"Avg Length: {AverageLength:F2}, " +
-               $"Spread: {spread:F2}, " +
-               $"Avg Interval: {AverageInterval:F2}";
+                $"Avg Length: {AverageLength:F2}, " +
+                $"Spread: {spread:F2}, " +
+                $"Avg Interval: {AverageInterval:F2}";
     }
 };

@@ -81,7 +81,7 @@ public abstract class AbstractRangeFinderBenchmark
     /// 2. Generate query ranges for testing
     /// 3. Construct both RangeFinder and IntervalTree data structures
     /// 4. Validate that both implementations return identical results
-    /// 
+    ///
     /// If validation fails, throws InvalidOperationException to prevent
     /// performance measurement of incorrect implementations.
     /// </remarks>

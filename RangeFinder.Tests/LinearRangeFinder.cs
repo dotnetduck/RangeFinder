@@ -7,7 +7,7 @@ namespace RangeFinder.Tests;
 /// Naive linear implementation of IRangeFinder for back-to-back testing.
 /// This implementation prioritizes simplicity over performance for use as a reference
 /// implementation in unit tests. It performs O(n) linear scans for all operations.
-/// 
+///
 /// WARNING: This implementation is intentionally slow and should never be used in production.
 /// It exists solely to provide a simple, obviously correct implementation for testing purposes.
 /// </summary>
