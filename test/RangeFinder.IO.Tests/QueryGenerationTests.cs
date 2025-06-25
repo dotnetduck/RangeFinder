@@ -34,7 +34,7 @@ public class QueryGenerationTests : TestBase
 
         var parameters = isSmallType
             ? RangeParameterFactory.Custom(count: 10, spacePerRange: 1.0, lengthRatio: 0.5, overlapFactor: 1.0, lengthVariability: 0.1, clusteringFactor: 0.1)
-            : RangeParameterFactory.Custom(count: TestSizes.Small, spacePerRange: 10.0, lengthRatio: 1.0, overlapFactor: 2.0, lengthVariability: 0.25, clusteringFactor: 0.3);
+            : RangeParameterFactory.Custom(count: GetCountForSize(TestSizes.Small), spacePerRange: 10.0, lengthRatio: 1.0, overlapFactor: 2.0, lengthVariability: 0.25, clusteringFactor: 0.3);
 
         const int queryCount = 25;
 
@@ -58,7 +58,7 @@ public class QueryGenerationTests : TestBase
     [Test]
     public void QueryGenerator_VariableQueryLengthMultiplier_ProducesCorrectSizes()
     {
-        var parameters = RangeParameterFactory.Uniform(TestSizes.Small);
+        var parameters = RangeParameterFactory.Uniform(GetCountForSize(TestSizes.Small));
         var multipliers = new[] { 0.5, 1.0, 2.0, 5.0 };
 
         foreach (var multiplier in multipliers)
@@ -85,7 +85,7 @@ public class QueryGenerationTests : TestBase
     [Test]
     public void QueryGenerator_BoundaryQueryCounts_HandleCorrectly()
     {
-        var parameters = RangeParameterFactory.Uniform(TestSizes.Small);
+        var parameters = RangeParameterFactory.Uniform(GetCountForSize(TestSizes.Small));
 
         // Test zero queries
         var zeroQueryRanges = Generator.GenerateQueryRanges<double>(parameters, 0);
@@ -102,7 +102,7 @@ public class QueryGenerationTests : TestBase
         Validators.ValidateQueryPoints(singleQueryPoints, parameters, 1, "Single query points");
 
         // Test large query count
-        var largeQueryCount = TestSizes.Medium;
+        var largeQueryCount = GetCountForSize(TestSizes.Medium);
         var largeQueryRanges = Generator.GenerateQueryRanges<double>(parameters, largeQueryCount);
         var largeQueryPoints = Generator.GenerateQueryPoints<double>(parameters, largeQueryCount);
 
@@ -113,7 +113,7 @@ public class QueryGenerationTests : TestBase
     [Test]
     public void QueryGenerator_RepeatableResults_WithSameSeed()
     {
-        var parameters = RangeParameterFactory.Uniform(TestSizes.Small);
+        var parameters = RangeParameterFactory.Uniform(GetCountForSize(TestSizes.Small));
         const int queryCount = 10;
 
         var queryRanges1 = Generator.GenerateQueryRanges<double>(parameters, queryCount);
@@ -143,8 +143,8 @@ public class QueryGenerationTests : TestBase
     [Test]
     public void QueryGenerator_PerformanceRegression_CompletesWithinReasonableTime()
     {
-        var parameters = RangeParameterFactory.Uniform(TestSizes.Large);
-        const int largeQueryCount = TestSizes.Large;
+        var parameters = RangeParameterFactory.Uniform(GetCountForSize(TestSizes.Large));
+        var largeQueryCount = GetCountForSize(TestSizes.Large);
 
         var executionTime = PerformanceHelpers.MeasureExecutionTime(() =>
         {
@@ -155,13 +155,13 @@ public class QueryGenerationTests : TestBase
             Validators.ValidateQueryPoints(queryPoints, parameters, largeQueryCount, "Performance test points");
         });
 
-        PerformanceHelpers.ValidatePerformance(executionTime, largeQueryCount, "Large query generation");
+        PerformanceHelpers.ValidatePerformance(executionTime, TestSizes.Large, "Large query generation");
     }
 
     [Test]
     public void QueryGenerator_DifferentSeeds_ProduceDifferentResults()
     {
-        var baseParams = RangeParameterFactory.Uniform(TestSizes.Small);
+        var baseParams = RangeParameterFactory.Uniform(GetCountForSize(TestSizes.Small));
         var params1 = baseParams with { RandomSeed = 111 };
         var params2 = baseParams with { RandomSeed = 222 };
 

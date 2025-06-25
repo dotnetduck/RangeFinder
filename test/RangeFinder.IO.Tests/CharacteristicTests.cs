@@ -31,10 +31,10 @@ public class CharacteristicTests : TestBase
             {
                 var parameters = type switch
                 {
-                    Characteristic.DenseOverlapping => RangeParameterFactory.DenseOverlapping(TestSizes.Small),
-                    Characteristic.SparseNonOverlapping => RangeParameterFactory.SparseNonOverlapping(TestSizes.Small),
-                    Characteristic.Clustered => RangeParameterFactory.Clustered(TestSizes.Small),
-                    Characteristic.Uniform => RangeParameterFactory.Uniform(TestSizes.Small),
+                    Characteristic.DenseOverlapping => RangeParameterFactory.DenseOverlapping(GetCountForSize(TestSizes.Small)),
+                    Characteristic.SparseNonOverlapping => RangeParameterFactory.SparseNonOverlapping(GetCountForSize(TestSizes.Small)),
+                    Characteristic.Clustered => RangeParameterFactory.Clustered(GetCountForSize(TestSizes.Small)),
+                    Characteristic.Uniform => RangeParameterFactory.Uniform(GetCountForSize(TestSizes.Small)),
                     _ => throw new ArgumentException($"Unknown dataset type: {type}")
                 };
                 parameters.Validate();
@@ -84,7 +84,7 @@ public class CharacteristicTests : TestBase
     [Test, TestCaseSource(nameof(NumericTypeTestCases))]
     public void Characteristic_DifferentNumericTypes_GenerateCorrectly(Type numericType)
     {
-        var parameters = RangeParameterFactory.Uniform(TestSizes.Small);
+        var parameters = RangeParameterFactory.Uniform(GetCountForSize(TestSizes.Small));
 
         var method = typeof(Generator).GetMethod(nameof(Generator.GenerateRanges))!.MakeGenericMethod(numericType);
         var ranges = method.Invoke(null, new object[] { parameters })!;
@@ -110,10 +110,10 @@ public class CharacteristicTests : TestBase
         {
             var parameters = type switch
             {
-                Characteristic.DenseOverlapping => RangeParameterFactory.DenseOverlapping(TestSizes.Large),
-                Characteristic.SparseNonOverlapping => RangeParameterFactory.SparseNonOverlapping(TestSizes.Large),
-                Characteristic.Clustered => RangeParameterFactory.Clustered(TestSizes.Large),
-                Characteristic.Uniform => RangeParameterFactory.Uniform(TestSizes.Large),
+                Characteristic.DenseOverlapping => RangeParameterFactory.DenseOverlapping(GetCountForSize(TestSizes.Large)),
+                Characteristic.SparseNonOverlapping => RangeParameterFactory.SparseNonOverlapping(GetCountForSize(TestSizes.Large)),
+                Characteristic.Clustered => RangeParameterFactory.Clustered(GetCountForSize(TestSizes.Large)),
+                Characteristic.Uniform => RangeParameterFactory.Uniform(GetCountForSize(TestSizes.Large)),
                 _ => throw new ArgumentException($"Unknown dataset type: {type}")
             };
 
@@ -130,7 +130,7 @@ public class CharacteristicTests : TestBase
     [Test]
     public void Characteristic_ZeroQueryCount_ReturnsEmptyCollections()
     {
-        var parameters = RangeParameterFactory.Uniform(TestSizes.Small);
+        var parameters = RangeParameterFactory.Uniform(GetCountForSize(TestSizes.Small));
 
         var queryRanges = Generator.GenerateQueryRanges<double>(parameters, 0);
         var queryPoints = Generator.GenerateQueryPoints<double>(parameters, 0);

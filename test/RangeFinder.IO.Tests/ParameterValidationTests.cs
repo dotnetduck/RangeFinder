@@ -175,11 +175,11 @@ public class ParameterValidationTests : TestBase
     [Test]
     public void Parameter_RecordImmutability_WorksCorrectly()
     {
-        var originalParams = RangeParameterFactory.Uniform(TestSizes.Small);
-        var modifiedParams = originalParams with { Count = TestSizes.Medium };
+        var originalParams = RangeParameterFactory.Uniform(GetCountForSize(TestSizes.Small));
+        var modifiedParams = originalParams with { Count = GetCountForSize(TestSizes.Medium) };
 
-        Assert.That(originalParams.Count, Is.EqualTo(TestSizes.Small), "Original parameters should be unchanged");
-        Assert.That(modifiedParams.Count, Is.EqualTo(TestSizes.Medium), "Modified parameters should have new value");
+        Assert.That(originalParams.Count, Is.EqualTo(GetCountForSize(TestSizes.Small)), "Original parameters should be unchanged");
+        Assert.That(modifiedParams.Count, Is.EqualTo(GetCountForSize(TestSizes.Medium)), "Modified parameters should have new value");
         Assert.That(modifiedParams.SpacePerRange, Is.EqualTo(originalParams.SpacePerRange),
             "Non-modified properties should remain the same");
     }

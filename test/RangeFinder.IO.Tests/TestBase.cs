@@ -22,12 +22,23 @@ public abstract class TestBase
     /// </summary>
     public static IEnumerable<object[]> AllCharacteristicTestCases(TestSizes size)
     {
-        var count = (int)size;
+        var count = GetCountForSize(size);
         yield return new object[] { Characteristic.Uniform, RangeParameterFactory.Uniform(count) };
         yield return new object[] { Characteristic.DenseOverlapping, RangeParameterFactory.DenseOverlapping(count) };
         yield return new object[] { Characteristic.SparseNonOverlapping, RangeParameterFactory.SparseNonOverlapping(count) };
         yield return new object[] { Characteristic.Clustered, RangeParameterFactory.Clustered(count) };
     }
+
+    /// <summary>
+    /// Converts TestSizes enum to the corresponding int count value
+    /// </summary>
+    public static int GetCountForSize(TestSizes size) => size switch
+    {
+        TestSizes.Small => 100,
+        TestSizes.Medium => 1000,
+        TestSizes.Large => 10000,
+        _ => throw new ArgumentException($"Unknown test size: {size}")
+    };
 
     /// <summary>
     /// Numeric type test cases
@@ -72,6 +83,19 @@ public static class Validators
     public static void ValidateQueryRanges<TNumber>(
         IEnumerable<NumericRange<TNumber, object>> queries,
         Parameter parameters,
+        int expectedCount,
+        string context)
+        where TNumber : INumber<TNumber>
+    {
+        Assert.That(queries, Is.Not.Null, $"{context}: Queries should not be null");
+        var queryList = queries.ToList();
+        Assert.That(queryList, Is.All.Not.Null, $"{context}: All queries should be non-null");
+        Assert.That(queryList.Count, Is.EqualTo(expectedCount), $"{context}: Count should match expected");
+    }
+
+    public static void ValidateQueryRanges<TNumber>(
+        IEnumerable<NumericRange<TNumber, object>> queries,
+        Parameter parameters,
         Characteristic characteristic,
         string context)
         where TNumber : INumber<TNumber>
@@ -88,6 +112,19 @@ public static class Validators
         Assert.That(points, Is.Not.Null, $"{context}: Points should not be null");
         var pointList = points.ToList();
         Assert.That(pointList, Is.All.Not.Null, $"{context}: All points should be non-null");
+    }
+
+    public static void ValidateQueryPoints<TNumber>(
+        IEnumerable<TNumber> points,
+        Parameter parameters,
+        int expectedCount,
+        string context)
+        where TNumber : INumber<TNumber>
+    {
+        Assert.That(points, Is.Not.Null, $"{context}: Points should not be null");
+        var pointList = points.ToList();
+        Assert.That(pointList, Is.All.Not.Null, $"{context}: All points should be non-null");
+        Assert.That(pointList.Count, Is.EqualTo(expectedCount), $"{context}: Count should match expected");
     }
 
     public static void ValidateQueryPoints<TNumber>(
