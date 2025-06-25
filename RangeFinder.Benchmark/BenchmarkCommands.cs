@@ -495,7 +495,7 @@ Generated Files:
 
 Notes:
 - All benchmarks run in Release mode with sequential execution
-- Results include both CSV data and markdown reports  
+- Results include both CSV data and markdown reports
 - Memory measurements may require additional investigation (see issue #14)
 - For detailed analysis, see SUMMARY.md and individual result files
 ";

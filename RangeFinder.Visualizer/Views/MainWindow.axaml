@@ -17,44 +17,44 @@
     <DockPanel>
         <!-- Top Controls -->
         <StackPanel DockPanel.Dock="Top" Orientation="Horizontal" Margin="10" Spacing="10">
-            <TextBlock Text="Data:" VerticalAlignment="Center"/>
-            <ComboBox ItemsSource="{Binding AvailableDatasets}" 
-                      SelectedItem="{Binding SelectedDataset}"
-                      Width="120"/>
-            <Button Content="Load File..." 
-                    Name="LoadFileButton"
-                    Margin="5,0,0,0"
-                    Padding="8,2"/>
-            
-            <TextBlock Text="Viewport:" VerticalAlignment="Center" Margin="20,0,0,0"/>
-            <TextBlock Text="{Binding ViewportStart, StringFormat=F1}" 
-                       VerticalAlignment="Center" 
-                       FontFamily="Consolas,Monaco,Courier New,monospace"/>
-            <TextBlock Text=" - " VerticalAlignment="Center"/>
-            <TextBlock Text="{Binding ViewportEnd, StringFormat=F1}" 
-                       VerticalAlignment="Center"
-                       FontFamily="Consolas,Monaco,Courier New,monospace"/>
-            
-            <TextBlock Text="Ranges:" VerticalAlignment="Center" Margin="20,0,0,0"/>
-            <TextBlock Text="{Binding Ranges.Count}" 
-                       VerticalAlignment="Center"
-                       FontFamily="Consolas,Monaco,Courier New,monospace"/>
-            
-            <TextBlock Text="Controls:" VerticalAlignment="Center" Margin="20,0,0,0"/>
-            <TextBlock Text="Ctrl+Wheel: Zoom | ←→: Scroll | PgUp/Dn: Fast scroll | Home/End: Boundaries | +/-: Zoom" 
-                       VerticalAlignment="Center" 
-                       FontSize="10" 
-                       Foreground="Gray"/>
+        <TextBlock Text="Data:" VerticalAlignment="Center"/>
+        <ComboBox ItemsSource="{Binding AvailableDatasets}"
+                SelectedItem="{Binding SelectedDataset}"
+                Width="120"/>
+        <Button Content="Load File..."
+                Name="LoadFileButton"
+                Margin="5,0,0,0"
+                Padding="8,2"/>
+
+        <TextBlock Text="Viewport:" VerticalAlignment="Center" Margin="20,0,0,0"/>
+        <TextBlock Text="{Binding ViewportStart, StringFormat=F1}"
+                VerticalAlignment="Center"
+                FontFamily="Consolas,Monaco,Courier New,monospace"/>
+        <TextBlock Text=" - " VerticalAlignment="Center"/>
+        <TextBlock Text="{Binding ViewportEnd, StringFormat=F1}"
+                VerticalAlignment="Center"
+                FontFamily="Consolas,Monaco,Courier New,monospace"/>
+
+        <TextBlock Text="Ranges:" VerticalAlignment="Center" Margin="20,0,0,0"/>
+        <TextBlock Text="{Binding Ranges.Count}"
+                VerticalAlignment="Center"
+                FontFamily="Consolas,Monaco,Courier New,monospace"/>
+
+        <TextBlock Text="Controls:" VerticalAlignment="Center" Margin="20,0,0,0"/>
+        <TextBlock Text="Ctrl+Wheel: Zoom | ←→: Scroll | PgUp/Dn: Fast scroll | Home/End: Boundaries | +/-: Zoom"
+                VerticalAlignment="Center"
+                FontSize="10"
+                Foreground="Gray"/>
         </StackPanel>
 
         <!-- Main Visualization -->
         <controls:RangeViewer x:Name="RangeCanvas"
-                                        Margin="10"
-                                        StringRanges="{Binding Ranges}"
-                                        ViewportStart="{Binding ViewportStart, Mode=TwoWay}"
-                                        ViewportEnd="{Binding ViewportEnd, Mode=TwoWay}"
-                                        DataMin="{Binding DataMin, Mode=TwoWay}"
-                                        DataMax="{Binding DataMax, Mode=TwoWay}"
-                                        ShowControls="True"/>
+                                Margin="10"
+                                StringRanges="{Binding Ranges}"
+                                ViewportStart="{Binding ViewportStart, Mode=TwoWay}"
+                                ViewportEnd="{Binding ViewportEnd, Mode=TwoWay}"
+                                DataMin="{Binding DataMin, Mode=TwoWay}"
+                                DataMax="{Binding DataMax, Mode=TwoWay}"
+                                ShowControls="True"/>
     </DockPanel>
 </Window>

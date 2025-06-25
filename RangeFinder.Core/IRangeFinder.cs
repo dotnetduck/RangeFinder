@@ -3,7 +3,7 @@ using System.Numerics;
 namespace RangeFinder.Core;
 
 /// <summary>
-/// Provides an interface for efficiently finding overlapping ranges and ranges between 
+/// Provides an interface for efficiently finding overlapping ranges and ranges between
 /// specified boundaries in a collection of NumericRange with optimized performance.
 /// </summary>
 /// <typeparam name="TNumber">The type of number used in the ranges.</typeparam>

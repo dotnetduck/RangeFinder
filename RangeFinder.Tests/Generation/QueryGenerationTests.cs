@@ -30,7 +30,7 @@ public class QueryGenerationTests : TestBase
     {
         // Use smaller parameters for small numeric types to avoid overflow
         var isSmallType = numericType == typeof(sbyte) || numericType == typeof(byte) ||
-                         numericType == typeof(short) || numericType == typeof(ushort);
+                        numericType == typeof(short) || numericType == typeof(ushort);
 
         var parameters = isSmallType
             ? RangeParameterFactory.Custom(count: 10, spacePerRange: 1.0, lengthRatio: 0.5, overlapFactor: 1.0, lengthVariability: 0.1, clusteringFactor: 0.1)

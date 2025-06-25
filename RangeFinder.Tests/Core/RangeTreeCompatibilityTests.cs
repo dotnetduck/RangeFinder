@@ -65,7 +65,7 @@ public class RangeTreeCompatibilityTests
         var testRanges = new[]
         {
             (0.0, 0.9),   // Before range
-            (0.5, 1.0),   // Touches start boundary  
+            (0.5, 1.0),   // Touches start boundary
             (0.5, 1.5),   // Overlaps start
             (1.0, 2.0),   // Exact match
             (1.5, 2.0),   // Overlaps end

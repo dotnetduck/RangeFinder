@@ -7,7 +7,7 @@ using RangeFinder.Tests.Helper;
 namespace RangeFinder.Tests.PropertyBased;
 
 /// <summary>
-/// Property-based compatibility tests using FsCheck that verify RangeFinder behavior 
+/// Property-based compatibility tests using FsCheck that verify RangeFinder behavior
 /// against IntervalTree using custom generators and factory methods.
 /// </summary>
 [TestFixture]
