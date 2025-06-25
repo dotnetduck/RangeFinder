@@ -29,7 +29,7 @@
 
     <ItemGroup>
       <ProjectReference Include="..\..\src\RangeFinder.Core\RangeFinder.Core.csproj" />
-      <ProjectReference Include="..\..\src\RangeFinder.IO\RangeFinder.IO.csproj" />
+      <ProjectReference Include="..\..\src\RangeFinder.Serialization\RangeFinder.Serialization.csproj" />
       <ProjectReference Include="..\RangeFinder.TestUtilities\RangeFinder.TestUtilities.csproj" />
     </ItemGroup>
 

@@ -6,11 +6,11 @@
     <Nullable>enable</Nullable>
 
     <!-- Package Information -->
-    <PackageId>RangeFinder.IO</PackageId>
+    <PackageId>RangeFinder.Serialization</PackageId>
     <Version>0.3.0-preview</Version>
     <Authors>dotnetduck</Authors>
     <Copyright>Copyright (c) 2025- dotnetduck@gmail.com</Copyright>
-    <Description>Experimental file I/O and data generation utilities for RangeFinder library. Pre-release package with basic CSV and Parquet support.</Description>
+    <Description>Serialization utilities for RangeFinder library. Provides CSV and Parquet serialization support for range data.</Description>
     <PackageProjectUrl>https://github.com/dotnetduck/RangeFinder</PackageProjectUrl>
     <RepositoryUrl>https://github.com/dotnetduck/RangeFinder</RepositoryUrl>
     <RepositoryType>git</RepositoryType>

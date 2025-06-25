@@ -3,15 +3,15 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RangeFinder.Benchmark", "te
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RangeFinder.Core", "src\RangeFinder.Core\RangeFinder.Core.csproj", "{D876E2E5-6F44-4F57-8AA9-B6AC3724AD6F}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RangeFinder.IO", "src\RangeFinder.IO\RangeFinder.IO.csproj", "{DBFBEDB7-A8D4-467C-B5CB-01713E46307A}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RangeFinder.Serialization", "src\RangeFinder.Serialization\RangeFinder.Serialization.csproj", "{DBFBEDB7-A8D4-467C-B5CB-01713E46307A}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RangeFinder.Visualizer", "src\RangeFinder.Visualizer\RangeFinder.Visualizer.csproj", "{FFFFFFFF-FFFF-FFFF-FFFF-FFFFFFFFFFFF}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RangeFinder.Core.Tests", "test\RangeFinder.Core.Tests\RangeFinder.Core.Tests.csproj", "{6BBA4949-48D8-44D1-9555-B37BA4F93011}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RangeFinder.IO.Tests", "test\RangeFinder.IO.Tests\RangeFinder.IO.Tests.csproj", "{7CCA5C50-59E9-45F2-8A66-C2AC4725BD12}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RangeFinder.Serialization.Tests", "test\RangeFinder.Serialization.Tests\RangeFinder.Serialization.Tests.csproj", "{7CCA5C50-59E9-45F2-8A66-C2AC4725BD12}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RangeFinder.Compatibility.Tests", "test\RangeFinder.Compatibility.Tests\RangeFinder.Compatibility.Tests.csproj", "{8DDB6D60-6A9F-46C3-9B77-D3BD4836CE23}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RangeFinder.Core.RangeTreeCompatTests", "test\RangeFinder.Core.RangeTreeCompatTests\RangeFinder.Core.RangeTreeCompatTests.csproj", "{8DDB6D60-6A9F-46C3-9B77-D3BD4836CE23}"
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RangeFinder.PropertyBased.Tests", "test\RangeFinder.PropertyBased.Tests\RangeFinder.PropertyBased.Tests.csproj", "{9EEC7E70-7B0G-47D4-AC88-E4CE5947DF34}"
 EndProject
