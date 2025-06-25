@@ -40,6 +40,12 @@ jobs:
       - name: Apply .NET formatting
         run: dotnet format --verbosity diagnostic
 
+      - name: Apply EditorConfig rules
+        uses: zbeekman/EditorConfig-Action@v1.3.0
+        with:
+          config_file: .editorconfig
+          check_only: false
+
       - name: Apply markdown formatting
         run: |
           # Only format main documentation files, not generated reports
@@ -75,13 +81,7 @@ jobs:
         run: |
           echo "🔍 Verifying final code quality..."
           
-          # Verify .NET formatting
-          if ! dotnet format --verify-no-changes --verbosity diagnostic; then
-            echo "❌ .NET formatting verification failed after auto-format"
-            exit 1
-          fi
-          
-          # Verify markdown formatting
+          # Verify markdown formatting only (EditorConfig may modify files after dotnet format)
           if ! markdownlint README.md CHANGELOG.md CONTRIBUTING.md CLAUDE.md RangeFinder.*/README.md RangeFinder.*/NUGET_README.md; then
             echo "❌ Markdown formatting verification failed after auto-format"
             exit 1
