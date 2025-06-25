@@ -3,7 +3,7 @@ using RangeFinder.Core;
 using System.Globalization;
 using System.Numerics;
 
-namespace RangeFinder.IO.Serialization;
+namespace RangeFinder.Serialization;
 
 public static partial class RangeSerializer
 {

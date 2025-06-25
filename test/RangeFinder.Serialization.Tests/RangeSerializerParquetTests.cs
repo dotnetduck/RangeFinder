@@ -1,8 +1,7 @@
 using RangeFinder.Core;
-using RangeFinder.IO;
-using RangeFinder.IO.Serialization;
+using RangeFinder.Serialization;
 
-namespace RangeFinder.IO.Tests;
+namespace RangeFinder.Serialization.Tests;
 
 [TestFixture]
 public class RangeSerializerParquetTests

@@ -1,4 +1,4 @@
-namespace RangeFinder.IO.Generation;
+namespace RangeFinder.Serialization.Generation;
 
 public record Stats(
     int Count,

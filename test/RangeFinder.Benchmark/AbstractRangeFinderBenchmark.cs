@@ -1,7 +1,7 @@
 using BenchmarkDotNet.Attributes;
 using IntervalTree;
 using RangeFinder.Core;
-using RangeFinder.IO.Generation;
+using RangeFinder.Serialization.Generation;
 
 namespace RangeFinder.Benchmark;
 

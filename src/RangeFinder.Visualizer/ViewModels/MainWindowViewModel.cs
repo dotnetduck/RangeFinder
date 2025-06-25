@@ -7,7 +7,7 @@ using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using RangeFinder.Core;
-using RangeFinder.IO.Serialization;
+using RangeFinder.Serialization;
 
 namespace RangeFinder.Visualizer.ViewModels;
 

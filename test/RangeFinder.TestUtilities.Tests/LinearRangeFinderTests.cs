@@ -1,7 +1,7 @@
 using RangeFinder.Core;
 using RangeFinder.TestUtilities;
 
-namespace RangeFinder.Core.Tests;
+namespace RangeFinder.TestUtilities.Tests;
 
 /// <summary>
 /// Tests for LinearRangeFinder to ensure it works correctly as a reference implementation.

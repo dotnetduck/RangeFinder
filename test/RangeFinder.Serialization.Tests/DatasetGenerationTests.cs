@@ -1,9 +1,8 @@
 using RangeFinder.Core;
-using RangeFinder.IO;
-using RangeFinder.IO.Generation;
+using RangeFinder.Serialization.Generation;
 using System.Reflection;
 
-namespace RangeFinder.IO.Tests;
+namespace RangeFinder.Serialization.Tests;
 
 /// <summary>
 /// Tests for core dataset generation functionality.

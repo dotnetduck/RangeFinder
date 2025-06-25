@@ -1,10 +1,9 @@
 using IntervalTree;
 using RangeFinder.Core;
-using RangeFinder.IO;
-using RangeFinder.IO.Generation;
-using Gen = RangeFinder.IO.Generation.Generator;
+using RangeFinder.Serialization.Generation;
+using Gen = RangeFinder.Serialization.Generation.Generator;
 
-namespace RangeFinder.Compatibility.Tests;
+namespace RangeFinder.Core.RangeTreeCompatTests;
 
 /// <summary>
 /// Pillar 2: RangeTree compatibility validation tests.

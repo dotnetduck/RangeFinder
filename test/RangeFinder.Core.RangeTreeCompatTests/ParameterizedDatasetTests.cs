@@ -1,9 +1,9 @@
 using IntervalTree;
 using RangeFinder.Core;
-using RangeFinder.IO.Generation;
-using Gen = RangeFinder.IO.Generation.Generator;
+using RangeFinder.Serialization.Generation;
+using Gen = RangeFinder.Serialization.Generation.Generator;
 
-namespace RangeFinder.Compatibility.Tests;
+namespace RangeFinder.Core.RangeTreeCompatTests;
 
 /// <summary>
 /// Parameterized dataset tests demonstrating systematic performance validation

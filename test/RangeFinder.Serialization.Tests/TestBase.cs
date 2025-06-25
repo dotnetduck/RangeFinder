@@ -1,9 +1,9 @@
 using RangeFinder.Core;
-using RangeFinder.IO.Generation;
+using RangeFinder.Serialization.Generation;
 using System.Numerics;
 using NUnit.Framework;
 
-namespace RangeFinder.IO.Tests;
+namespace RangeFinder.Serialization.Tests;
 
 /// <summary>
 /// Base class providing common test utilities and test data for IO tests.

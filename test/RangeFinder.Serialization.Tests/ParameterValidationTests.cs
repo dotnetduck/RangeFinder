@@ -1,9 +1,8 @@
-using RangeFinder.IO;
-using RangeFinder.IO.Generation;
-using RangeFinder.IO.Tests;
+using RangeFinder.Serialization.Generation;
+using RangeFinder.Serialization.Tests;
 using System.Reflection;
 
-namespace RangeFinder.IO.Tests;
+namespace RangeFinder.Serialization.Tests;
 
 /// <summary>
 /// Tests for parameter validation functionality.

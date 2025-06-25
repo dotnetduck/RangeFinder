@@ -1,7 +1,7 @@
 using RangeFinder.Core;
 using System.Numerics;
 
-namespace RangeFinder.IO.Serialization;
+namespace RangeFinder.Serialization;
 
 /// <summary>
 /// Loader for creating RangeFinder instances from CSV and Parquet files.

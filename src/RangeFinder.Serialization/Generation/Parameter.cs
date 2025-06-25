@@ -1,4 +1,4 @@
-namespace RangeFinder.IO.Generation;
+namespace RangeFinder.Serialization.Generation;
 
 /// <summary>
 /// Range generation parameters that clearly express intent
