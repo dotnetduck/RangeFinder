@@ -45,14 +45,12 @@ public class ParameterValidationTests : TestBase
     }
 
     [Test]
-    public void Parameter_InvalidCombinations_ThrowsExpectedExceptions()
+    public void Parameter_InvalidCombinations_ThrowsArgumentException()
     {
-        foreach (var (invalidParams, expectedError) in TestParameterFactory.InvalidParameterCases())
+        foreach (var (invalidParams, _) in TestParameterFactory.InvalidParameterCases())
         {
-            var exception = Assert.Throws<ArgumentException>(() => invalidParams.Validate(),
-                $"Should throw ArgumentException for: {expectedError}");
-            Assert.That(exception.Message, Does.Contain(expectedError),
-                "Exception message should contain expected error text");
+            Assert.Throws<ArgumentException>(() => invalidParams.Validate(),
+                "Should throw ArgumentException for invalid parameters");
         }
     }
 

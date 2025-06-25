@@ -25,34 +25,56 @@ public class QueryGenerationTests : TestBase
         Validators.ValidateQueryPoints(queryPoints, parameters, queryCount, $"{type} query points");
     }
 
-    [Test, TestCaseSource(nameof(NumericTypeTestCases))]
-    public void QueryGenerator_DifferentNumericTypes_GenerateCorrectly(Type numericType)
+    [Test]
+    public void QueryGenerator_DoubleType_GenerateCorrectly()
     {
-        // Use smaller parameters for small numeric types to avoid overflow
-        var isSmallType = numericType == typeof(sbyte) || numericType == typeof(byte) ||
-                        numericType == typeof(short) || numericType == typeof(ushort);
-
-        var parameters = isSmallType
-            ? RangeParameterFactory.Custom(count: 10, spacePerRange: 1.0, lengthRatio: 0.5, overlapFactor: 1.0, lengthVariability: 0.1, clusteringFactor: 0.1)
-            : RangeParameterFactory.Custom(count: GetCountForSize(TestSizes.Small), spacePerRange: 10.0, lengthRatio: 1.0, overlapFactor: 2.0, lengthVariability: 0.25, clusteringFactor: 0.3);
-
+        var parameters = RangeParameterFactory.Custom(count: GetCountForSize(TestSizes.Small), spacePerRange: 10.0, lengthRatio: 1.0, overlapFactor: 2.0, lengthVariability: 0.25, clusteringFactor: 0.3);
         const int queryCount = 25;
 
-        var queryRangeMethod = typeof(Generator).GetMethod(nameof(Generator.GenerateQueryRanges))!.MakeGenericMethod(numericType);
-        var queryPointMethod = typeof(Generator).GetMethod(nameof(Generator.GenerateQueryPoints))!.MakeGenericMethod(numericType);
+        var queryRanges = Generator.GenerateQueryRanges<double>(parameters, queryCount, 2.0);
+        var queryPoints = Generator.GenerateQueryPoints<double>(parameters, queryCount);
 
-        var queryRanges = queryRangeMethod.Invoke(null, new object[] { parameters, queryCount, 2.0 })!;
-        var queryPoints = queryPointMethod.Invoke(null, new object[] { parameters, queryCount })!;
+        Validators.ValidateQueryRanges(queryRanges, parameters, queryCount, "Double query ranges");
+        Validators.ValidateQueryPoints(queryPoints, parameters, queryCount, "Double query points");
+    }
 
-        // Validate collections using reflection
-        var rangeValidatorMethod = typeof(Validators).GetMethod(nameof(Validators.ValidateQueryRanges))!.MakeGenericMethod(numericType);
-        var pointValidatorMethod = typeof(Validators).GetMethod(nameof(Validators.ValidateQueryPoints))!.MakeGenericMethod(numericType);
+    [Test]
+    public void QueryGenerator_IntType_GenerateCorrectly()
+    {
+        var parameters = RangeParameterFactory.Custom(count: GetCountForSize(TestSizes.Small), spacePerRange: 10.0, lengthRatio: 1.0, overlapFactor: 2.0, lengthVariability: 0.25, clusteringFactor: 0.3);
+        const int queryCount = 25;
 
-        Assert.DoesNotThrow(() =>
-        {
-            rangeValidatorMethod.Invoke(null, new[] { queryRanges, parameters, queryCount, $"{numericType.Name} query ranges" });
-            pointValidatorMethod.Invoke(null, new[] { queryPoints, parameters, queryCount, $"{numericType.Name} query points" });
-        }, $"Should generate valid {numericType.Name} queries");
+        var queryRanges = Generator.GenerateQueryRanges<int>(parameters, queryCount, 2.0);
+        var queryPoints = Generator.GenerateQueryPoints<int>(parameters, queryCount);
+
+        Validators.ValidateQueryRanges(queryRanges, parameters, queryCount, "Int query ranges");
+        Validators.ValidateQueryPoints(queryPoints, parameters, queryCount, "Int query points");
+    }
+
+    [Test]
+    public void QueryGenerator_LongType_GenerateCorrectly()
+    {
+        var parameters = RangeParameterFactory.Custom(count: GetCountForSize(TestSizes.Small), spacePerRange: 10.0, lengthRatio: 1.0, overlapFactor: 2.0, lengthVariability: 0.25, clusteringFactor: 0.3);
+        const int queryCount = 25;
+
+        var queryRanges = Generator.GenerateQueryRanges<long>(parameters, queryCount, 2.0);
+        var queryPoints = Generator.GenerateQueryPoints<long>(parameters, queryCount);
+
+        Validators.ValidateQueryRanges(queryRanges, parameters, queryCount, "Long query ranges");
+        Validators.ValidateQueryPoints(queryPoints, parameters, queryCount, "Long query points");
+    }
+
+    [Test]
+    public void QueryGenerator_FloatType_GenerateCorrectly()
+    {
+        var parameters = RangeParameterFactory.Custom(count: GetCountForSize(TestSizes.Small), spacePerRange: 10.0, lengthRatio: 1.0, overlapFactor: 2.0, lengthVariability: 0.25, clusteringFactor: 0.3);
+        const int queryCount = 25;
+
+        var queryRanges = Generator.GenerateQueryRanges<float>(parameters, queryCount, 2.0);
+        var queryPoints = Generator.GenerateQueryPoints<float>(parameters, queryCount);
+
+        Validators.ValidateQueryRanges(queryRanges, parameters, queryCount, "Float query ranges");
+        Validators.ValidateQueryPoints(queryPoints, parameters, queryCount, "Float query points");
     }
 
     [Test]

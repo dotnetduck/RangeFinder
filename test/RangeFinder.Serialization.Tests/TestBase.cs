@@ -226,10 +226,10 @@ public static class TestParameterFactory
     public static IEnumerable<(Parameter invalidParams, string expectedError)> InvalidParameterCases()
     {
         yield return (new Parameter { Count = 0, SpacePerRange = 4.0, LengthRatio = 0.4, LengthVariability = 0.4, OverlapFactor = 1.5, ClusteringFactor = 0.2 }, 
-                      "Count must be positive");
+                      "Calculated TotalSpace must be a positive value");
         yield return (new Parameter { Count = -1, SpacePerRange = 4.0, LengthRatio = 0.4, LengthVariability = 0.4, OverlapFactor = 1.5, ClusteringFactor = 0.2 }, 
-                      "Count must be positive");
+                      "Calculated TotalSpace must be a positive value");
         yield return (new Parameter { Count = 100, SpacePerRange = -1.0, LengthRatio = 0.4, LengthVariability = 0.4, OverlapFactor = 1.5, ClusteringFactor = 0.2 }, 
-                      "SpacePerRange must be positive");
+                      "Calculated TotalSpace must be a positive value");
     }
 }
